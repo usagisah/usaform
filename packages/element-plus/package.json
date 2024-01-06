@@ -1,12 +1,25 @@
 {
-  "name": "element-plus",
-  "version": "1.0.0",
+  "name": "@usaform/element-plus",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./style.scss": "./style.scss"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsc -w",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "MIT",
+  "dependencies": {
+    "@usaform/vue": "workspace:^",
+    "async-validator": "^4.2.5",
+    "vue": "^3.4.5"
+  }
 }

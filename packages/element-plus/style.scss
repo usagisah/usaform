@@ -1,0 +1,128 @@
+.ufi {
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 20px;
+
+  .ufi {
+    padding-bottom: 0px;
+  }
+}
+
+.ufi-inline {
+  display: inline-flex;
+  padding-right: 20px;
+}
+
+.ufi-block {
+  display: flex;
+}
+
+.ufi-label {
+  display: inline-flex;
+  color: #606266;
+  align-items: center;
+  user-select: none;
+}
+
+.ufi-content {
+  position: relative;
+  display: flex;
+  gap: 18px 24px;
+  flex-wrap: wrap;
+  flex: 1;
+  width: 100%;
+  align-items: center;
+
+  .el-button + .el-button {
+    margin-left: 0;
+  }
+}
+
+/* -------------- size -------------- */
+
+.ufi-size-small {
+  font-size: 12px;
+  .ufi-label {
+    height: 24px;
+    line-height: 24px;
+  }
+}
+
+.ufi-size-default {
+  font-size: 14px;
+  .ufi-label {
+    height: 32px;
+    line-height: 32px;
+  }
+}
+
+.ufi-size-large {
+  font-size: 14px;
+  .ufi-label {
+    height: 40px;
+    line-height: 40px;
+  }
+}
+
+/* -------------- required -------------- */
+
+.ufi-required {
+  .ufi-label::before {
+    content: "*";
+    color: #f56c6c;
+    margin-right: 4px;
+  }
+}
+
+/* -------------- position -------------- */
+
+.ufi-pos-right {
+  .ufi-label {
+    justify-content: flex-end;
+  }
+}
+
+.ufi-pos-left {
+  .ufi-label {
+    justify-content: flex-start;
+  }
+}
+
+.ufi-pos-top {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0px;
+}
+
+/* -------------- disabled -------------- */
+
+.ufi-disabled {
+  .ufi-label {
+    color: #a8abb2;
+  }
+}
+
+/* --------------  -------------- */
+
+.ufi-error {
+  .ufi-content-error {
+    position: absolute;
+    top: 100%;
+    color: #f56c6c;
+    font-size: 12px;
+    line-height: 1;
+    left: 0;
+    padding-top: 4px;
+  }
+
+  .el-input__wrapper,
+  .el-input__wrapper:hover {
+    box-shadow: 0 0 0 1px #f56c6c inset;
+  }
+
+  .el-input__prefix svg,
+  .el-input__suffix svg {
+    color: #f56c6c;
+  }
+}

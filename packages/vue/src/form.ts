@@ -124,7 +124,7 @@ export function callFieldAction(field: Field, key: string, point: any, params: a
     try {
       const action = field.userConfig[key]
       if (typeof action === "function") {
-        results[selfPath] = field.userConfig[key].apply(point, params)
+        results[selfPath] = action.apply(point, [{ path: selfPath },...params])
       }
       if (field.type !== "plain") field.struct.forEach(f => call(f, selfPath))
     } catch (e) {

@@ -6,10 +6,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "execa": "^8.0.1",
     "prettier": "^3.1.1",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-packagejson": "^2.4.8",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vue": "^3.4.5"
   },
   "private": true,
   "workspaces": {
