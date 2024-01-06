@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "useDefineForClassFields": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "sourceMap": true,
+    "incremental": true,
+    "jsx": "preserve",
+    "strict": true,
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "outDir": "dist",
+    "declaration": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}
