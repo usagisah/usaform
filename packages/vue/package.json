@@ -11,7 +11,8 @@
   },
   "scripts": {
     "dev": "tsc -w",
-    "build": "rm -rf dist && tsc -p tsconfig.build.json"
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "test": "vitest"
   },
   "keywords": [
     "@usaform",

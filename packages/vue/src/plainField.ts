@@ -1,4 +1,4 @@
-import { inject, provide, toRaw } from "vue"
+import { inject, onBeforeUnmount, provide, toRaw } from "vue"
 import { useFormArrayItem } from "./arrayItem.js"
 import { FormContext, GlobalInfo, formContext } from "./context.js"
 import { BaseFiled, FieldName, FormConfig, getProperty } from "./form.common.js"
@@ -97,6 +97,9 @@ export function useFormPlainField<T>(name: FieldName, init: PlainFieldInit<T>, p
   if (field.type === "ary") return useFormArrayItem({ ctx, init: p => createPlainField(name, ctx, init, p), params: { index: name, ...params } })
   const { _field, _actions, bind } = createPlainField(name, ctx, init)
   field.struct.set(name, _field)
+  onBeforeUnmount(() => {
+    field.struct.delete(name)
+  })
   provide(formContext, null)
   return [bind, { ...actions, ..._actions }]
 }

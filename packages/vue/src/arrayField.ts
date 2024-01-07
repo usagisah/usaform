@@ -1,7 +1,7 @@
-import { inject, provide, toRaw } from "vue"
+import { inject, onBeforeUnmount, provide, toRaw } from "vue"
 import { useFormArrayItem } from "./arrayItem.js"
 import { FormContext, GlobalInfo, formContext } from "./context.js"
-import { BaseFiled, Field, FieldName, getProperty } from "./form.common.js"
+import { BaseFiled, Field, FieldName, getProperty, setProperty } from "./form.common.js"
 import { FormBaseActions } from "./form.js"
 
 export interface ArrayField extends BaseFiled {
@@ -13,6 +13,7 @@ export interface ArrayField extends BaseFiled {
 type AddValue = (index: number, e: any) => void
 type DelValue = (index: number) => void
 type Swap = (i1: number, i2: number) => void
+export const ArrayEmptyItem = Symbol()
 
 export interface ArrayFieldInitInfo {
   formConfig: Record<string, any>
@@ -40,7 +41,16 @@ type ArrayFieldInit<T> = (info: ArrayFieldInitInfo) => ArrayFieldConfig<T>
 export function createArrayField(name: FieldName, { formConfig, currentInitValue }: FormContext, init: ArrayFieldInit<any>, rest: Record<string, any> = {}) {
   const _field: ArrayField = { name, type: "ary", struct: [], userConfig: {}, __uform_field: true }
   const _setStruct = () => {
-    setValue(_field.struct.map((v: any) => (v.__uform_aryItem_field ? v.__aryValue : v)))
+    const ss: any[] = _field.struct
+    const _ss: Field[] = []
+    const _sv: any[] = []
+    for (const s of ss) {
+      if (s === ArrayEmptyItem) return
+      _ss.push(s)
+      _sv.push(s.__uform_aryItem_field ? s.__aryValue : s)
+    }
+    _field.struct = _ss
+    setValue(_sv)
   }
   const addValue: AddValue = (index, e) => {
     e = toRaw(e)
@@ -90,7 +100,11 @@ export function useFormArrayField<T>(name: FieldName, init: ArrayFieldInit<T>, p
 
   const { _field, _actions, bind } = createArrayField(name, ctx, init)
   field.struct.set(name, _field)
+  onBeforeUnmount(() => {
+    field.struct.delete(name)
+  })
 
   provide(formContext, { ...ctx, field: _field, currentInitValue: getProperty(currentInitValue, name) } as FormContext)
+  setProperty(currentInitValue, name, null)
   return [bind, { ...actions, ..._actions }]
 }

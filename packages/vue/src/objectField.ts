@@ -1,7 +1,7 @@
-import { inject, provide } from "vue"
+import { inject, onBeforeUnmount, provide } from "vue"
 import { useFormArrayItem } from "./arrayItem.js"
 import { FormContext, GlobalInfo, formContext } from "./context.js"
-import { BaseFiled, Field, FieldName, getProperty } from "./form.common.js"
+import { BaseFiled, Field, FieldName, getProperty, setProperty } from "./form.common.js"
 import { FormBaseActions } from "./form.js"
 
 export interface ObjectField extends BaseFiled {
@@ -36,6 +36,10 @@ export function useFormObjectFiled<T>(name: FieldName, init: ObjectFieldInit<T>,
 
   const { _field, bind } = createObjectField(name, ctx, init)
   field.struct.set(name, _field)
+  onBeforeUnmount(() => {
+    field.struct.delete(name)
+  })
   provide(formContext, { ...ctx, field: _field, currentInitValue: getProperty(currentInitValue, name) } as FormContext)
-  return [bind, actions]
+  setProperty(currentInitValue, name, null)
+  return [bind, { ...actions }]
 }

@@ -1,5 +1,5 @@
-import { provide } from "vue"
-import { ArrayField } from "./arrayField.js"
+import { onBeforeUnmount, provide } from "vue"
+import { ArrayEmptyItem, ArrayField } from "./arrayField.js"
 import { FormContext, formContext } from "./context.js"
 import { Field, getProperty, setProperty } from "./form.common.js"
 
@@ -49,5 +49,8 @@ export function useFormArrayItem({ ctx, init, params }: ArrayItemConfig): [any, 
         } as FormContext)
   )
   setProperty(currentInitValue, index, null)
+  onBeforeUnmount(() => {
+    setProperty(currentInitValue, index, ArrayEmptyItem)
+  })
   return [bind, { ...actions, ..._actions }]
 }
