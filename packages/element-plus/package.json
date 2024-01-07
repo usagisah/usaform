@@ -14,12 +14,27 @@
     "dev": "tsc -w",
     "build": "rm -rf dist && tsc -p tsconfig.build.json"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "@usaform",
+    "usaform",
+    "@usaform/element-plus"
+  ],
+  "files": [
+    "dist",
+    "style.scss"
+  ],
+  "homepage": "https://github.com/usagisah/usaform/tree/main/packages/element-plus",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usagisah/usaform.git"
+  },
+  "author": "顾弦笙/usagisah",
   "license": "MIT",
   "dependencies": {
-    "@usaform/vue": "workspace:^",
-    "async-validator": "^4.2.5",
-    "vue": "^3.4.5"
+    "async-validator": "^4.2.5"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.5",
+    "@usaform/vue": "workspace:^"
   }
 }
