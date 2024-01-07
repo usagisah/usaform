@@ -1,8 +1,8 @@
 import { inject, onBeforeUnmount, provide } from "vue"
-import { useFormArrayItem } from "./arrayItem.js"
-import { FormContext, GlobalInfo, formContext } from "./context.js"
-import { BaseFiled, Field, FieldName, getProperty, setProperty } from "./form.common.js"
-import { FormBaseActions } from "./form.js"
+import { useFormArrayItem } from "./arrayItem"
+import { FormContext, GlobalInfo, formContext } from "./context"
+import { BaseFiled, Field, FieldName, getProperty, setProperty } from "./form.common"
+import { FormBaseActions } from "./form"
 
 export interface ObjectField extends BaseFiled {
   type: "object"

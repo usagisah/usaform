@@ -1,7 +1,7 @@
 import { provide, toRaw } from "vue"
-import { FormContext, formContext } from "./context.js"
-import { BaseFiled, Field, FieldName, FormConfig } from "./form.common.js"
-import { PlainFieldWatchHandler } from "./plainField.js"
+import { FormContext, formContext } from "./context"
+import { BaseFiled, Field, FieldName, FormConfig } from "./form.common"
+import { PlainFieldWatchHandler } from "./plainField"
 
 export interface RootField extends BaseFiled {
   type: "root"
@@ -124,7 +124,7 @@ export function callFieldAction(field: Field, key: string, point: any, params: a
     try {
       const action = field.userConfig[key]
       if (typeof action === "function") {
-        results[selfPath] = action.apply(point, [{ path: selfPath },...params])
+        results[selfPath] = action.apply(point, [{ path: selfPath }, ...params])
       }
       if (field.type !== "plain") field.struct.forEach(f => call(f, selfPath))
     } catch (e) {

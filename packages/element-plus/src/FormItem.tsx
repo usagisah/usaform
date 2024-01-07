@@ -97,7 +97,7 @@ function useRules(props: FormItemProps, setErrorState: (p: ErrorState) => any) {
   })
 
   const validate: Validate = (name: string, value: any) => {
-    return new (Schema as any)({ [name]: rules }).validate({ [name]: value }).catch((e: any) => {
+    return new Schema({ [name]: rules }).validate({ [name]: value }).catch((e: any) => {
       throw e.errors
     })
   }

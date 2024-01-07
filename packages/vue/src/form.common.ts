@@ -1,7 +1,7 @@
-import { ArrayField } from "./arrayField.js"
-import { RootField } from "./form.js"
-import { ObjectField } from "./objectField.js"
-import { PlainField } from "./plainField.js"
+import { ArrayField } from "./arrayField"
+import { RootField } from "./form"
+import { ObjectField } from "./objectField"
+import { PlainField } from "./plainField"
 
 export interface FormConfig {
   defaultValue: any

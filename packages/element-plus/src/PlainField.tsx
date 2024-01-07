@@ -1,5 +1,5 @@
 import { defineComponent, h, onBeforeMount, reactive, ref } from "vue"
-import { FormItemExpose } from "./FormItem.jsx"
+import { FormItemExpose } from "./FormItem"
 import { ArrayItemParams, useFormPlainField } from "@usaform/vue"
 
 export interface PlainFieldProps {

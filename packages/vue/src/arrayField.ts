@@ -1,8 +1,8 @@
 import { inject, onBeforeUnmount, provide, toRaw } from "vue"
-import { useFormArrayItem } from "./arrayItem.js"
-import { FormContext, GlobalInfo, formContext } from "./context.js"
-import { BaseFiled, Field, FieldName, getProperty, setProperty } from "./form.common.js"
-import { FormBaseActions } from "./form.js"
+import { useFormArrayItem } from "./arrayItem"
+import { FormContext, GlobalInfo, formContext } from "./context"
+import { FormBaseActions } from "./form"
+import { BaseFiled, Field, FieldName, getProperty, setProperty } from "./form.common"
 
 export interface ArrayField extends BaseFiled {
   type: "ary"

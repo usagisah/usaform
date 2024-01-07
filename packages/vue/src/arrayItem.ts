@@ -1,7 +1,7 @@
 import { onBeforeUnmount, provide } from "vue"
-import { ArrayEmptyItem, ArrayField } from "./arrayField.js"
-import { FormContext, formContext } from "./context.js"
-import { Field, getProperty, setProperty } from "./form.common.js"
+import { ArrayEmptyItem, ArrayField } from "./arrayField"
+import { FormContext, formContext } from "./context"
+import { Field, getProperty, setProperty } from "./form.common"
 
 export interface ArrayItemParams {
   index: number

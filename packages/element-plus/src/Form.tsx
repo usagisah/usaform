@@ -1,6 +1,6 @@
 import { FormActions, FormConfig, useForm } from "@usaform/vue"
 import { defineComponent, h } from "vue"
-import { FormItemProps } from "./FormItem.jsx"
+import { FormItemProps } from "./FormItem"
 
 export interface FormProps {
   config?: FormConfig
