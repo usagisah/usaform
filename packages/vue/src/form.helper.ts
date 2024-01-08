@@ -1,7 +1,9 @@
+import { toRaw, unref } from "vue"
 import { ArrayField } from "./arrayField"
 import { RootField } from "./form"
 import { ObjectField } from "./objectField"
 import { PlainField } from "./plainField"
+import { FieldValue } from "./useFieldValue"
 
 export interface FormConfig {
   defaultValue: any
@@ -12,17 +14,27 @@ export interface FormConfig {
   [x: string]: any
 }
 
-export interface BaseFiled {
+export interface BaseFiled extends FieldValue {
   name: FieldName
   __uform_field: boolean
+  __aryValue?: any
+  __uform_aryItem_field?: boolean
 }
 
 export type Field = RootField | PlainField | ObjectField | ArrayField
 export type FieldName = string | number
 
-export function getProperty(target: any, key: FieldName) {
+export function isPlainObject(target: any): target is Record<string, any> {
+  return Object.prototype.toString.call(target) === "[object Object]"
+}
+
+export function getProperty(target: any, key: FieldName, checkRaw = true) {
+  if (checkRaw) target = toRaw(unref(target))
   try {
-    return target[key]
+    const res = target[key]
+    if (Array.isArray(res)) return [...res]
+    if (isPlainObject(res)) return { ...res }
+    return res
   } catch {
     return null
   }

@@ -15,6 +15,7 @@ export interface FormValidateError {
 
 export interface FormExpose extends FormActions {
   validate: () => Promise<FormValidateError[]>
+  reset: () => void
 }
 
 export const Form = defineComponent({
@@ -46,7 +47,11 @@ export const Form = defineComponent({
       return errs
     }
 
-    expose({ ...form, validate })
+    function reset() {
+      form.call("reset", null)
+    }
+
+    expose({ ...form, validate, reset })
 
     return () => {
       const children = slots.default?.() ?? []

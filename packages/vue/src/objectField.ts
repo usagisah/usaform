@@ -1,8 +1,9 @@
-import { inject, onBeforeUnmount, provide } from "vue"
-import { useFormArrayItem } from "./arrayItem"
+import { Ref, WritableComputedRef, inject, onBeforeUnmount, provide } from "vue"
+import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
-import { BaseFiled, Field, FieldName, getProperty, setProperty } from "./form.common"
 import { FormBaseActions } from "./form"
+import { BaseFiled, Field, FieldName, getProperty, setProperty } from "./form.helper"
+import { useFieldValue } from "./useFieldValue"
 
 export interface ObjectField extends BaseFiled {
   type: "object"
@@ -11,11 +12,12 @@ export interface ObjectField extends BaseFiled {
 }
 
 export interface ObjectFieldInitInfo {
+  initValue: any
   formConfig: Record<string, any>
 }
 
-export interface ObjectFieldConfig<T> {
-  bind?: T
+export interface ObjectFieldConfig<T = any> {
+  initValue?: T
   [x: string]: any
 }
 
@@ -23,23 +25,55 @@ export interface ObjectFieldActions extends FormBaseActions {}
 
 type ObjectFieldInit<T> = (info: ObjectFieldInitInfo) => ObjectFieldConfig<T>
 
-export function createObjectField(name: FieldName, { formConfig }: FormContext, init: ObjectFieldInit<any>, rest: Record<string, any> = {}) {
-  const { bind, ...config } = init({ ...rest, formConfig })
-  const _field: ObjectField = { name, type: "object", struct: new Map(), userConfig: config, __uform_field: true }
-  return { _field, config, bind }
-}
-export function useFormObjectFiled<T>(name: FieldName, init: ObjectFieldInit<T>, params: any = {}): [T, ObjectFieldActions] {
+export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldInit<T>): [Ref<T>, ObjectFieldActions] {
   const ctx: FormContext = inject(formContext)!
-  const { field, actions, currentInitValue } = ctx
+  const { field, actions } = ctx
   if (field.type === "plain") throw GlobalInfo.nullPlainField
-  if (field.type === "ary") return useFormArrayItem({ ctx, init: p => createObjectField(name, ctx, init, p), params: { index: name, ...params } })
+  if (field.type === "ary") {
+    return useFormArrayItem({
+      ctx,
+      init: p => createObjectField(name, ctx, init, p),
+      afterInit: updateField,
+      index: name as number
+    })
+  }
 
-  const { _field, bind } = createObjectField(name, ctx, init)
+  const { _field } = createObjectField(name, ctx, init)
   field.struct.set(name, _field)
+  updateField(_field, ctx)
+
+  return [_field.fieldValue, { ...actions }]
+}
+
+function updateField(_field: ObjectField, ctx: FormContext) {
+  const { name } = _field
+  const field: any = ctx.field
+
+  const provideContext: FormContext = { ...ctx, field: _field, currentInitValue: _field.getter() }
+  provide(formContext, provideContext)
+  setProperty(ctx.currentInitValue, name, null)
+
+  _field.subscribe(() => {
+    _field.struct.clear()
+    provideContext.currentInitValue = _field.getter()
+  }, true)
   onBeforeUnmount(() => {
     field.struct.delete(name)
+    _field.struct.clear()
+    _field.clearSubscribers()
   })
-  provide(formContext, { ...ctx, field: _field, currentInitValue: getProperty(currentInitValue, name) } as FormContext)
-  setProperty(currentInitValue, name, null)
-  return [bind, { ...actions }]
+}
+
+export function createObjectField(name: FieldName, { currentInitValue, formConfig, defaultValue }: FormContext, init: ObjectFieldInit<any>, p?: ArrayItemInitParams) {
+  const _defaultValue = p?.initValue ?? getProperty(currentInitValue, name) ?? defaultValue
+  const { initValue, ..._conf } = init({ formConfig, initValue: _defaultValue })
+  const _field: ObjectField = {
+    type: "object",
+    name,
+    struct: new Map(),
+    userConfig: _conf,
+    __uform_field: true,
+    ...useFieldValue(initValue ?? _defaultValue)
+  }
+  return { _field }
 }

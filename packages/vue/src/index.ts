@@ -1,6 +1,6 @@
-import { FormConfig as _FormConfig } from "./form.common"
+import { FormConfig as _FormConfig } from "./form.helper"
 export type FormConfig = Partial<_FormConfig>
-export type { Field, FieldName } from "./form.common"
+export type { Field, FieldName } from "./form.helper"
 
 export { useForm } from "./form"
 export type { FormActions } from "./form"
@@ -13,7 +13,5 @@ export type { ObjectField, ObjectFieldActions, ObjectFieldConfig, ObjectFieldIni
 
 export { useFormArrayField } from "./arrayField"
 export type { ArrayField, ArrayFieldActions, ArrayFieldConfig, ArrayFieldInitInfo } from "./arrayField"
-
-export type { ArrayItemParams } from "./arrayItem"
 
 export { createGlobalFormProvide } from "./context"

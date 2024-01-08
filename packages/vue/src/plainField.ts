@@ -1,105 +1,70 @@
-import { inject, onBeforeUnmount, provide, toRaw } from "vue"
-import { useFormArrayItem } from "./arrayItem"
+import { Ref, inject, onBeforeUnmount, provide } from "vue"
+import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
 import { FormBaseActions } from "./form"
-import { BaseFiled, FieldName, FormConfig, getProperty } from "./form.common"
-
-export type PlainFieldGetter = () => any
-export type PlainFieldSetter = (value: any) => any
-export type PlainFieldWatchHandler = (newValue: any, oldValue: any) => any
-export type PlainFieldUnWatch = () => void
-export type PlainFieldWatch = (handle: PlainFieldWatchHandler) => PlainFieldUnWatch
-export type PlainFieldClearWatcher = () => void
+import { BaseFiled, FieldName, FormConfig, getProperty, setProperty } from "./form.helper"
+import { useFieldValue } from "./useFieldValue"
 
 export interface PlainField extends BaseFiled {
   type: "plain"
-  value: any
-  getter: PlainFieldGetter
-  setter: PlainFieldSetter
-  watch: PlainFieldWatch
   userConfig: Record<any, any>
 }
 
 export interface PlainFieldInitInfo {
-  initValue?: any
+  initValue: any
   formConfig: FormConfig
-  setValue: (v: any) => any
 }
 
-export interface PlainFieldConfig<T> {
-  initValue: any
-  bind?: T
-  getter?: (value: any) => any
-  setter?: (newValue: any, oldValue: any) => any
+export interface PlainFieldConfig<T = any> {
+  initValue?: T
   [x: string]: any
 }
 
-export interface PlainFieldActions extends FormBaseActions {
-  clearWatcher: PlainFieldClearWatcher
-}
+export interface PlainFieldActions extends FormBaseActions {}
 
 type PlainFieldInit<T> = (info: PlainFieldInitInfo) => PlainFieldConfig<T>
+export function useFormPlainField<T = any>(name: FieldName, init: PlainFieldInit<T>): [Ref<T>, PlainFieldActions] {
+  const ctx: FormContext = inject(formContext)!
+  const { field, actions } = ctx
 
-export function createPlainField(name: FieldName, { formConfig, currentInitValue, defaultValue }: FormContext, init: PlainFieldInit<any>, rest: Record<string, any> = {}) {
-  const { initValue, bind, getter, setter, ...conf } = init({
-    initValue: getProperty(currentInitValue, name) ?? defaultValue,
-    ...rest,
-    formConfig,
-    setValue: (v: unknown) => {
-      const oldValue = _field.value
-      const newValue = (_field.value = toRaw(rest.setValue ? rest.setValue(v) : v))
-      try {
-        _w_handlers.forEach(f => f(newValue, oldValue))
-      } catch (e) {
-        console.error(e)
-      }
-      return newValue
-    }
+  if (field.type === "plain") throw GlobalInfo.nullPlainField
+  if (field.type === "ary") {
+    return useFormArrayItem({
+      ctx,
+      init: p => createPlainField(name, ctx, init, p),
+      afterInit: updateField,
+      index: name as number
+    })
+  }
+
+  const { _field } = createPlainField(name, ctx, init)
+  field.struct.set(name, _field)
+  updateField(_field, ctx)
+  return [_field.fieldValue, { ...actions }]
+}
+
+function updateField(_field: PlainField, ctx: FormContext) {
+  const { name } = _field
+  const field: any = ctx.field
+
+  onBeforeUnmount(() => {
+    field.struct.delete(name)
+    _field.clearSubscribers()
   })
+  provide(formContext, null)
+}
 
-  const _getter: PlainFieldGetter = () => {
-    return typeof getter === "function" ? getter(_field.value) : _field.value
-  }
-
-  const _setter: PlainFieldSetter = (v: unknown) => {
-    _field.value = typeof setter === "function" ? setter(v, _field.value) : v
-  }
-
-  const _w_handlers: PlainFieldWatchHandler[] = []
-  const _watch: PlainFieldWatch = handler => {
-    _w_handlers.push(handler)
-    return () => {
-      const i = _w_handlers.indexOf(handler)
-      if (i > -1) _w_handlers.splice(i, 1)
-    }
-  }
-  const _clearWatcher: PlainFieldClearWatcher = () => {
-    _w_handlers.length = 0
-  }
+export function createPlainField(name: FieldName, { formConfig, currentInitValue, defaultValue }: FormContext, init: PlainFieldInit<any>, p?: ArrayItemInitParams) {
+  const _defaultValue = p?.initValue ?? getProperty(currentInitValue, name) ?? defaultValue
+  const { initValue, ..._conf } = init({ formConfig, initValue: _defaultValue })
+  setProperty(currentInitValue, name, null)
 
   const _field: PlainField = {
     type: "plain",
     name,
-    value: initValue,
-    getter: _getter,
-    setter: _setter,
-    watch: _watch,
-    userConfig: conf,
-    __uform_field: true
+    userConfig: _conf,
+    __uform_field: true,
+    ...useFieldValue(initValue ?? _defaultValue)
   }
-
-  return { _field, _actions: { clearWatcher: _clearWatcher }, conf, bind }
-}
-export function useFormPlainField<T>(name: FieldName, init: PlainFieldInit<T>, params: any = {}): [T, PlainFieldActions] {
-  const ctx: FormContext = inject(formContext)!
-  const { field, actions } = ctx
-  if (field.type === "plain") throw GlobalInfo.nullPlainField
-  if (field.type === "ary") return useFormArrayItem({ ctx, init: p => createPlainField(name, ctx, init, p), params: { index: name, ...params } })
-  const { _field, _actions, bind } = createPlainField(name, ctx, init)
-  field.struct.set(name, _field)
-  onBeforeUnmount(() => {
-    field.struct.delete(name)
-  })
-  provide(formContext, null)
-  return [bind, { ...actions, ..._actions }]
+  return { _field }
 }

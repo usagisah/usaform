@@ -12,7 +12,8 @@ export type { PlainFieldProps } from "./PlainField"
 
 export * from "@usaform/vue"
 
-interface FormConfig {
+import type { FormConfig as _FormConfig } from "@usaform/vue"
+export interface FormConfig extends _FormConfig {
   Elements?: Record<string, any>
   Rules?: Record<string, RuleItem>
 }

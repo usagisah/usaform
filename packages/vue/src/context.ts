@@ -1,6 +1,6 @@
 import { provide } from "vue"
 import { FormBaseActions } from "./form"
-import { Field, FormConfig } from "./form.common"
+import { Field, FormConfig } from "./form.helper"
 
 export interface FormContext {
   field: Field

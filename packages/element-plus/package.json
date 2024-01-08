@@ -8,6 +8,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./validator": {
+      "types": "./dist/validator.d.ts",
+      "default": "./dist/validator.js"
+    },
     "./style.scss": "./style.scss"
   },
   "scripts": {

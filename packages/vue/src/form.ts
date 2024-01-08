@@ -1,7 +1,7 @@
 import { provide, toRaw } from "vue"
 import { FormContext, formContext } from "./context"
-import { BaseFiled, Field, FieldName, FormConfig } from "./form.common"
-import { PlainFieldWatchHandler } from "./plainField"
+import { BaseFiled, Field, FieldName, FormConfig } from "./form.helper"
+import { FieldSubscribeHandle } from "./useFieldValue"
 
 export interface RootField extends BaseFiled {
   type: "root"
@@ -10,7 +10,7 @@ export interface RootField extends BaseFiled {
 
 export interface FormBaseActions {
   getFormData: () => Record<string, any>
-  watch: (paths: string, handle: PlainFieldWatchHandler) => () => void
+  subscribe: (paths: string, handle: FieldSubscribeHandle) => () => void
   get: (path: string) => any[]
   set: (path: string, value: any) => void
   call: (key: string, point: any, ...params: any[]) => Record<string, any>
@@ -21,19 +21,19 @@ export interface FormActions extends FormBaseActions {
 }
 
 export function useForm(formConfig: Partial<FormConfig>) {
-  const field = { type: "root", struct: new Map(), __uform_field: true } as RootField
+  const field = { type: "root", name: "root", struct: new Map(), __uform_field: true } as RootField
 
   function getFormData(): Record<string, any> {
     return mapFieldToRecord(field)
   }
 
-  function watch(path: string, handle: PlainFieldWatchHandler) {
-    const unWatch: Function[] = []
+  function subscribe(path: string, handle: FieldSubscribeHandle) {
+    const unSubscribe: Function[] = []
     resolveFields(path, field).forEach(f => {
-      if (f.type === "plain") unWatch.push(f.watch(handle))
+      unSubscribe.push(f.subscribe(handle))
     })
     return () => {
-      unWatch.forEach(f => f())
+      unSubscribe.forEach(f => f())
     }
   }
 
@@ -42,16 +42,14 @@ export function useForm(formConfig: Partial<FormConfig>) {
   }
 
   function set(path: string, value: any) {
-    resolveFields(path, field).forEach(f => {
-      if (f.type === "plain") f.setter(value)
-    })
+    resolveFields(path, field).forEach(f => f.setter(value))
   }
 
   function call(key: string, point: any, ...params: any[]) {
     return callFieldAction(field, key, point, params)
   }
 
-  const actions: FormBaseActions = { getFormData, watch, get, set, call }
+  const actions: FormBaseActions = { getFormData, subscribe, get, set, call }
 
   function formProvide() {
     const { defaultValue, defaultFormData, arrayItemBindKey } = toRaw(formConfig)
@@ -69,7 +67,7 @@ export function useForm(formConfig: Partial<FormConfig>) {
 }
 
 export function mapFieldToRecord(field: Field): Record<string, any> {
-  if (field.type === "plain") return field.value
+  if (field.type === "plain") return field.getter()
   if (field.type === "ary") return field.struct.map(mapFieldToRecord)
   const record: Record<string, any> = {}
   field.struct.forEach((field, name) => (record[name] = mapFieldToRecord(field)))
@@ -115,23 +113,23 @@ export function resolveFields(path: string, field: Field): Field[] {
 
 export function callFieldAction(field: Field, key: string, point: any, params: any[]) {
   const results: Record<string, any> = {}
-  function call(field: Field, path: string): unknown {
+  function call(name: string, field: Field, path: string): unknown {
     if (field.type === "root") {
-      return field.struct.forEach(f => call(f, ""))
+      return field.struct.forEach(f => call(f.name as string, f, ""))
     }
 
-    const selfPath = path.length === 0 ? field.name.toString() : `${path}/${field.name}`
+    const selfPath = path.length === 0 ? name.toString() : `${path}/${name}`
     try {
       const action = field.userConfig[key]
       if (typeof action === "function") {
         results[selfPath] = action.apply(point, [{ path: selfPath }, ...params])
       }
-      if (field.type !== "plain") field.struct.forEach(f => call(f, selfPath))
+      if (field.type !== "plain") field.struct.forEach((f, i) => call(i.toString(), f, selfPath))
     } catch (e) {
       results[selfPath] = e
       console.error(e)
     }
   }
-  call(field, "")
+  call("root", field, "")
   return results
 }

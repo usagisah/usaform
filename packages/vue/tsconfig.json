@@ -7,7 +7,14 @@
     "outDir": "dist",
   },
   "include": [
-    "src/**/*.ts",
-    "__test__/**/*.ts"
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "__test__"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.test.json"
+    }
   ]
 }
