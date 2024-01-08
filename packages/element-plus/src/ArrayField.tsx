@@ -14,7 +14,7 @@ interface UFormFieldProps {
 export const ArrayField = defineComponent({
   name: "ArrayField",
   props: ["name", "layout", "layoutProps", "element", "props"],
-  setup(props: UFormFieldProps) {
+  setup(props: UFormFieldProps, { slots }) {
     const { name, layout, element } = props
 
     let FieldLayout: any
@@ -40,6 +40,7 @@ export const ArrayField = defineComponent({
     }
 
     return () => {
+      if (1) return slots.default!(mergeElementProps())
       if (FieldLayout) {
         return h(FieldLayout, { ...(props.layoutProps ?? {}), children: (p: any) => [h(FieldElement, mergeElementProps(p))] })
       }

@@ -1,4 +1,4 @@
-import { Ref, WritableComputedRef, inject, onBeforeUnmount, provide } from "vue"
+import { Ref, inject, onBeforeUnmount, provide } from "vue"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
 import { FormBaseActions } from "./form"
@@ -40,15 +40,15 @@ export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldIn
 
   const { _field } = createObjectField(name, ctx, init)
   field.struct.set(name, _field)
-  updateField(_field, ctx)
+  updateField(_field, ctx, () => {
+    field.struct.delete(name)
+  })
 
   return [_field.fieldValue, { ...actions }]
 }
 
-function updateField(_field: ObjectField, ctx: FormContext) {
+function updateField(_field: ObjectField, ctx: FormContext, clean: Function) {
   const { name } = _field
-  const field: any = ctx.field
-
   const provideContext: FormContext = { ...ctx, field: _field, currentInitValue: _field.getter() }
   provide(formContext, provideContext)
   setProperty(ctx.currentInitValue, name, null)
@@ -58,9 +58,9 @@ function updateField(_field: ObjectField, ctx: FormContext) {
     provideContext.currentInitValue = _field.getter()
   }, true)
   onBeforeUnmount(() => {
-    field.struct.delete(name)
     _field.struct.clear()
     _field.clearSubscribers()
+    clean()
   })
 }
 

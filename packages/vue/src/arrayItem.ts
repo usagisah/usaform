@@ -1,4 +1,4 @@
-import { ArrayField } from "./arrayField"
+import { ArrayEmptyItem, ArrayField } from "./arrayField"
 import { FormContext } from "./context"
 import { Field, getProperty } from "./form.helper"
 
@@ -9,7 +9,7 @@ export interface ArrayItemInitParams {
 export interface ArrayItemConfig {
   ctx: FormContext
   init: (p: ArrayItemInitParams) => { _field: Field; _actions?: any }
-  afterInit: (_field: any, ctx: FormContext) => any
+  afterInit: (_field: any, ctx: FormContext, clean: Function) => any
   index: number
 }
 
@@ -27,6 +27,8 @@ export function useFormArrayItem({ ctx, init, afterInit, index }: ArrayItemConfi
     __uform_aryItem_field: { value: true, enumerable: true }
   })
   struct[index] = _field
-  afterInit(_field, ctx)
+  afterInit(_field, ctx, () => {
+    struct[index] = ArrayEmptyItem as any
+  })
   return [_field.fieldValue, { ...actions, ..._actions }]
 }

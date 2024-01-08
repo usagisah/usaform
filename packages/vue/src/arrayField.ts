@@ -49,15 +49,15 @@ export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit
 
   const { _field, _actions } = createArrayField(name, ctx, init)
   field.struct.set(name, _field)
-  updateField(_field, ctx)
+  updateField(_field, ctx, () => {
+    field.struct.delete(name)
+  })
 
   return [_field.fieldValue, { ...actions, ..._actions }]
 }
 
-function updateField(_field: ArrayField, ctx: FormContext) {
+function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
   const { name } = _field
-  const field: any = ctx.field
-
   const provideContext: FormContext = { ...ctx, field: _field, currentInitValue: _field.getter() }
   provide(formContext, provideContext)
   setProperty(ctx.currentInitValue, name, null)
@@ -69,9 +69,9 @@ function updateField(_field: ArrayField, ctx: FormContext) {
     provideContext.currentInitValue = _field.getter()
   }, true)
   onBeforeUnmount(() => {
-    field.struct.delete(name)
     _field.struct = []
     _field.clearSubscribers()
+    clean()
   })
 }
 
@@ -84,10 +84,10 @@ export function createArrayField(name: FieldName, { formConfig, currentInitValue
   const _field: ArrayField = {
     type: "ary",
     name,
-    struct: toRaw([...(initValue ?? _defaultValue)]),
+    struct: toRaw([...(initValue ?? _defaultValue ?? [])]),
     userConfig: _conf,
     __uform_field: true,
-    ...useFieldValue([...(initValue ?? _defaultValue)])
+    ...useFieldValue([...(initValue ?? _defaultValue ?? [])])
   }
   const _setStruct = () => {
     const _fieldStruct: Field[] = []

@@ -39,17 +39,16 @@ export function useFormPlainField<T = any>(name: FieldName, init: PlainFieldInit
 
   const { _field } = createPlainField(name, ctx, init)
   field.struct.set(name, _field)
-  updateField(_field, ctx)
+  updateField(_field, ctx, () => {
+    field.struct.delete(name)
+  })
   return [_field.fieldValue, { ...actions }]
 }
 
-function updateField(_field: PlainField, ctx: FormContext) {
-  const { name } = _field
-  const field: any = ctx.field
-
+function updateField(_field: PlainField, _: FormContext, clean: Function) {
   onBeforeUnmount(() => {
-    field.struct.delete(name)
     _field.clearSubscribers()
+    clean()
   })
   provide(formContext, null)
 }
