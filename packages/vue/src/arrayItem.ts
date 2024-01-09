@@ -19,16 +19,16 @@ export function useFormArrayItem({ ctx, init, afterInit, index }: ArrayItemConfi
 
   const record: any = struct[index]
   if (getProperty(record, "__uform_field", false)) throw "array-field 检测到意外的重复，请检测是否进行了错误嵌套"
+
   const { _field, _actions } = init({
     initValue: getProperty(record, arrayItemBindKey, false)
   })
-  Object.defineProperties(_field, {
-    __aryValue: { value: record, enumerable: true },
-    __uform_aryItem_field: { value: true, enumerable: true }
-  })
+  _field.__aryValue = { value: record, enumerable: true }
+  _field.__uform_aryItem_field = true
   struct[index] = _field
   afterInit(_field, ctx, () => {
     struct[index] = ArrayEmptyItem as any
   })
+  if (!_field.fieldValue.value) console.log(_field.fieldValue.value)
   return [_field.fieldValue, { ...actions, ..._actions }]
 }

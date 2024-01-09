@@ -45,19 +45,18 @@ export function useFormPlainField<T = any>(name: FieldName, init: PlainFieldInit
   return [_field.fieldValue, { ...actions }]
 }
 
-function updateField(_field: PlainField, _: FormContext, clean: Function) {
+function updateField(_field: PlainField, { currentInitValue }: FormContext, clean: Function) {
+  provide(formContext, null)
   onBeforeUnmount(() => {
     _field.clearSubscribers()
+    setProperty(currentInitValue, _field.name, null)
     clean()
   })
-  provide(formContext, null)
 }
 
 export function createPlainField(name: FieldName, { formConfig, currentInitValue, defaultValue }: FormContext, init: PlainFieldInit<any>, p?: ArrayItemInitParams) {
   const _defaultValue = p?.initValue ?? getProperty(currentInitValue, name) ?? defaultValue
   const { initValue, ..._conf } = init({ formConfig, initValue: _defaultValue })
-  setProperty(currentInitValue, name, null)
-
   const _field: PlainField = {
     type: "plain",
     name,

@@ -58,29 +58,26 @@ export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit
 
 function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
   const { name } = _field
-  const provideContext: FormContext = { ...ctx, field: _field, currentInitValue: _field.getter() }
+  const provideContext: FormContext = { ...ctx, field: _field, currentInitValue: [..._field.getter()] }
   provide(formContext, provideContext)
-  setProperty(ctx.currentInitValue, name, null)
 
   _field.subscribe(() => {
     _field.struct = _field.fieldValue.value.map((item: Field) => {
       return item.__uform_aryItem_field ? item.__aryValue : item
     })
-    provideContext.currentInitValue = _field.getter()
+    provideContext.currentInitValue = [..._field.getter()]
   }, true)
   onBeforeUnmount(() => {
     _field.struct = []
     _field.clearSubscribers()
+    setProperty(ctx.currentInitValue, name, null)
     clean()
   })
 }
 
 export function createArrayField(name: FieldName, { formConfig, currentInitValue, defaultValue }: FormContext, init: ArrayFieldInit<any>, p?: ArrayItemInitParams) {
   const _defaultValue = p?.initValue ?? getProperty(currentInitValue, name) ?? defaultValue
-  const { initValue, ..._conf } = init({
-    initValue: getProperty(currentInitValue, name),
-    formConfig
-  })
+  const { initValue, ..._conf } = init({ formConfig, initValue: _defaultValue })
   const _field: ArrayField = {
     type: "ary",
     name,

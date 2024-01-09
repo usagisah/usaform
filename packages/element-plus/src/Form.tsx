@@ -24,7 +24,7 @@ export const Form = defineComponent({
   setup(props: FormProps, { slots, expose }) {
     const config = props.config ?? {}
     config.Elements = { ...(config.Elements ?? {}) }
-    config.rules = { ...(config.rules ?? {}) }
+    config.Rules = { ...(config.Rules ?? {}) }
     const form = useForm(config)
     form.provide()
 

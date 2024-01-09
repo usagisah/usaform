@@ -5,9 +5,9 @@ interface UFormFieldProps {
   name: string
 
   layout?: string
-  layoutProps?: any
+  layoutProps?: Record<any, any>
 
-  element: string
+  element?: string
   props?: Record<any, any>
 }
 
@@ -22,8 +22,8 @@ export const ArrayField = defineComponent({
 
     const [modelValue, actions] = useFormArrayField(name, ({ formConfig }) => {
       const Elements = formConfig.Elements ?? []
-      FieldLayout = layout ? Elements[layout] : null
-      FieldElement = Elements[element]
+      FieldLayout = Elements[layout!]
+      FieldElement = Elements[element!]
       return {}
     })
     const { delValue, setValue, swap } = actions
@@ -40,11 +40,15 @@ export const ArrayField = defineComponent({
     }
 
     return () => {
-      if (1) return slots.default!(mergeElementProps())
       if (FieldLayout) {
-        return h(FieldLayout, { ...(props.layoutProps ?? {}), children: (p: any) => [h(FieldElement, mergeElementProps(p))] })
+        return h(FieldLayout, {
+          ...(props.layoutProps ?? {}),
+          children(p: any) {
+            return FieldElement ? [h(FieldElement, mergeElementProps(p))] : slots.default?.(mergeElementProps(p))
+          }
+        })
       }
-      return h(FieldElement, mergeElementProps())
+      return FieldElement ? h(FieldElement, mergeElementProps()) : slots.default?.(mergeElementProps())
     }
   }
 })

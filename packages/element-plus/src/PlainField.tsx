@@ -60,13 +60,12 @@ export const PlainField = defineComponent({
     }
 
     const mergeElementProps = (p = {}) => {
-      const v = reactive({
+      return reactive({
         ...props.props,
         ...p,
         modelValue,
         "onUpdate:modelValue": setModelValue
       })
-      return v
     }
 
     return () => {

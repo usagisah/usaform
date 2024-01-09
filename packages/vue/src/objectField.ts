@@ -49,17 +49,17 @@ export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldIn
 
 function updateField(_field: ObjectField, ctx: FormContext, clean: Function) {
   const { name } = _field
-  const provideContext: FormContext = { ...ctx, field: _field, currentInitValue: _field.getter() }
+  const provideContext: FormContext = { ...ctx, field: _field, currentInitValue: { ..._field.getter() } }
   provide(formContext, provideContext)
-  setProperty(ctx.currentInitValue, name, null)
 
   _field.subscribe(() => {
     _field.struct.clear()
-    provideContext.currentInitValue = _field.getter()
+    provideContext.currentInitValue = { ..._field.getter() }
   }, true)
   onBeforeUnmount(() => {
     _field.struct.clear()
     _field.clearSubscribers()
+    setProperty(ctx.currentInitValue, name, null)
     clean()
   })
 }
