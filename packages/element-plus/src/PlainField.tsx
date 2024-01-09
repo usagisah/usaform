@@ -13,6 +13,7 @@ export interface PlainFieldProps {
 
   formSlots?: FormSlots
 }
+
 type FormSlots = Record<string, string | ((...props: any[]) => any)>
 export const PlainField = defineComponent({
   name: "PlainField",
@@ -30,7 +31,7 @@ export const PlainField = defineComponent({
     let FieldSlots: any = {}
     let FieldRules: any = {}
 
-    const [modelValue] = useFormPlainField(name, ({ formConfig }) => {
+    const { fieldValue, fieldKey } = useFormPlainField(name, ({ formConfig }) => {
       const { Elements = [], Rules = {}, defaultValue } = formConfig
 
       FieldLayout = layout ? Elements[layout] : null
@@ -47,24 +48,24 @@ export const PlainField = defineComponent({
 
       return {
         reset: () => {
-          modelValue.value = defaultValue
+          fieldValue.value = defaultValue
           fieldLayoutRef.value!.setValidateState({ error: false, message: "" })
         },
         validate({ path }: any) {
-          return fieldLayoutRef.value!.validate(path, modelValue.value)
+          return fieldLayoutRef.value!.validate(path, fieldValue.value)
         }
       }
     })
-    const setModelValue = (v: any) => {
-      modelValue.value = v
+    const setFieldValue = (v: any) => {
+      fieldValue.value = v
     }
 
-    const mergeElementProps = (p = {}) => {
+    const mergeElementProps = (p: object) => {
       return reactive({
         ...props.props,
         ...p,
-        modelValue,
-        "onUpdate:modelValue": setModelValue
+        modelValue: fieldValue,
+        "onUpdate:modelValue": setFieldValue
       })
     }
 
@@ -74,10 +75,11 @@ export const PlainField = defineComponent({
           ...props.layoutProps,
           Rules: FieldRules,
           ref: fieldLayoutRef,
+          key: fieldKey.value,
           children: (p = {}) => [h(FieldElement, mergeElementProps(p), FieldSlots)]
         })
       }
-      return h(FieldElement, mergeElementProps(), FieldSlots)
+      return h(FieldElement, mergeElementProps({ key: fieldKey.value }), FieldSlots)
     }
   }
 })

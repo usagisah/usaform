@@ -2,7 +2,7 @@ import { Ref, inject, onBeforeUnmount, provide } from "vue"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
 import { FormBaseActions } from "./form"
-import { BaseFiled, Field, FieldName, getProperty, setProperty } from "./form.helper"
+import { BaseFiled, Field, FieldName, FieldWrapper, getProperty, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
 export interface ObjectField extends BaseFiled {
@@ -25,7 +25,7 @@ export interface ObjectFieldActions extends FormBaseActions {}
 
 type ObjectFieldInit<T> = (info: ObjectFieldInitInfo) => ObjectFieldConfig<T>
 
-export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldInit<T>): [Ref<T>, ObjectFieldActions] {
+export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldInit<T>): FieldWrapper<T, ObjectFieldActions> {
   const ctx: FormContext = inject(formContext)!
   const { field, actions } = ctx
   if (field.type === "plain") throw GlobalInfo.nullPlainField
@@ -44,7 +44,7 @@ export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldIn
     field.struct.delete(name)
   })
 
-  return [_field.fieldValue, { ...actions }]
+  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: { ...actions } }
 }
 
 function updateField(_field: ObjectField, ctx: FormContext, clean: Function) {
@@ -54,6 +54,7 @@ function updateField(_field: ObjectField, ctx: FormContext, clean: Function) {
 
   _field.subscribe(() => {
     _field.struct.clear()
+    _field.fieldKey.value++
     provideContext.currentInitValue = { ..._field.getter() }
   }, true)
   onBeforeUnmount(() => {
@@ -64,9 +65,9 @@ function updateField(_field: ObjectField, ctx: FormContext, clean: Function) {
   })
 }
 
-export function createObjectField(name: FieldName, { currentInitValue, formConfig, defaultValue }: FormContext, init: ObjectFieldInit<any>, p?: ArrayItemInitParams) {
-  const _defaultValue = p?.initValue ?? getProperty(currentInitValue, name) ?? defaultValue
-  const { initValue, ..._conf } = init({ formConfig, initValue: _defaultValue })
+export function createObjectField(name: FieldName, ctx: FormContext, init: ObjectFieldInit<any>, p?: ArrayItemInitParams) {
+  const _defaultValue = resolveFieldDefaultValue(name, ctx, p)
+  const { initValue, ..._conf } = init({ formConfig: ctx.formConfig, initValue: _defaultValue })
   const _field: ObjectField = {
     type: "object",
     name,

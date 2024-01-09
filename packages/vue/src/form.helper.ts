@@ -1,5 +1,7 @@
-import { toRaw, unref } from "vue"
+import { Ref, toRaw, unref } from "vue"
 import { ArrayField } from "./arrayField"
+import { ArrayItemInitParams } from "./arrayItem"
+import { FormContext } from "./context"
 import { RootField } from "./form"
 import { ObjectField } from "./objectField"
 import { PlainField } from "./plainField"
@@ -24,6 +26,12 @@ export interface BaseFiled extends FieldValue {
 export type Field = RootField | PlainField | ObjectField | ArrayField
 export type FieldName = string | number
 
+export type FieldWrapper<T, A> = {
+  fieldValue: Ref<T>
+  fieldKey: Ref<number>
+  actions: A
+}
+
 export function isPlainObject(target: any): target is Record<string, any> {
   return Object.prototype.toString.call(target) === "[object Object]"
 }
@@ -43,4 +51,9 @@ export function setProperty(target: any, key: FieldName, val: any) {
   try {
     target[key] = val
   } catch {}
+}
+
+export function resolveFieldDefaultValue(name: FieldName, { currentInitValue, defaultValue }: FormContext, p?: ArrayItemInitParams) {
+  if (p) return p.initValue
+  return getProperty(currentInitValue, name) ?? defaultValue
 }

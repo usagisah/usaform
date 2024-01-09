@@ -9,6 +9,7 @@ export type FieldSubscribe = (handle: FieldSubscribeHandle, skip?: boolean) => F
 export type FieldClearSubscribes = () => void
 
 export type FieldValue = {
+  fieldKey: Ref<number>
   fieldValue: Ref<any>
   getter: () => any
   setter: FieldSetter
@@ -48,5 +49,7 @@ export function useFieldValue(value: any): FieldValue {
   const clearSubscribers: FieldClearSubscribes = () => {
     subscribers.length = 0
   }
-  return { fieldValue, getter, setter, subscribe, clearSubscribers }
+
+  const fieldKey = ref(0)
+  return { fieldValue, fieldKey, getter, setter, subscribe, clearSubscribers }
 }

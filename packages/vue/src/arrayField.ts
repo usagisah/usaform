@@ -1,8 +1,8 @@
-import { Ref, inject, onBeforeUnmount, provide, toRaw } from "vue"
+import { inject, onBeforeUnmount, provide, toRaw } from "vue"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
 import { FormBaseActions } from "./form"
-import { BaseFiled, Field, FieldName, getProperty, setProperty } from "./form.helper"
+import { BaseFiled, Field, FieldName, FieldWrapper, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
 export interface ArrayField extends BaseFiled {
@@ -34,7 +34,7 @@ export interface ArrayFieldActions extends FormBaseActions {
 
 type ArrayFieldInit<T> = (info: ArrayFieldInitInfo) => ArrayFieldConfig<T>
 
-export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit<T>): [Ref<T[]>, ArrayFieldActions] {
+export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit<T>): FieldWrapper<T[], ArrayFieldActions> {
   const ctx: FormContext = inject(formContext)!
   const { field, actions } = ctx
   if (field.type === "plain") throw GlobalInfo.nullPlainField
@@ -53,7 +53,7 @@ export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit
     field.struct.delete(name)
   })
 
-  return [_field.fieldValue, { ...actions, ..._actions }]
+  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: { ...actions, ..._actions } }
 }
 
 function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
@@ -65,6 +65,7 @@ function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
     _field.struct = _field.fieldValue.value.map((item: Field) => {
       return item.__uform_aryItem_field ? item.__aryValue : item
     })
+    _field.fieldKey.value++
     provideContext.currentInitValue = [..._field.getter()]
   }, true)
   onBeforeUnmount(() => {
@@ -75,9 +76,9 @@ function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
   })
 }
 
-export function createArrayField(name: FieldName, { formConfig, currentInitValue, defaultValue }: FormContext, init: ArrayFieldInit<any>, p?: ArrayItemInitParams) {
-  const _defaultValue = p?.initValue ?? getProperty(currentInitValue, name) ?? defaultValue
-  const { initValue, ..._conf } = init({ formConfig, initValue: _defaultValue })
+export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayFieldInit<any>, p?: ArrayItemInitParams) {
+  const _defaultValue = resolveFieldDefaultValue(name, ctx, p)
+  const { initValue, ..._conf } = init({ formConfig: ctx.formConfig, initValue: _defaultValue })
   const _field: ArrayField = {
     type: "ary",
     name,

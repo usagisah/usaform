@@ -15,6 +15,13 @@ export interface FormItemProps {
   children?: (p: any) => any[]
 }
 
+export interface FormItemAttrs {
+  id: string
+  disabled: boolean
+  size: "small" | "large" | "default"
+  onChange: (e: any) => void
+}
+
 export interface FormItemExpose {
   validate: Validate
   setValidateState: (state: { error: boolean; message: string }) => void
