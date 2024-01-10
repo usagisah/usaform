@@ -1,3 +1,4 @@
+import { useFormActions } from "./actions/hooks"
 import { ArrayEmptyItem, ArrayField } from "./arrayField"
 import { FormContext } from "./context"
 import { Field, FieldWrapper, getProperty } from "./form.helper"
@@ -14,7 +15,7 @@ export interface ArrayItemConfig {
 }
 
 export function useFormArrayItem({ ctx, init, afterInit, index }: ArrayItemConfig): FieldWrapper<any, any> {
-  const { field, actions } = ctx
+  const { field, root } = ctx
   const { struct } = field as ArrayField
 
   const record: any = struct[index]
@@ -30,5 +31,5 @@ export function useFormArrayItem({ ctx, init, afterInit, index }: ArrayItemConfi
     struct[index] = ArrayEmptyItem as any
   })
   if (!_field.fieldValue.value) console.log(_field.fieldValue.value)
-  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: { ...actions, ..._actions } }
+  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: { ...useFormActions(_field, root), ..._actions } }
 }

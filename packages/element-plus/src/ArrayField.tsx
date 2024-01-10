@@ -14,8 +14,8 @@ export interface ArrayFieldProps {
 export type ArrayFieldAttrs = {
   fields: any[]
   api: {
-    push: (e: any) => void
-    unshift: (e: any) => void
+    push: (e: Record<any, any>) => void
+    unshift: (e: Record<any, any>) => void
     remove: (index: number) => void
     pop: () => void
     shift: () => void

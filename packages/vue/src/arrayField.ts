@@ -1,7 +1,7 @@
 import { inject, onBeforeUnmount, provide, toRaw } from "vue"
+import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
-import { FormBaseActions } from "./form"
 import { BaseFiled, Field, FieldName, FieldWrapper, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
@@ -36,7 +36,7 @@ type ArrayFieldInit<T> = (info: ArrayFieldInitInfo) => ArrayFieldConfig<T>
 
 export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit<T>): FieldWrapper<T[], ArrayFieldActions> {
   const ctx: FormContext = inject(formContext)!
-  const { field, actions } = ctx
+  const { field, root } = ctx
   if (field.type === "plain") throw GlobalInfo.nullPlainField
   if (field.type === "ary") {
     return useFormArrayItem({
@@ -53,7 +53,7 @@ export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit
     field.struct.delete(name)
   })
 
-  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: { ...actions, ..._actions } }
+  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: { ...useFormActions(_field, root), ..._actions } }
 }
 
 function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
@@ -84,6 +84,7 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     name,
     struct: toRaw([...(initValue ?? _defaultValue ?? [])]),
     userConfig: _conf,
+    parent: ctx.field,
     __uform_field: true,
     ...useFieldValue([...(initValue ?? _defaultValue ?? [])])
   }

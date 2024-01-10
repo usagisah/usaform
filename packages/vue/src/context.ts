@@ -1,16 +1,13 @@
 import { provide } from "vue"
-import { FormBaseActions } from "./form"
 import { Field, FormConfig } from "./form.helper"
 
 export interface FormContext {
+  root: Field
   field: Field
 
   defaultValue: any
   currentInitValue: any
 
-  arrayItemBindKey: string
-
-  actions: FormBaseActions
   formConfig: FormConfig
 }
 

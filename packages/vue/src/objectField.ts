@@ -1,8 +1,8 @@
-import { Ref, inject, onBeforeUnmount, provide } from "vue"
+import { inject, onBeforeUnmount, provide } from "vue"
+import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
-import { FormBaseActions } from "./form"
-import { BaseFiled, Field, FieldName, FieldWrapper, getProperty, resolveFieldDefaultValue, setProperty } from "./form.helper"
+import { BaseFiled, Field, FieldName, FieldWrapper, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
 export interface ObjectField extends BaseFiled {
@@ -27,7 +27,7 @@ type ObjectFieldInit<T> = (info: ObjectFieldInitInfo) => ObjectFieldConfig<T>
 
 export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldInit<T>): FieldWrapper<T, ObjectFieldActions> {
   const ctx: FormContext = inject(formContext)!
-  const { field, actions } = ctx
+  const { field, root } = ctx
   if (field.type === "plain") throw GlobalInfo.nullPlainField
   if (field.type === "ary") {
     return useFormArrayItem({
@@ -44,7 +44,7 @@ export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldIn
     field.struct.delete(name)
   })
 
-  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: { ...actions } }
+  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: useFormActions(_field, root) }
 }
 
 function updateField(_field: ObjectField, ctx: FormContext, clean: Function) {
@@ -73,6 +73,7 @@ export function createObjectField(name: FieldName, ctx: FormContext, init: Objec
     name,
     struct: new Map(),
     userConfig: _conf,
+    parent: ctx.field,
     __uform_field: true,
     ...useFieldValue(initValue ?? _defaultValue)
   }

@@ -1,8 +1,8 @@
 import { inject, onBeforeUnmount, provide } from "vue"
+import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
-import { FormBaseActions } from "./form"
-import { BaseFiled, FieldName, FieldWrapper, FormConfig, getProperty, resolveFieldDefaultValue, setProperty } from "./form.helper"
+import { BaseFiled, FieldName, FieldWrapper, FormConfig, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
 export interface PlainField extends BaseFiled {
@@ -25,7 +25,7 @@ export interface PlainFieldActions extends FormBaseActions {}
 type PlainFieldInit<T> = (info: PlainFieldInitInfo) => PlainFieldConfig<T>
 export function useFormPlainField<T = any>(name: FieldName, init: PlainFieldInit<T>): FieldWrapper<T, PlainFieldActions> {
   const ctx: FormContext = inject(formContext)!
-  const { field, actions } = ctx
+  const { field, root } = ctx
 
   if (field.type === "plain") throw GlobalInfo.nullPlainField
   if (field.type === "ary") {
@@ -42,7 +42,7 @@ export function useFormPlainField<T = any>(name: FieldName, init: PlainFieldInit
   updateField(_field, ctx, () => {
     field.struct.delete(name)
   })
-  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: { ...actions } }
+  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: useFormActions(_field, root) }
 }
 
 function updateField(_field: PlainField, { currentInitValue }: FormContext, clean: Function) {
@@ -62,6 +62,7 @@ export function createPlainField(name: FieldName, ctx: FormContext, init: PlainF
     name,
     userConfig: _conf,
     __uform_field: true,
+    parent: ctx.field,
     ...useFieldValue(initValue ?? _defaultValue)
   }
   return { _field }

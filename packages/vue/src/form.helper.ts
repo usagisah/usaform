@@ -8,16 +8,14 @@ import { PlainField } from "./plainField"
 import { FieldValue } from "./useFieldValue"
 
 export interface FormConfig {
-  defaultValue: any
-  defaultFormData: Record<any, any>
-
-  arrayItemBindKey: string
-
+  defaultValue?: any
+  defaultFormData?: Record<any, any>
   [x: string]: any
 }
 
 export interface BaseFiled extends FieldValue {
   name: FieldName
+  parent: Field
   __uform_field: boolean
   __aryValue?: any
   __uform_aryItem_field?: boolean
