@@ -22,24 +22,25 @@ export const ObjectField = defineComponent({
 
     let FieldLayout: any
     let FieldElement: any
-    const { fieldKey } = useFormObjectFiled(name, ({ formConfig }) => {
+    const { render, actions } = useFormObjectFiled(name, ({ formConfig }) => {
       const Elements = formConfig.Elements ?? []
       FieldLayout = Elements[layout!]
       FieldElement = Elements[element!]
       return {}
     })
 
-    return () => {
+    return render(() => {
       if (FieldLayout) {
         return h(FieldLayout, {
           ...props.layoutProps,
-          key: fieldKey.value,
           children(p: any) {
-            return FieldElement ? [h(FieldElement, { ...props.props, ...p })] : slots.default?.({ ...props.props, ...p })
+            const _props = { ...props.props, ...p, actions }
+            return FieldElement ? [h(FieldElement, _props)] : slots.default?.(_props)
           }
         })
       }
-      return FieldElement ? h(FieldElement, { ...props.props, key: fieldKey.value }) : slots.default?.({ ...props.props, key: fieldKey.value })
-    }
+      const _props = { ...props.props, actions }
+      return FieldElement ? h(FieldElement, _props) : slots.default?.(_props)
+    })
   }
 })

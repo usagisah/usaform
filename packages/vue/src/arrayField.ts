@@ -2,6 +2,7 @@ import { inject, onBeforeUnmount, provide, toRaw } from "vue"
 import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
+import { createFieldRender } from "./fieldRender"
 import { BaseFiled, Field, FieldName, FieldWrapper, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
@@ -34,7 +35,7 @@ export interface ArrayFieldActions extends FormBaseActions {
 
 type ArrayFieldInit<T> = (info: ArrayFieldInitInfo) => ArrayFieldConfig<T>
 
-export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit<T>): FieldWrapper<T[], ArrayFieldActions> {
+export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit<T>): FieldWrapper<T[], ArrayFieldActions, false> {
   const ctx: FormContext = inject(formContext)!
   const { field, root } = ctx
   if (field.type === "plain") throw GlobalInfo.nullPlainField
@@ -53,7 +54,11 @@ export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit
     field.struct.delete(name)
   })
 
-  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: { ...useFormActions(_field, root), ..._actions } }
+  return {
+    fieldValue: _field.fieldValue,
+    actions: { ...useFormActions(_field, root), ..._actions },
+    render: createFieldRender(_field.fieldKey, _field.fieldValue)
+  }
 }
 
 function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
@@ -65,9 +70,8 @@ function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
     _field.struct = _field.fieldValue.value.map((item: Field) => {
       return item.__uform_aryItem_field ? item.__aryValue : item
     })
-    _field.fieldKey.value++
     provideContext.currentInitValue = [..._field.getter()]
-  }, true)
+  })
   onBeforeUnmount(() => {
     _field.struct = []
     _field.clearSubscribers()

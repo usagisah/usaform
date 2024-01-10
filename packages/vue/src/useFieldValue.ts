@@ -1,4 +1,4 @@
-import { Ref, ref, unref, watch } from "vue"
+import { Ref, nextTick, shallowRef, unref, watch } from "vue"
 
 export type FieldGetter = () => any
 export type FieldSetter = (value: any) => any
@@ -18,31 +18,30 @@ export type FieldValue = {
 }
 
 export function useFieldValue(value: any): FieldValue {
-  const subscribers: [FieldSubscribeHandle, boolean][] = []
-  let customSetter = false
-  const fieldValue = ref(value)
+  const subscribers: FieldSubscribeHandle[] = []
+  const fieldValue = shallowRef(value)
   watch(fieldValue, (newValue, oldValue) => {
-    for (const item of subscribers) {
+    for (const fn of subscribers) {
       try {
-        if (customSetter && item[1]) continue
-        item[0](newValue, oldValue)
+        fn(newValue, oldValue)
       } catch (e) {
         console.error(e)
       }
     }
-    customSetter = false
   })
 
   const getter: FieldGetter = () => unref(fieldValue)
   const setter: FieldSetter = (_value: any) => {
-    customSetter = true
-    fieldValue.value = _value
+    const key = ++fieldKey.value
+    nextTick(() => {
+      if (key !== fieldKey.value) return
+      fieldValue.value = _value
+    })
   }
-  const subscribe: FieldSubscribe = (handle, skip = false) => {
-    const item: [FieldSubscribeHandle, boolean] = [handle, skip]
-    subscribers.push(item)
+  const subscribe: FieldSubscribe = handle => {
+    subscribers.push(handle)
     return () => {
-      const i = subscribers.indexOf(item)
+      const i = subscribers.indexOf(handle)
       if (i > -1) subscribers.splice(i, 1)
     }
   }
@@ -50,6 +49,6 @@ export function useFieldValue(value: any): FieldValue {
     subscribers.length = 0
   }
 
-  const fieldKey = ref(0)
+  const fieldKey = shallowRef(0)
   return { fieldValue, fieldKey, getter, setter, subscribe, clearSubscribers }
 }

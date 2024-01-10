@@ -2,6 +2,7 @@ import { inject, onBeforeUnmount, provide } from "vue"
 import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
+import { createFieldRender } from "./fieldRender"
 import { BaseFiled, Field, FieldName, FieldWrapper, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
@@ -25,7 +26,7 @@ export interface ObjectFieldActions extends FormBaseActions {}
 
 type ObjectFieldInit<T> = (info: ObjectFieldInitInfo) => ObjectFieldConfig<T>
 
-export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldInit<T>): FieldWrapper<T, ObjectFieldActions> {
+export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldInit<T>): FieldWrapper<T, ObjectFieldActions, false> {
   const ctx: FormContext = inject(formContext)!
   const { field, root } = ctx
   if (field.type === "plain") throw GlobalInfo.nullPlainField
@@ -44,7 +45,11 @@ export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldIn
     field.struct.delete(name)
   })
 
-  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: useFormActions(_field, root) }
+  return {
+    fieldValue: _field.fieldValue,
+    actions: useFormActions(_field, root),
+    render: createFieldRender(_field.fieldKey, _field.fieldValue)
+  }
 }
 
 function updateField(_field: ObjectField, ctx: FormContext, clean: Function) {
@@ -54,9 +59,8 @@ function updateField(_field: ObjectField, ctx: FormContext, clean: Function) {
 
   _field.subscribe(() => {
     _field.struct.clear()
-    _field.fieldKey.value++
     provideContext.currentInitValue = { ..._field.getter() }
-  }, true)
+  })
   onBeforeUnmount(() => {
     _field.struct.clear()
     _field.clearSubscribers()

@@ -2,6 +2,7 @@ import { inject, onBeforeUnmount, provide } from "vue"
 import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
+import { createFieldRender } from "./fieldRender"
 import { BaseFiled, FieldName, FieldWrapper, FormConfig, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
@@ -23,7 +24,7 @@ export interface PlainFieldConfig<T = any> {
 export interface PlainFieldActions extends FormBaseActions {}
 
 type PlainFieldInit<T> = (info: PlainFieldInitInfo) => PlainFieldConfig<T>
-export function useFormPlainField<T = any>(name: FieldName, init: PlainFieldInit<T>): FieldWrapper<T, PlainFieldActions> {
+export function useFormPlainField<T = any>(name: FieldName, init: PlainFieldInit<T>): FieldWrapper<T, PlainFieldActions, true> {
   const ctx: FormContext = inject(formContext)!
   const { field, root } = ctx
 
@@ -42,7 +43,11 @@ export function useFormPlainField<T = any>(name: FieldName, init: PlainFieldInit
   updateField(_field, ctx, () => {
     field.struct.delete(name)
   })
-  return { fieldValue: _field.fieldValue, fieldKey: _field.fieldKey, actions: useFormActions(_field, root) }
+  return {
+    fieldValue: _field.fieldValue,
+    actions: useFormActions(_field, root),
+    render: null
+  }
 }
 
 function updateField(_field: PlainField, { currentInitValue }: FormContext, clean: Function) {

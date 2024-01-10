@@ -31,7 +31,7 @@ export const PlainField = defineComponent({
     let FieldSlots: any = {}
     let FieldRules: any = {}
 
-    const { fieldValue, fieldKey } = useFormPlainField(name, ({ formConfig }) => {
+    const { fieldValue } = useFormPlainField(name, ({ formConfig }) => {
       const { Elements = [], Rules = {}, defaultValue } = formConfig
 
       FieldLayout = layout ? Elements[layout] : null
@@ -75,11 +75,10 @@ export const PlainField = defineComponent({
           ...props.layoutProps,
           Rules: FieldRules,
           ref: fieldLayoutRef,
-          key: fieldKey.value,
           children: (p = {}) => [h(FieldElement, mergeElementProps(p), FieldSlots)]
         })
       }
-      return h(FieldElement, mergeElementProps({ key: fieldKey.value }), FieldSlots)
+      return h(FieldElement, mergeElementProps({}), FieldSlots)
     }
   }
 })

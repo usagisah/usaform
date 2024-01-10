@@ -24,10 +24,10 @@ export interface BaseFiled extends FieldValue {
 export type Field = RootField | PlainField | ObjectField | ArrayField
 export type FieldName = string | number
 
-export type FieldWrapper<T, A> = {
+export type FieldWrapper<T, A, Plain extends boolean> = {
   fieldValue: Ref<T>
-  fieldKey: Ref<number>
   actions: A
+  render: Plain extends false ? (fn: () => any) => any : null
 }
 
 export function isPlainObject(target: any): target is Record<string, any> {

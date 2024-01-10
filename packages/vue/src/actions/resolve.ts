@@ -7,39 +7,37 @@ export function resolveFields(path: string, cur: Field, root: Field): Field[] {
   if (matches.length === 0) return []
 
   const result: Field[] = []
-  function resolve(matches: (RegExp | "..")[], field?: Field) {
+  function resolve(matches: (RegExp | "..")[], name: string, field?: Field): unknown {
     if (!field) return
-    if (matches.length === 0) {
-      if (field !== cur) result.push(field)
-      return
-    }
 
     const [m, ...ms] = matches
+
     if (m === "..") {
-      return resolve(ms, field.parent)
+      return resolve(ms, field.parent.name + "", field.parent)
     }
 
-    if (!m.test(field.name + "")) {
+    if (!m.test(name)) {
       return
+    }
+
+    if (ms.length === 0) {
+      return result.push(field)
     }
 
     if (field.type === "root" || field.type === "object") {
-      const names = [...field.struct.keys()].filter(k => m.test(k + ""))
-      for (const name of names) resolve(ms, field.struct.get(name))
-      return
+      return field.struct.forEach(f => resolve(ms, f.name as string, f))
     }
 
     if (field.type === "ary") {
-      field.struct.forEach((f, i) => {
-        if (!m.test(i + "")) return
+      return field.struct.forEach((f, i) => {
         if (!f.__uform_field) return
-        resolve(ms, f)
+        resolve(ms, i + "", f)
       })
-      return
     }
   }
 
-  return resolve(matches, startRoot ? root : cur), result
+  const startField = startRoot ? root : cur
+  return resolve(matches, startField.name + "", startField), result
 }
 
 function parse(path: string) {
