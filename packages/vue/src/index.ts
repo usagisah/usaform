@@ -1,6 +1,4 @@
-import { FormConfig as _FormConfig } from "./form.helper"
-export type FormConfig = Partial<_FormConfig>
-export type { Field, FieldName } from "./form.helper"
+export type { Field, FieldName, FormConfig } from "./form.helper"
 
 export { useForm } from "./form"
 export type { FormActions } from "./form"

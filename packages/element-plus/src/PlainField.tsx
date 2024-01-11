@@ -6,7 +6,7 @@ export interface PlainFieldProps {
   name: string | number
 
   layout?: string
-  layoutProps?: any
+  layoutProps?: Record<any, any>
 
   element: string
   props?: Record<any, any>
