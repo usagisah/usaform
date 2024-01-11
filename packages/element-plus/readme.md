@@ -32,7 +32,15 @@
 下载依赖
 
 ```shell
-pnpm add @usaform/element-plus element-plus
+pnpm add @usaform/element-plus element-plus @vitejs/plugin-vue-jsx
+```
+
+配置 vite
+
+```js
+export default defineConfig({
+  plugins: [vue(), jsx()]
+})
 ```
 
 引入样式文件
