@@ -1,4 +1,4 @@
-import { useFormObjectFiled } from "@usaform/vue"
+import { useFormObjectField } from "@usaform/vue"
 import { defineComponent, h } from "vue"
 
 export interface ObjectFieldProps {
@@ -22,7 +22,7 @@ export const ObjectField = defineComponent({
 
     let FieldLayout: any
     let FieldElement: any
-    const { render, actions } = useFormObjectFiled(name, ({ formConfig }) => {
+    const { render, actions } = useFormObjectField(name, ({ formConfig }) => {
       const Elements = formConfig.Elements ?? []
       FieldLayout = Elements[layout!]
       FieldElement = Elements[element!]

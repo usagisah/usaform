@@ -1,9 +1,6 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "types": [
-      "vitest/globals"
-    ],
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,

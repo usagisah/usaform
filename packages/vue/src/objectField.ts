@@ -26,7 +26,7 @@ export interface ObjectFieldActions extends FormBaseActions {}
 
 type ObjectFieldInit<T> = (info: ObjectFieldInitInfo) => ObjectFieldConfig<T>
 
-export function useFormObjectFiled<T = any>(name: FieldName, init: ObjectFieldInit<T>): FieldWrapper<T, ObjectFieldActions, false> {
+export function useFormObjectField<T = any>(name: FieldName, init: ObjectFieldInit<T>): FieldWrapper<T, ObjectFieldActions, false> {
   const ctx: FormContext = inject(formContext)!
   const { field, root } = ctx
   if (field.type === "plain") throw GlobalInfo.nullPlainField

@@ -11,7 +11,7 @@ export default defineConfig({
   },
   plugins: [vue(), jsx()],
   test: {
-    include: args.map(s => `packages/${s}/**/*.spec.{ts,tsx}`),
+    include: args.map(s => `packages/${s}/**/*.spec.ts`),
     globals: true,
     environment: "jsdom",
     restoreMocks: true

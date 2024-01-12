@@ -2,18 +2,19 @@ import { Field } from "../form.helper"
 
 type MatchPath = ".." | RegExp
 
-export function resolveFields(path: string, cur: Field, root: Field): Field[] {
+export function resolveFields(path: string, cur: Field, root: Field, first: boolean): Field[] {
   const { matches, startRoot } = parse(path)
   if (matches.length === 0) return []
 
   const result: Field[] = []
-  function resolve(matches: (RegExp | "..")[], name: string, field?: Field): unknown {
+  function resolve(matches: (RegExp | "..")[], name: string, field?: Field | null): unknown {
+    if (first && result.length === 1) return
     if (!field) return
 
     const [m, ...ms] = matches
 
     if (m === "..") {
-      return resolve(ms, field.parent.name + "", field.parent)
+      return resolve(ms, field.parent?.name + "", field.parent)
     }
 
     if (!m.test(name)) {

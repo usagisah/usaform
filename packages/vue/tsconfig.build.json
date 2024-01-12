@@ -5,6 +5,6 @@
     "incremental": false
   },
   "exclude": [
-    "test/**/*.ts"
-  ]
+    "__test__"
+  ],
 }

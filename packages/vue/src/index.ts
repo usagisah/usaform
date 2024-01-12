@@ -6,7 +6,7 @@ export type { FormActions } from "./form"
 export { useFormPlainField } from "./plainField"
 export type { PlainField, PlainFieldActions, PlainFieldConfig, PlainFieldInitInfo } from "./plainField"
 
-export { useFormObjectFiled } from "./objectField"
+export { useFormObjectField } from "./objectField"
 export type { ObjectField, ObjectFieldActions, ObjectFieldConfig, ObjectFieldInitInfo } from "./objectField"
 
 export { useFormArrayField } from "./arrayField"

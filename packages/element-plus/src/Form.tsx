@@ -23,11 +23,11 @@ export const Form = defineComponent({
     const config = props.config ?? {}
     config.Elements = { ...(config.Elements ?? {}) }
     config.Rules = { ...(config.Rules ?? {}) }
-    const form = useForm(config)
-    form.provide()
+    const { actions, render } = useForm(config)
+    actions.provide()
 
     async function validate() {
-      const res = form.call("validate", null)
+      const res = actions.call("validate", null)
       const ps: Promise<any>[] = []
       const errs: FormValidateError[] = []
       for (const path in res) {
@@ -46,13 +46,13 @@ export const Form = defineComponent({
     }
 
     function reset() {
-      form.call("reset", null)
+      actions.call("reset", null)
     }
 
-    expose({ ...form, validate, reset })
+    expose({ ...actions, validate, reset })
 
-    return () => {
+    return render(() => {
       return <div class="u-form">{slots.default?.()}</div>
-    }
+    })
   }
 })

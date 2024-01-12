@@ -15,7 +15,7 @@ export interface FormConfig {
 
 export interface BaseFiled extends FieldValue {
   name: FieldName
-  parent: Field
+  parent?: Field | null
   __uform_field: boolean
   __aryValue?: any
   __uform_aryItem_field?: boolean

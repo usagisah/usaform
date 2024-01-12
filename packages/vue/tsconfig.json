@@ -9,9 +9,6 @@
   "include": [
     "src/**/*.ts"
   ],
-  "exclude": [
-    "__test__"
-  ],
   "references": [
     {
       "path": "./tsconfig.test.json"
