@@ -3,7 +3,7 @@ import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
 import { createFieldRender } from "./fieldRender"
-import { BaseFiled, Field, FieldName, FieldWrapper, resolveFieldDefaultValue, setProperty } from "./form.helper"
+import { BaseFiled, Field, FieldName, FieldWrapper, FormConfig, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
 export interface ObjectField extends BaseFiled {
@@ -14,7 +14,7 @@ export interface ObjectField extends BaseFiled {
 
 export interface ObjectFieldInitInfo {
   initValue: any
-  formConfig: Record<string, any>
+  formConfig: FormConfig
 }
 
 export interface ObjectFieldConfig<T = any> {

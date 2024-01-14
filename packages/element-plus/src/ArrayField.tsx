@@ -1,7 +1,7 @@
 import { ArrayFieldActions, useFormArrayField } from "@usaform/vue"
-import { defineComponent, h, reactive } from "vue"
+import { SlotsType, defineComponent, h, reactive } from "vue"
 
-export interface ArrayFieldProps {
+export interface CArrayFieldProps {
   name: string
 
   layout?: string
@@ -11,7 +11,7 @@ export interface ArrayFieldProps {
   props?: Record<any, any>
 }
 
-export type ArrayFieldAttrs = {
+export type CArrayFieldAttrs = {
   fields: any[]
   actions: {
     push: (e: Record<any, any>) => void
@@ -24,16 +24,21 @@ export type ArrayFieldAttrs = {
 export const ArrayField = defineComponent({
   name: "ArrayField",
   props: ["name", "layout", "layoutProps", "element", "props"],
-  setup(props: ArrayFieldProps, { slots }) {
+  slots: Object as SlotsType<{
+    default?: CArrayFieldAttrs
+  }>,
+  setup(props: CArrayFieldProps, { slots }) {
     const { name, layout, element } = props
 
     let FieldLayout: any
     let FieldElement: any
-
+    let FieldSlot = slots.default
+    let gLayoutProps: any
     const { fieldValue, actions, render } = useFormArrayField(name, ({ formConfig }) => {
-      const Elements = formConfig.Elements ?? []
-      FieldLayout = Elements[layout!]
-      FieldElement = Elements[element!]
+      const { Elements, layoutProps } = formConfig
+      FieldLayout = Elements![layout as any]
+      FieldElement = Elements![element as any]
+      gLayoutProps = layoutProps
       return {}
     })
     const { delValue, setValue, swap } = actions
@@ -42,20 +47,19 @@ export const ArrayField = defineComponent({
     const push = (e: any) => setValue(fieldValue.value.length, e)
     const unshift = (e: any) => setValue(-1, e)
 
-    const mergeElementProps = (p = {}) => {
-      return reactive({ ...props.props, ...p, fields: fieldValue, actions: { ...actions, push, unshift, pop, shift, swap } })
+    const resolveElement = (p = {}) => {
+      const _props = reactive({ ...props.props, ...p, fields: fieldValue, actions: { ...actions, push, unshift, pop, shift, swap } })
+      return FieldElement ? [h(FieldElement), _props] : FieldSlot?.(_props)
     }
-
     return render(() => {
       if (FieldLayout) {
         return h(FieldLayout, {
-          ...(props.layoutProps ?? {}),
-          children(p: any) {
-            return FieldElement ? [h(FieldElement, mergeElementProps(p))] : slots.default?.(mergeElementProps(p))
-          }
+          ...gLayoutProps,
+          ...props.layoutProps,
+          children: resolveElement
         })
       }
-      return FieldElement ? h(FieldElement, mergeElementProps()) : slots.default?.(mergeElementProps())
+      return resolveElement()
     })
   }
 })

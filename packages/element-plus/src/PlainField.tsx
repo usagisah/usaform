@@ -1,50 +1,43 @@
 import { useFormPlainField } from "@usaform/vue"
-import { defineComponent, h, reactive, ref } from "vue"
+import { RuleItem } from "async-validator"
+import { SlotsType, defineComponent, h, reactive, ref } from "vue"
 import { FormItemExpose } from "./FormItem"
 
-export interface PlainFieldProps {
+export interface CPlainFieldProps {
   name: string | number
 
   layout?: string
   layoutProps?: Record<any, any>
 
-  element: string
+  element?: string
   props?: Record<any, any>
-
-  formSlots?: FormSlots
 }
 
-type FormSlots = Record<string, string | ((...props: any[]) => any)>
 export const PlainField = defineComponent({
   name: "PlainField",
-  props: ["name", "layout", "layoutProps", "element", "props", "formSlots"],
-  setup(props: PlainFieldProps) {
-    const { name, layout, element, formSlots } = props
+  props: ["name", "layout", "layoutProps", "element", "props"],
+  slots: Object as SlotsType<{
+    default?: { bind: { modelValue: any; "onUpdate:modelValue": (e: any) => any } } & Record<any, any>
+  }>,
+  setup(props: CPlainFieldProps, { slots }) {
+    const { name, layout, element } = props
     if (name !== 0 && !name) {
       throw "非法的使用方式，请正确使用 PlainField 组件"
     }
 
     const fieldLayoutRef = ref<FormItemExpose | null>(null)
 
-    let FieldLayout: any
-    let FieldElement: any
-    let FieldSlots: any = {}
-    let FieldRules: any = {}
-
+    let FieldLayout: any = null
+    let FieldElement: any = null
+    let gFieldRules: Record<any, RuleItem>
+    let gLayoutProps: any
+    let FieldSlot = slots.default
     const { fieldValue } = useFormPlainField(name, ({ formConfig }) => {
-      const { Elements = [], Rules = {}, defaultValue } = formConfig
-
-      FieldLayout = layout ? Elements[layout] : null
-      FieldElement = Elements[element]
-      FieldRules = Rules
-
-      if (formSlots) {
-        for (const key in formSlots) {
-          const val = formSlots[key]
-          if (typeof val === "string") FieldSlots[key] = () => h(Elements[val])
-          else FieldSlots[key] = () => h(val)
-        }
-      }
+      const { Elements, Rules, layoutProps, defaultValue } = formConfig
+      FieldLayout = Elements![layout as any]
+      FieldElement = Elements![element as any]
+      gFieldRules = Rules!
+      gLayoutProps = layoutProps!
 
       return {
         reset: () => {
@@ -60,25 +53,26 @@ export const PlainField = defineComponent({
       fieldValue.value = v
     }
 
-    const mergeElementProps = (p: object) => {
-      return reactive({
-        ...props.props,
-        ...p,
-        modelValue: fieldValue,
-        "onUpdate:modelValue": setFieldValue
-      })
+    const resolveElement = (p = {}) => {
+      const baseProps = { ...props.props, ...p }
+      if (FieldElement) {
+        return [h(FieldElement), reactive({ ...baseProps, modelValue: fieldValue, "onUpdate:modelValue": setFieldValue })]
+      } else {
+        return FieldSlot?.(reactive({ ...baseProps, bind: { modelValue: fieldValue, "onUpdate:modelValue": setFieldValue } }))
+      }
     }
 
     return () => {
       if (FieldLayout) {
         return h(FieldLayout, {
+          ...gLayoutProps,
           ...props.layoutProps,
-          Rules: FieldRules,
+          Rules: gFieldRules,
           ref: fieldLayoutRef,
-          children: (p = {}) => [h(FieldElement, mergeElementProps(p), FieldSlots)]
+          children: resolveElement
         })
       }
-      return h(FieldElement, mergeElementProps({}), FieldSlots)
+      return resolveElement()
     }
   }
 })
