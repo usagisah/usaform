@@ -10,6 +10,7 @@ import { FieldValue } from "./useFieldValue"
 export interface FormConfig {
   defaultValue?: any
   defaultFormData?: Record<any, any>
+  arrayUnwrapKey?: string | string[]
   [x: string]: any
 }
 

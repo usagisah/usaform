@@ -16,15 +16,20 @@ export interface ArrayItemConfig {
 }
 
 export function useFormArrayItem({ ctx, init, afterInit, index }: ArrayItemConfig): FieldWrapper<any, any, any> {
-  const { field, root } = ctx
+  const { field, root, arrayUnwrapKey } = ctx
   const { struct } = field as ArrayField
 
   const record: any = struct[index]
   if (getProperty(record, "__uform_field", false)) throw "array-field 检测到意外的重复，请检测是否进行了错误嵌套"
 
-  const { _field, _actions } = init({
-    initValue: getProperty(record, "value", false) ?? getProperty(record, "children", false)
-  })
+  let initValue: any = record
+  for (const k of arrayUnwrapKey) {
+    if (k in record) {
+      initValue = record[k]
+      break
+    }
+  }
+  const { _field, _actions } = init({ initValue })
   _field.__aryValue = record
   _field.__uform_aryItem_field = true
   struct[index] = _field

@@ -8,6 +8,8 @@ export interface FormContext {
   defaultValue: any
   currentInitValue: any
 
+  arrayUnwrapKey: string[]
+
   formConfig: FormConfig
 }
 

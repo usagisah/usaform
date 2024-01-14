@@ -74,9 +74,10 @@ export function normalizeFormConfig(c: FormConfig): FormConfig {
     if (ctxConfig) {
       for (const key in ctxConfig) {
         const ctxVal = ctxConfig[key]
+        const cVal = config[key]
         if (key === "Elements" || key === "Rules" || key === "layoutProps") {
           config[key] = { ...ctxVal, ...config[key] }
-        } else {
+        } else if (cVal === undefined) {
           config[key] = ctxVal
         }
       }

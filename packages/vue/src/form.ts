@@ -15,7 +15,7 @@ export interface FormActions extends FormBaseActions {
 }
 
 export function useForm(formConfig: FormConfig) {
-  const { defaultValue, defaultFormData } = toRaw(formConfig)
+  const { defaultValue, defaultFormData, arrayUnwrapKey, arrayUnwrapArrayKey } = toRaw(formConfig)
   const field: RootField = {
     type: "root",
     name: "root",
@@ -29,6 +29,7 @@ export function useForm(formConfig: FormConfig) {
     root: field,
     defaultValue,
     currentInitValue: { ...defaultFormData },
+    arrayUnwrapKey: arrayUnwrapKey ? (Array.isArray(arrayUnwrapKey) ? arrayUnwrapKey : [arrayUnwrapArrayKey]) : ["value", "children"],
     formConfig
   }
 
