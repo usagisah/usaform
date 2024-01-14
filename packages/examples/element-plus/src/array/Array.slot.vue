@@ -1,24 +1,23 @@
 <script lang="ts" setup>
 import { PlainField } from "@usaform/element-plus"
 import { ElButton, ElSpace } from "element-plus"
-import {} from "vue"
 
 defineOptions({
   inheritAttrs: false
 })
-const props = defineProps<{ fields: any; actions: any }>()
+const props = defineProps<{ fieldValue: any[]; actions: any }>()
 </script>
 
 <template>
-  <div v-for="(item, i) in fields" :key="item.id">
+  <div v-for="(item, i) in fieldValue" :key="item.id">
     <PlainField :name="i" layout="FormItem" :layout-props="{ label: '名称', required: true }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
   </div>
   <ElSpace>
-    <ElButton @click="props.actions.push({ id: Math.random(), value: '11111111' })">add</ElButton>
-    <ElButton @click="props.actions.pop()">pop</ElButton>
-    <ElButton @click="props.actions.unshift({ id: Math.random(), value: '2222' })">unshift</ElButton>
-    <ElButton @click="props.actions.shift()">shift</ElButton>
-    <ElButton @click="props.actions.swap(0, fields.length - 1)">swap</ElButton>
+    <ElButton @click="props.actions.push({ id: Math.random(), value: '11111111' })">尾部添加</ElButton>
+    <ElButton @click="props.actions.pop()">尾部删除</ElButton>
+    <ElButton @click="props.actions.unshift({ id: Math.random(), value: '2222' })">头部添加</ElButton>
+    <ElButton @click="props.actions.shift()">头部删除</ElButton>
+    <ElButton @click="props.actions.swap(0, fieldValue.length - 1)" v-if="fieldValue.length >= 2">交换收尾</ElButton>
   </ElSpace>
 </template>
 

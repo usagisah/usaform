@@ -1,0 +1,42 @@
+<script lang="ts" setup>
+import { ElAlert, ElLink, ElSpace } from "element-plus"
+import { ref, shallowReactive } from "vue"
+import Basic from "./Basic.vue"
+import Obj from "./Object.vue"
+import Arr from "./Array.vue"
+import Dnamic from "./DynamicNest.vue"
+
+const list = shallowReactive([
+  { n: "普通平铺", d: "基本的平铺写法，与直接使用 ElForm 差不多", c: Basic },
+  { n: "对象嵌套", d: "以对象的形式深层次嵌套", c: Obj },
+  { n: "数据嵌套", d: "数组形式的动态表单", c: Arr },
+  { n: "复杂嵌套", d: "3者混合的动态表单，演示功能：多层嵌套，多字段联动，动态更新，跨字段监听", c: Dnamic }
+])
+const act = ref(0)
+</script>
+
+<template>
+  <div class="layout">
+    <ElSpace>
+      <ElLink v-for="(item, index) in list" :key="item.n" @click="act = index" :type="index === act ? 'primary' : 'default'">
+        {{ item.n }}
+      </ElLink>
+    </ElSpace>
+    <ElAlert style="width: 400px" center :closable="false" title="打开vue的调试工具(devTools)可以看到具体的更新范围，点提交可以在控制台看到返回的数据结构" type="success" />
+    <ElAlert style="width: 400px" center :closable="false" :title="list[act].d" type="success" />
+    <div class="form">
+      <component :is="list[act].c" />
+    </div>
+  </div>
+</template>
+
+<style lang="scss">
+.layout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  width: 100vw;
+}
+</style>

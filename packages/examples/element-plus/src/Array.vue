@@ -1,70 +1,60 @@
 <script lang="ts" setup>
-import { nextTick, ref } from "vue"
-import { ElInput, ElSelect, ElInputNumber, ElDivider, ElCard, ElButton, ElDatePicker, ElCascader, ElSpace } from "element-plus"
-import { Form, FormConfig, FormItem, PlainField, FormExpose, ArrayField } from "@usaform/element-plus"
-import Select from "./form/Select.vue"
-import Radio from "./form/Radio.vue"
-import Checkbox from "./form/Checkbox.vue"
-import ArraySlot from "./array/Array.slot.vue"
+import { ref } from "vue"
+import { ElInput, ElDivider, ElCard, ElButton, ElSpace } from "element-plus"
+import { Form, FormItem, PlainField, CFormExpose, ArrayField } from "@usaform/element-plus"
 
-const formConfig: FormConfig = {
-  Elements: { ElInput, ElSelect, FormItem, ElInputNumber, Select, Radio, Checkbox, ElDatePicker, ElCascader, ArraySlot },
-  defaultFormData: {
-    array1: [{ value: "1111111" }, { value: "2222222" }]
-  }
-}
-const form = ref<FormExpose | null>(null)
-const print = () => {
-  console.log(form.value!.getFormData())
-}
-const validate = async () => {
-  console.log(await form.value!.validate())
-}
-const reset = () => {
-  form.value!.reset()
-}
-nextTick(() => {
-  form.value!.subscribe("array1/[0-1]", (nv, ov) => {
-    console.log(nv, ov)
-  })
-})
+const formSlot = ref<CFormExpose | null>(null)
+const callSlot = (key: string) => console.log(formSlot.value![key]())
+const formKey = ref<CFormExpose | null>(null)
+const callKey = (key: string) => console.log(formKey.value![key]())
 </script>
 
 <template>
-  <div class="form">
+  <ElSpace>
     <ElCard>
-      <Form :config="formConfig" ref="form">
-        <!-- 这两种使用效果一样， -->
-        <!-- 但使用 element 不会更新当前组件，性能更好一点 -->
-
-        <ElDivider content-position="center">高性能版本</ElDivider>
-        <ArrayField name="array1" element="ArraySlot" />
-
-        <ElDivider content-position="center">简单版本</ElDivider>
-        <ArrayField name="array2">
-          <template #default="{ fields, actions }">
-            <div v-for="(item, i) in fields" :key="item.id">
-              <PlainField :name="i" layout="FormItem" :layout-props="{ label: '名称', required: true }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
+      <template #header>插槽</template>
+      <Form ref="formSlot">
+        <ArrayField name="array">
+          <template #default="{ fieldValue, actions }">
+            <div v-for="(item, i) in fieldValue" :key="item.id">
+              <PlainField :name="i" layout="FormItem" :layout-props="{ label: '名称', required: true }">
+                <template #default="{ bind }">
+                  <ElInput v-bind="bind" placeholder="请输入名称" />
+                </template>
+              </PlainField>
             </div>
             <ElSpace>
-              <ElButton @click="actions.push({ id: Math.random(), value: '11111111' })">add</ElButton>
-              <ElButton @click="actions.pop()">pop</ElButton>
-              <ElButton @click="actions.unshift({ id: Math.random(), value: '2222' })">unshift</ElButton>
-              <ElButton @click="actions.shift()">shift</ElButton>
-              <ElButton @click="actions.swap(0, fields.length - 1)">swap</ElButton>
+              <ElButton @click="actions.push({ id: Math.random(), value: '11111111' })">尾部添加</ElButton>
+              <ElButton @click="actions.pop()">尾部删除</ElButton>
+              <ElButton @click="actions.unshift({ id: Math.random(), value: '2222' })">头部添加</ElButton>
+              <ElButton @click="actions.shift()">头部删除</ElButton>
+              <ElButton @click="actions.swap(0, fieldValue.length - 1)" v-if="fieldValue.length >= 2">交换收尾</ElButton>
             </ElSpace>
           </template>
         </ArrayField>
 
         <ElDivider content-position="center">(布局样式) 提交</ElDivider>
         <FormItem>
-          <ElButton @click="print">submit</ElButton>
-          <ElButton @click="validate">validate</ElButton>
-          <ElButton type="danger" @click="reset">reset</ElButton>
+          <ElButton @click="callSlot('getFormData')">submit</ElButton>
+          <ElButton @click="callSlot('validate')">validate</ElButton>
+          <ElButton @click="callSlot('reset')">reset</ElButton>
         </FormItem>
       </Form>
     </ElCard>
-  </div>
+
+    <ElCard>
+      <template #header>指定 key</template>
+      <Form ref="formKey">
+        <ArrayField name="array" element="ArraySlot" />
+        <ElDivider content-position="center">(布局样式) 提交</ElDivider>
+        <FormItem>
+          <ElButton @click="callKey('getFormData')">submit</ElButton>
+          <ElButton @click="callKey('validate')">validate</ElButton>
+          <ElButton @click="callKey('reset')">reset</ElButton>
+        </FormItem>
+      </Form>
+    </ElCard>
+  </ElSpace>
 </template>
 
 <style lang="scss" scoped>

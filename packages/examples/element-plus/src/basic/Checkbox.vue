@@ -1,17 +1,9 @@
 <script lang="ts" setup>
 import { ElCheckbox, ElCheckboxGroup } from "element-plus"
-import { computed } from "vue";
-const props = defineProps<{ modelValue: any; onChange: any }>()
-const emit = defineEmits(["update:modelValue"])
-const value = computed({
-  get() {
-    return props.modelValue ?? []
-  },
-  set(value) {
-    emit("update:modelValue", value)
-    props.onChange?.(value)
-  }
-})
+import { computed, watch } from "vue"
+const props = defineProps<{ onChange: any }>()
+const value = defineModel<string[]>()
+watch(value, v => props.onChange?.(v))
 </script>
 
 <template>

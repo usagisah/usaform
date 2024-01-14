@@ -1,12 +1,7 @@
 <script lang="ts" setup>
 import { provide, reactive, ref } from "vue"
-import { ElInput, ElSelect, ElInputNumber, ElDivider, ElCard, ElButton, ElDatePicker } from "element-plus"
-import { Form, FormConfig, FormItem, FormExpose, ArrayField } from "@usaform/element-plus"
-import DynamicGroup from "./dynamic/DynamicNest.Group.vue"
-import DynamicItem from "./dynamic/DynamicNest.Item.vue"
-import DynamicType from "./dynamic/DynamicNest.Type.vue"
-import DynamicOperate from "./dynamic/DynamicNest.Operate.vue"
-import DynamicValue from "./dynamic/DynamicNest.Value.vue"
+import { ElDivider, ElCard, ElButton } from "element-plus"
+import { Form, FormConfig, FormItem, CFormExpose, ArrayField } from "@usaform/element-plus"
 
 const fetchData = reactive({
   types: [
@@ -20,9 +15,8 @@ const fetchData = reactive({
 })
 provide("formData", fetchData)
 const formConfig: FormConfig = {
-  Elements: { ElInput, ElSelect, FormItem, ElInputNumber, ElDatePicker, DynamicType, DynamicOperate, DynamicValue, DynamicGroup, DynamicItem },
   defaultFormData: {
-    group: [
+    dynamic: [
       {
         groupId: 1,
         children: [
@@ -39,9 +33,9 @@ const formConfig: FormConfig = {
     ]
   }
 }
-const form = ref<FormExpose | null>(null)
+const form = ref<CFormExpose | null>(null)
 setTimeout(() => {
-  form.value!.set("group", [
+  form.value!.set("dynamic", [
     {
       groupId: 1,
       children: [
@@ -58,7 +52,7 @@ setTimeout(() => {
   ])
 }, 5000)
 
-const print = () => {
+const submit = () => {
   console.log(form.value!.getFormData())
 }
 const validate = async () => {
@@ -70,33 +64,16 @@ const reset = () => {
 </script>
 
 <template>
-  <div class="form">
-    <ElCard>
-      <Form :config="formConfig" ref="form">
-        <ArrayField name="group" element="DynamicGroup" />
-
-        <ElDivider content-position="center">(布局样式) 提交</ElDivider>
-        <FormItem>
-          <ElButton @click="print">submit</ElButton>
-          <ElButton @click="validate">validate</ElButton>
-          <ElButton type="danger" @click="reset">reset</ElButton>
-        </FormItem>
-      </Form>
-    </ElCard>
-  </div>
+  <ElCard style="width: 1000px">
+    <template #header>指定 key</template>
+    <Form :config="formConfig" ref="form">
+      <ArrayField name="dynamic" element="DynamicGroup" />
+      <ElDivider content-position="center">(布局样式) 提交</ElDivider>
+      <FormItem>
+        <ElButton @click="submit">submit</ElButton>
+        <ElButton @click="validate">validate</ElButton>
+        <ElButton type="danger" @click="reset">reset</ElButton>
+      </FormItem>
+    </Form>
+  </ElCard>
 </template>
-
-<style lang="scss" scoped>
-.form {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-
-  .el-card {
-    width: 1000px;
-    margin-top: -200px;
-  }
-}
-</style>

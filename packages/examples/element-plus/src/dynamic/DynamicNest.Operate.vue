@@ -1,21 +1,13 @@
 <script lang="ts" setup>
-import { ArrayFieldAttrs } from "@usaform/element-plus"
+import { CArrayFieldAttrs } from "@usaform/element-plus"
 import { ElOption, ElSelect } from "element-plus"
 import { computed, inject, ref } from "vue"
 const props = defineProps<{ data: any; modelValue: any; actions: any }>()
-const emit = defineEmits(["update:modelValue"])
-const value = computed({
-  get() {
-    return props.modelValue
-  },
-  set(value) {
-    emit("update:modelValue", value)
-  }
-})
+const value = defineModel<string>()
 
 const _data = inject<any>("formData")!
 const operates = ref<any>([])
-const { get, subscribe }: ArrayFieldAttrs["actions"] = props.actions
+const { get, subscribe }: CArrayFieldAttrs["actions"] = props.actions
 operates.value = _data.operates[get("type")[0]]
 subscribe("type", v => {
   const o = (operates.value = _data.operates[v])

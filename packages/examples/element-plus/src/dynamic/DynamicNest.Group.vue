@@ -6,7 +6,7 @@ import { onBeforeUnmount } from "vue"
 defineOptions({
   inheritAttrs: false
 })
-const props = defineProps<{ fields: any; actions: any }>()
+const props = defineProps<{ fieldValue: any; actions: any }>()
 onBeforeUnmount(() => {
   console.log("onUnmounted, group")
 })
@@ -14,7 +14,7 @@ onBeforeUnmount(() => {
 
 <template>
   <ElDivider content-position="center">分组配置</ElDivider>
-  <div v-for="(item, index) in props.fields" :key="item.groupId">
+  <div v-for="(item, index) in props.fieldValue" :key="item.groupId">
     <ArrayField :name="index" element="DynamicItem" />
   </div>
 </template>
