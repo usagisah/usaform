@@ -1,5 +1,5 @@
 import { FormActions, FormConfig, useForm } from "@usaform/vue"
-import { defineComponent, inject, provide } from "vue"
+import { App, defineComponent, hasInjectionContext, inject, provide } from "vue"
 
 export interface CFormProps {
   config?: FormConfig
@@ -20,7 +20,7 @@ export const Form = defineComponent({
   name: "Form",
   props: ["config"],
   setup(props: CFormProps, { slots, expose }) {
-    const config = normalizeFormConfig(props.config)
+    const config = normalizeFormConfig(props.config ?? {})
     const { actions, render } = useForm(config)
     actions.provide()
 
@@ -56,24 +56,29 @@ export const Form = defineComponent({
 })
 
 export const FormContextKey = Symbol()
-export function useFormConfigProvide(config: FormConfig) {
-  provide(FormContextKey, normalizeFormConfig(config))
+export function useFormConfigProvide(config: FormConfig): FormConfig
+export function useFormConfigProvide(config: FormConfig, app: App): FormConfig
+export function useFormConfigProvide(config: FormConfig, app?: App) {
+  const conf = normalizeFormConfig(config ?? {})
+  app ? app.provide(FormContextKey, conf) : provide(FormContextKey, conf)
+  return conf
 }
 
-export function normalizeFormConfig(c1?: FormConfig): FormConfig {
-  const config = c1 ? { ...c1 } : {}
+export function normalizeFormConfig(c: FormConfig): FormConfig {
+  const config = { ...c }
   config.Elements = { ...(config.Elements ?? {}) }
   config.Rules = { ...(config.Rules ?? {}) }
   config.layoutProps = { ...(config.layoutProps ?? {}) }
-
-  const ctxConfig = inject<FormConfig>(FormContextKey)
-  if (ctxConfig) {
-    for (const key in ctxConfig) {
-      const ctxVal = ctxConfig[key]
-      if (key === "Elements" || key === "Rules" || key === "layoutProps") {
-        config[key] = { ...ctxVal, ...config[key] }
-      } else {
-        config[key] = ctxVal
+  if (hasInjectionContext()) {
+    const ctxConfig = inject<FormConfig>(FormContextKey)
+    if (ctxConfig) {
+      for (const key in ctxConfig) {
+        const ctxVal = ctxConfig[key]
+        if (key === "Elements" || key === "Rules" || key === "layoutProps") {
+          config[key] = { ...ctxVal, ...config[key] }
+        } else {
+          config[key] = ctxVal
+        }
       }
     }
   }

@@ -1,7 +1,7 @@
 import Schema, { RuleItem } from "async-validator"
 import { SlotsType, computed, defineComponent, h, reactive, watchEffect } from "vue"
 
-export interface FormItemProps {
+export interface CFormItemProps {
   label?: string
   labelWith?: string | number
   size?: "small" | "large" | "default"
@@ -15,14 +15,14 @@ export interface FormItemProps {
   children?: (p: any) => any[]
 }
 
-export interface FormItemAttrs {
+export interface CFormItemAttrs {
   id: string
   disabled: boolean
   size: "small" | "large" | "default"
   onChange: (e: any) => void
 }
 
-export interface FormItemExpose {
+export interface CFormItemExpose {
   validate: Validate
   setValidateState: (state: { error: boolean; message: string }) => void
 }
@@ -35,7 +35,7 @@ export const FormItem = defineComponent({
   slots: Object as SlotsType<{
     default?: { id: string; size: string; disabled: boolean }
   }>,
-  setup(props: FormItemProps, { slots, expose }) {
+  setup(props: CFormItemProps, { slots, expose }) {
     const { showError, errorState, setValidateState } = useError(props)
     const { onChange, validate } = useRules(props, setValidateState)
     expose({ validate, setValidateState })
@@ -60,7 +60,11 @@ export const FormItem = defineComponent({
       else style.width = "auto"
       return style
     })
-    const contentProps = computed<any>(() => ({ id, size: size.value, disabled: !!props.disabled, onChange }))
+    const contentProps = computed<any>(() => {
+      const p: any = { id, size: size.value, disabled: !!props.disabled, onChange }
+      p.bind = p
+      return p
+    })
 
     return () => {
       const children = (props.children ? props.children(contentProps.value) : slots.default?.(contentProps.value)) ?? []
@@ -82,7 +86,7 @@ export const FormItem = defineComponent({
 })
 
 type Validate = (name: string, value: any) => Promise<any>
-function useRules(props: FormItemProps, setErrorState: (p: ErrorState) => any) {
+function useRules(props: CFormItemProps, setErrorState: (p: ErrorState) => any) {
   let rules: RuleItem[] = []
   watchEffect(() => {
     const { Rules, required } = props
@@ -124,7 +128,7 @@ type ErrorState = {
   error: boolean
   message: string
 }
-function useError(props: FormItemProps) {
+function useError(props: CFormItemProps) {
   const showError = computed(() => (typeof props.showError === "boolean" ? props.showError : true))
   const errorState = reactive({ error: false, message: "" })
   const setValidateState = (state: ErrorState) => {

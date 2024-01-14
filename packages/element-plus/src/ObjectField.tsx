@@ -4,6 +4,8 @@ import { SlotsType, defineComponent, h } from "vue"
 export interface CObjectFieldProps {
   name: string | number
 
+  initValue?: any
+
   layout?: string
   layoutProps?: Record<any, any>
 
@@ -13,9 +15,9 @@ export interface CObjectFieldProps {
 
 export const ObjectField = defineComponent({
   name: "ObjectField",
-  props: ["name", "layout", "layoutProps", "element", "props"],
+  props: ["name", "initValue", "layout", "layoutProps", "element", "props"],
   slots: Object as SlotsType<{
-    default?: { actions: ObjectFieldActions } & Record<any, any>
+    default: { actions: ObjectFieldActions; fieldValue: any; [x: string]: any }
   }>,
   setup(props: CObjectFieldProps, { slots }) {
     const { name, layout, element } = props
@@ -27,12 +29,12 @@ export const ObjectField = defineComponent({
     let FieldElement: any
     let FieldSlot = slots.default
     let gLayoutProps: any
-    const { render, actions } = useFormObjectField(name, ({ formConfig }) => {
+    const { fieldValue, render, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
       const { Elements, layoutProps } = formConfig
       FieldLayout = Elements![layout as any]
       FieldElement = Elements![element as any]
       gLayoutProps = layoutProps
-      return {}
+      return { initValue: initValue ?? props.initValue }
     })
 
     return render(() => {
@@ -41,12 +43,13 @@ export const ObjectField = defineComponent({
           ...gLayoutProps,
           ...props.layoutProps,
           children(p: any) {
-            const _props = { ...props.props, ...p, actions }
+            const { bind, ..._p } = p
+            const _props = { ..._p, ...props.props, fieldValue: fieldValue.value, actions }
             return FieldElement ? [h(FieldElement, _props)] : FieldSlot?.(_props)
           }
         })
       }
-      const _props = { ...props.props, actions }
+      const _props = { ...props.props, fieldValue: fieldValue.value, actions }
       return FieldElement ? h(FieldElement, _props) : FieldSlot?.(_props)
     })
   }

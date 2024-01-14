@@ -1,10 +1,12 @@
 import { useFormPlainField } from "@usaform/vue"
 import { RuleItem } from "async-validator"
-import { SlotsType, defineComponent, h, reactive, ref } from "vue"
-import { FormItemExpose } from "./FormItem"
+import { SlotsType, defineComponent, h, ref } from "vue"
+import { CFormItemExpose } from "./FormItem"
 
 export interface CPlainFieldProps {
   name: string | number
+
+  initValue?: any
 
   layout?: string
   layoutProps?: Record<any, any>
@@ -15,9 +17,9 @@ export interface CPlainFieldProps {
 
 export const PlainField = defineComponent({
   name: "PlainField",
-  props: ["name", "layout", "layoutProps", "element", "props"],
+  props: ["name", "initValue", "layout", "layoutProps", "element", "props"],
   slots: Object as SlotsType<{
-    default?: { bind: { modelValue: any; "onUpdate:modelValue": (e: any) => any } } & Record<any, any>
+    default: { bind: { modelValue: any; "onUpdate:modelValue": (e: any) => any } } & Record<any, any>
   }>,
   setup(props: CPlainFieldProps, { slots }) {
     const { name, layout, element } = props
@@ -25,14 +27,14 @@ export const PlainField = defineComponent({
       throw "非法的使用方式，请正确使用 PlainField 组件"
     }
 
-    const fieldLayoutRef = ref<FormItemExpose | null>(null)
+    const fieldLayoutRef = ref<CFormItemExpose | null>(null)
 
     let FieldLayout: any = null
     let FieldElement: any = null
     let gFieldRules: Record<any, RuleItem>
     let gLayoutProps: any
     let FieldSlot = slots.default
-    const { fieldValue } = useFormPlainField(name, ({ formConfig }) => {
+    const { fieldValue } = useFormPlainField(name, ({ initValue, formConfig }) => {
       const { Elements, Rules, layoutProps, defaultValue } = formConfig
       FieldLayout = Elements![layout as any]
       FieldElement = Elements![element as any]
@@ -40,6 +42,7 @@ export const PlainField = defineComponent({
       gLayoutProps = layoutProps!
 
       return {
+        initValue: initValue ?? props.initValue,
         reset: () => {
           fieldValue.value = defaultValue
           fieldLayoutRef.value!.setValidateState({ error: false, message: "" })
@@ -53,12 +56,12 @@ export const PlainField = defineComponent({
       fieldValue.value = v
     }
 
-    const resolveElement = (p = {}) => {
-      const baseProps = { ...props.props, ...p }
+    const resolveElement = (p: any = {}) => {
       if (FieldElement) {
-        return [h(FieldElement), reactive({ ...baseProps, modelValue: fieldValue, "onUpdate:modelValue": setFieldValue })]
+        return [h(FieldElement, { ...p, ...props.props, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue })]
       } else {
-        return FieldSlot?.(reactive({ ...baseProps, bind: { modelValue: fieldValue, "onUpdate:modelValue": setFieldValue } }))
+        const { bind, ..._p } = p
+        return FieldSlot?.({ ..._p, ...props.props, bind: { ...bind, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue } })
       }
     }
 
