@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ElOption, ElSelect } from "element-plus"
-import { watch } from "vue";
+import { watch } from "vue"
 const props = defineProps<{ onChange: any }>()
 const value = defineModel<string>()
 watch(value, v => props.onChange?.(v))

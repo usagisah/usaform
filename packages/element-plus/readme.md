@@ -1,10 +1,12 @@
 # @usaform/element-plus
 
+文档请以[仓库](https://github.com/usagisah/usaform/tree/main/packages/element-plus)最新的内容为准
+
 
 
 ## 简介
 
-一个用于构建高性能**类表单系统**的逻辑控制组件库，使用它可以可以收获到以下好处，它有着以下优点
+一个用于构建高性能**类表单系统**的逻辑控制组件库，使用它可以可以收获到以下好处
 
 1. 高性能，跨组件的互操作性
 
@@ -18,6 +20,8 @@
 
    市面上会有许多表单相关的库，相比较而言该库**体积更小，观念更少，操作简单**
 
+ps: 当前是用的 tsc 打包，所以 npm 上的同级会很大，实际上并不大
+
 什么情况下可以尝试使用
 
 1. 多层次的嵌套表单 —— 主要提供便利
@@ -27,12 +31,24 @@
 
 
 
-## 快速上手
+## 必看内容
+
+- 项目配置（会 cv）
+
+- 组织概念（了解）
+
+如果文档看着比较难以理解，强烈建议看看仓库中的 examples 中的几个使用[例子](https://github.com/usagisah/usaform/tree/main/packages/examples/element-plus)
+
+
+
+
+
+## 项目配置
 
 下载依赖
 
 ```shell
-pnpm add @usaform/element-plus element-plus @vitejs/plugin-vue-jsx
+pnpm add @usaform/element-plus element-plus @vitejs/plugin-vue-jsx sass
 ```
 
 配置 vite
@@ -92,15 +108,15 @@ const reset = () => {
 </template>
 ```
 
-如果文档看着比较难以理解，可以结合 demo 对照理解
-
-强烈建议看看仓库中的 examples 中的几个使用例子
 
 
 
-## 表单组件的类型 & 组织理念
 
-使用组件分为 3 个部分
+## 组织理念
+
+### 结构
+
+通过上边的 `demo`，可以看到使用上大致分为 3 部分组成，其他内容均围绕这三个内容展开
 
 1. 创建表单
 
@@ -108,19 +124,17 @@ const reset = () => {
 
 2. 使用字段组件
 
-   拿变量举例，创建表单相当于创建了一个对象变量 `const form = {}`
+   字段组件用于创建表单项，使用时内部会自动注册到表单的上下文中
 
-   要往里面填充内容就需要用到，内部提供的其他的字段组件，它们会检测当前的上下文环境，动态的注册到表单上下文中，相当于进行了赋值操作 `form.xxxField = xxx`
+   提供的字段组件总共有3个
 
-   字段组件分为
-
-   	- `PlainField` 创建基本值字段，比如 `input/select` 这种无法继续细分的就是基本值，所以该组件无法嵌套
-   	- `ObjectField` 创建对象字段，用于对不同的字段进行分组和嵌套
-   	- `ArrayField` 创建数组字段，用于以数组的形式，对不同的字段进行分组和嵌套
-
+   - `PlainField` 创建基本值字段，比如 `input/select` 这种无法继续细分的就是基本值，所以该组件无法嵌套
+   - `ObjectField` 创建对象字段，用于嵌套
+   - （难）`ArrayField` 创建数组字段，用于嵌套和动态表单
+   
 3. 与表单交互
 
-   交互操作比如
+   交互操作需要用到互操作实例方法
 
    - 获取所有表单内容
    - 对表单进行校验
@@ -129,7 +143,24 @@ const reset = () => {
    - 获取某个字段内容
    - 监听某个字段内容
 
-   交互需要获取不同表单内部的操作实例，获取方式请往下看
+   交互需要获取不同表单内部的操作实例，获取方式请往后看
+
+### 写法
+
+为了保证使用的灵活性，框架只提供逻辑上的粘合能力，关于表单的实际的内容，布局全部自行填充
+
+写法上会有两种风格
+
+- 全部用插槽，写起来方便
+- 使用指定 key，写起来啰嗦，但性能最好
+
+建议，对于简单的场景可以直接 cv 组件库的组件填充。一般用插槽写即可，除非出现性能问题可以选择指定 key 的方式
+
+### 数据
+
+表单的数据由框架内部的一套机制进行管理，暴露出来的通常是一个`vue 的 shallowRef()`，不同字段（即使是上下级）的数据是互相独立的，只有在创建时会进行一次交互
+
+如果要对当前字段，或者其他字段进行增删改查，为了避免意外 bug 请全部使用 **通用的互操作实例方法** 进行操作
 
 
 
@@ -137,47 +168,402 @@ const reset = () => {
 
 用于创建表单的上下文容器
 
-### **参数**
+```vue
+<script setup lang="ts">
+import { Form, FormConfig, CFormExpose } from "@usaform/element-plus"
+const form = ref<CFormExpose | null>(null)
+const config: FormConfig = {}
+</script>
 
-- `config` 表单的全局配置，ts 类型参数 `FormConfig` ，具体内容如下
+<template>
+<Form ref="formKey" :config="config">
+  </Form>
+</template>
+```
 
-|      属性       | 类型                     | 可选 | 描述                                                         |
-| :-------------: | ------------------------ | :--: | ------------------------------------------------------------ |
-|  defaultValue   | any                      |  是  | 当创建新的字段，全没有初始值时，作为默认值使用               |
-| defaultFormData | Record<any, any>         |  是  | 整体表单的默认值，用于回显表单 \n                            |
-|    Elements     | Record<string, any>      |  是  | 设置内部用到的组件，例如 { input: ElInput }                  |
-|      Rules      | Record<string, RuleItem> |  是  | 设置全局校验项，规则和 element-plus 一致，更详细内容看npm包 async-validator |
+`ref` 获取到的是[互操作实例](#通用的互操作实例方法)
 
-补充
+`config` 配置选项同 [表单配置](#表单配置)
 
-- 不知道 `defaultFormData` 设置成什么结构，可以先调用 `getFormData` 方法，按照同样结构写即可
-
+`Form` 组件内，如果是字段组件会自动注册，其他组件和样式都会原封不动的显示
 
 
-### `ref 实例`
 
-可以拿到内部的操作实例，ts 类型参数 `FormExpose`
 
-| 属性        | 类型                                                         | 描述                                                   |
-| ----------- | ------------------------------------------------------------ | ------------------------------------------------------ |
-| reset       | () => void                                                   | 清空所有 `PlainField` 组件的值                         |
-| validate    | () => Promise<FormValidateError[]>                           | 触发所有 `PlainField` 组件的校验，只返回校验失败的字段 |
-| getFormData | Record<string, any>                                          | 不触发校验，返回表单内部所有的值                       |
-| subscribe   | (*paths*: string, *handle*: import("./useFieldValue").FieldSubscribeHandle) => () => void | 订阅匹配字段的修改                                     |
-| get         | (*path*: string) => any[]                                    | 获取匹配字段的值                                       |
-| set         | (*path*: string, *value*: any) => void                       | 设置匹配字段的值                                       |
 
-补充
+## 字段组件 -- `PlainField`
+
+**用处创建基本值的字段，无法进行嵌套**
+
+该组件没有操作性实例使用，因为如果传递，在直接 cv 组件库代码时，没有使用的属性会自动传递到填充组件的 dom 属性上导致不美观，如果需要使用请使用 `ObjectField` 嵌套后传递后使用
+
+### 参数
+
+```ts
+export interface PlainFieldProps {
+  name: string | number  //字段名称
+
+  initValue?: any   //字段的初始值，优先级大于配置的默认值，不传或传递undefined数据会自动透传
+
+  layout?: string    //布局组件 key，如果传就用
+  layoutProps?: Record<any, any> //转发给布局组件的参数
+
+  element?: string   //填充组件的 key
+  props?: Record<any, any> //填充组件的参数
+}
+```
+
+ps：key 值就是表单配置或者 `form` 组件配置中的 `Elements` 对象中的 key
+
+### 插槽写法
+
+```html
+<PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', required: true }">
+  <template #default="{ bind }">
+    <ElInput v-bind="bind" placeholder="请输入名称" />
+  </template>
+</PlainField>
+```
+
+`bind` 参数是一个包装好的对象，里边包含了数据绑定相关的方法，插槽写法则必须绑定
+
+### 指定 key 写法
+
+```html
+<PlainField 
+            name="input" 
+            layout="FormItem" 
+            :layout-props="{ label: '名称', required: true }" 
+            element="ElInput" 
+            :props="{ placeholder: '请输入名称' }" 
+/>
+```
+
+区别在于把放在插槽的内容放到了别处（通常是一个新的组件文件），通过配置表单的 `Elements`，再用 `element` 属性进行引用
+
+尽量让其保持高优先级，不然可能会导致意外的 bug
+
+### 封装 element 指向的组件文件
+
+```vue
+<script lang="ts" setup>
+import { ElOption, ElSelect } from "element-plus"
+import { watch } from "vue";
+const props = defineProps<{ onChange: any }>()
+const value = defineModel<string>()
+watch(value, v => props.onChange?.(v))
+</script>
+
+<template>
+  <ElSelect v-model="value">
+    <ElOption label="1" value="1" />
+    <ElOption label="2" value="2" />
+    <ElOption label="3" value="3" />
+  </ElSelect>
+</template>
+```
+
+以上写法是一个参考，该文件接收的参数来源于 2 个地方
+
+- [布局组件](#布局组件)
+- 框架内部的数据绑定，如果
+
+参数可能会比较多，不想控制台警告可以做如下设置
+
+```vue
+<script setup lang="ts">
+defineOptions({
+  inheritAttrs: false
+})
+</script>
+```
+
+
+
+
+
+## 字段组件 -- `ObjectField`
+
+用来做分组嵌套的组件，本身不产生样式和显示逻辑
+
+### 参数
+
+```tsx
+export interface PlainFieldProps {
+  name: string | number  //字段名称
+
+  initValue?: any   //字段的初始值，优先级大于配置的默认值，不传或传递undefined数据会自动透传
+
+  layout?: string    //布局组件 key，如果传就用
+  layoutProps?: Record<any, any> //转发给布局组件的参数
+
+  element?: string   //填充组件的 key
+  props?: Record<any, any> //填充组件的参数
+}
+```
+
+和 `PlainField` 基本一致
+
+### 插槽写法
+
+```vue
+<ObjectField name="object" layout="FormItem">
+  <template #default="{ actions, fieldValue, ...other }">
+		<PlainField name="aaa" element="MyInput" :props="{ actions }" />
+		<PlainField name="xxx" element="MyInput" :props="{ actions }" />
+  </template>
+</ObjectField>
+```
+
+`actions` 是[通用的互操作实例方法](#通用的互操作实例方法)
+
+`fieldValue` 是来自表单配置中的初始值
+
+`other` 来自布局组件
+
+### 指定 key 写法
+
+```html
+<ObjectField name="object" layout="FormItem" element="myInput"></ObjectField>
+```
+
+`ObjectField` 组件开销很小，为了方便可以多使用插槽写法
+
+### 自定义文件
+
+参数和插槽一样，写法上没有任何要求，当正常组件写即可
+
+```vue
+<script setup>
+const props = defineProps<{ actions: any, fieldValue: any }>()
+</script>
+<template>
+		<PlainField name="aaa" element="MyInput" :props="{ actions }" />
+		<PlainField name="xxx" element="MyInput" :props="{ actions }" />
+</template>
+```
+
+
+
+
+
+
+
+## 高级字段组件 -- `ArrayField`
+
+用来做分组嵌套的组件
+
+主要用于动态表单的场景，使用起来相对会更复杂些
+
+### 参数
+
+```tsx
+export interface PlainFieldProps {
+  name: string | number  //字段名称
+
+  initValue?: any   //字段的初始值，优先级大于配置的默认值，不传或传递undefined数据会自动透传
+
+  layout?: string    //布局组件 key，如果传就用
+  layoutProps?: Record<any, any> //转发给布局组件的参数
+
+  element?: string   //填充组件的 key
+  props?: Record<any, any> //填充组件的参数
+}
+```
+
+和 `PlainField` 基本一致
+
+### 插槽写法
+
+```vue
+<ArrayField name="array">
+  <template #default="{ fieldValue, actions }">
+    <div v-for="(item, i) in fieldValue" :key="item.id">
+      <PlainField :name="i" layout="FormItem" :layout-props="{ label: '名称', required: true }">
+        <template #default="{ bind }">
+          <ElInput v-bind="bind" placeholder="请输入名称" />
+      </template>
+      </PlainField>
+    </div>
+</template>
+</ArrayField>
+```
+
+### 指定 key 写法
+
+```vue
+<ArrayField name="array" element="MyArrayComponent" />
+```
+
+### 接受参数
+
+插槽和自定义组件的参数一致
+
+```ts
+export type CArrayFieldAttrs = {
+  fieldValue: any[]
+  actions: {
+    push: (e: Record<any, any>) => void
+    unshift: (e: Record<any, any>) => void
+    pop: () => void
+    shift: () => void
+    setValue: (index: number, e: any) => void
+    delValue: (index: number) => void;
+    swap: (i1: number, i2: number) => void;
+  }
+} & Record<any, any>
+```
+
+- `fieldValue` 数组组件内的数组，可以循环它创建视图
+- `actions` 经过二次封装后互操作方法（效果类似数组），除了公共的还有
+  - `push`  尾部添加 1 个
+  - `pop` 尾部删除 1 个
+  - `unshift` 头部添加 1 个
+  - `shift` 头部删除 1 个
+  - `delValue` 删除指定下标元素，当`< 0` 删除头，`>=` 数组长度删除尾
+  - `setValue` 修改指定下标元素，当`< 0` 头部添加，`>=` 数组长度尾部添加
+  - `swap` 交换指定下标位置
+- 其他参数为布局组件传递
+
+如果要修改整个数组的内容，可以使用公共方法中的 set
+
+```ts
+actions.set("", newArray)
+```
+
+### 唯一性的要求
+
+1. **在 `ArrayField` 组件下的，最顶层的字段组件，name 属性此时必须是循环的下标**
+
+   因为需要根据下标挂载到数组的指定位置上
+
+2. **最顶层的子字段有且仅有一个**
+
+   如果有多个会发生覆盖，所以有多个时请用支持嵌套的组件，例如 `ObjectField/ArrayField` 进行分组嵌套
+
+3. **请保证数组每一项都有一个唯一的 id**
+
+   没有 id可以直接 Math.random 整个随机 数字
+
+
+
+
+
+## 初始表单数据
+
+表单数据通过配置 `defaultFormData` 实现
+
+```ts
+const formConfig: FormConfig = {
+  defaultFormData: {
+    field1: 1,
+    field2: 2,
+    object: {
+      field3: 3,
+      field4: 4
+    },
+    array1: [
+      { id: 5, value: 5 },
+      { id: 6, value: 6 }
+    ],
+    array2: [
+      {
+        groupId: 1,
+        children: [
+          {
+            itemId: 11,
+            children: {
+              type: 1,
+              operate: "*",
+              value: ""
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+内部会根据给的数据结构自动匹配，如果匹配不到，或者值是 `undefined/null` 会自动跳过
+
+**对于数组来说比较特别，框架需要数组项必须有唯一标识**，而数组中的字段用的是具体的值（不一定就是标识字段），所以当遇到数组时会进行解构处理
+
+比如例子中的 `array1/array2`，它们的标识用的是 `id`，值用的是 `value/children`，当循环到数组时会判断是否存在指定的字段，有就用，没有就使用原始的数据。查找规则是按照配置顺序找，默认优先级为 `value > children` ，可通过配置改变顺序 [`config.arrayUnwrapKey`](#表单配置)
+
+
+
+
+
+## 表单配置 
+
+使用配置 hook `useFormConfigProvide()`
+
+```ts
+interface {
+  Elements?: Record<any, any>         //全局组件，属性名会被当做 key 使用
+  Rules?: Record<any, RuleItem>       //一个符合 async-validator 校验的对象（同element-plus）
+  layoutProps?: Record<any, RuleItem> //批量传给布局组件的参数
+  defaultValue?: any                  //字段的默认值
+  defaultFormData?: Record<any, any>  //表单的初始值
+  arrayUnwrapKey?: string | string[]  //数组组件的解构路径
+  [x: string]: any
+}
+```
+
+配置可以同时存在多个，下层的会默认继承上层，越是下层优先级越高
+
+```ts
+// 全局使用，这里需要传 app 实例
+import { FormItem, useFormConfigProvide } from "@usaform/element-plus"
+const app = createApp(AppVue)
+useFormConfigProvide(
+  {
+    Elements: {
+      ElInput,
+      ElSelect,
+      FormItem,
+      ElInputNumber
+    }
+  },
+  app
+)
+app.mount("#app")
+
+
+// 局部使用时，直接传配置即可
+defineComponent({
+  setup() {
+    useFormConfigProvide(
+      {
+        Elements: {
+          ElInput,
+          ElSelect,
+          FormItem,
+          ElInputNumber
+        }
+      }
+		)
+  }
+})
+```
+
+
+
+
+
+## 通用的互操作实例方法
+
+| 属性        | 类型                                                                                      | 描述                                                       |
+| ----------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| reset       | () => void                                                                                | 清空所有组件的值                                           |
+| validate    | () => Promise<FormValidateError[]>                                                        | 触发所有 `PlainField` 组件的校验，只返回校验失败的字段信息 |
+| getFormData | Record<string, any>                                                                       | 不触发校验，返回表单内部所有的值                           |
+| subscribe   | (*paths*: string, *handle*: import("./useFieldValue").FieldSubscribeHandle) => () => void | 订阅匹配字段的修改，返回取消订阅的函数                     |
+| get         | (*path*: string) => any[]                                                                 | 获取匹配字段的值                                           |
+| set         | (*path*: string, *value*: any) => void                                                    | 设置匹配字段的值                                           |
 
 - `get/set/subscribe` 方法的 `path` 都依赖于路径系统，详细规则往后看
-
-
-
-### 默认插槽
-
-如果是字段组件会自动注册，其他内容都会原封不动的显示，没有什么限制
-
-
 
 
 
@@ -212,317 +598,17 @@ const reset = () => {
 
 
 
-## 字段组件 -- `PlainField`
 
-用处创建基本值的字段，无法进行嵌套
 
-该组件没有操作性实例使用，因为如果传递，没有使用的属性会自动传递到填充组件的 dom 属性上，如果使用请使用 `ObjectField` 嵌套后传递后使用
 
-### 参数
 
-```ts
-export interface PlainFieldProps {
-  name: string | number
 
-  layout?: string
-  layoutProps?: Record<any, any>
 
-  element: string
-  props?: Record<any, any>
 
-  formSlots?: FormSlots
-}
-```
 
-| 属性        | 类型                         | 是否必传 | 描述                                |
-| ----------- | ---------------------------- | -------- | ----------------------------------- |
-| name        | string\|number               | 是       | 在表单中的字段名                    |
-| layout      | string                       | 否       | 使用 form.Elements 中的组件进行布局 |
-| layoutProps | Record<any, any>             | 否       | 转发给 layout 组件的参数            |
-| element     | string                       | 是       | 使用 form.Elements 中的组件进行填充 |
-| props       | Record<any, any>             | 否       | 转发给 element 组件的参数           |
-| formSlots   | Record<string, string>\|组件 | 否       | 转发给 element 组件的插槽           |
+## 布局组件
 
-补充
-
-- 为什么会有很多转发属性？
-
-  通过传递字符串来动态选择使用的组件，对动态表单比较友好
-
-  `vue` 中使用插槽时，当子组件更新时父组件**必定**更新，但如果通过参数就不会
-
-- layoutProps 具体内容请查看布局组件
-
-### demo
-
-```html
-<PlainField 
-            name="input" 
-            layout="FormItem" 
-            :layout-props="{ label: '名称', required: true }" 
-            element="ElInput" 
-            :props="{ placeholder: '请输入名称' }" 
-/>
-```
-
-### 自定义 element 元素
-
-看参数列表会发现，又是转发属性，又是转发插槽的，对于像是 `Select` 这种必须传插槽的体验会非常的不方便
-
-解决方式有两种
-
-一种是直接用 `jsx` 语法写个插槽，然后直接传给 `formSlots` 里，对于喜欢`react` 的开发者会更好接受些
-
-```vue
-<script setup lang="jsx">
-//... 一些其他代码
-const SelectOptions = () => {
-  return data.map(item => <ElOptions .../>)
-}
-</script>
-
-<template>
-<PlainField ... element="ElSelect"  :formSlots="{options: SelectOptions}" />
-</template>
-```
-
-第二种是自定义一个组件使用
-
-```vue
-<script lang="ts" setup>
-  //自定义的组件，假设名字叫 CustomSelect
-import { ElOption, ElSelect } from "element-plus"
-import { computed } from "vue"
-const props = defineProps<{ modelValue: any, options: any[] }>()
-const emit = defineEmits(["update:modelValue"])
-const value = computed({
-  get() {
-    return props.modelValue
-  },
-  set(value) {
-    emit("update:modelValue", value)
-  }
-})
-</script>
-
-<template>
-  <ElSelect v-model="value">
-    <ElOption label="1" value="1" />
-    <ElOption label="2" value="2" />
-    <ElOption label="3" value="3" />
-  </ElSelect>
-</template>
-```
-
-```vue
-<!-- 使用它（记得现在 form.Elements 中注册） -->
-<PlainField ... element="CustomSelect" :props="{options: []}" />
-```
-
-推荐使用第二种，因为在 ts 下，在模版中写 `jsx/tsx` 会严重拖垮类型提示的速度
-
-
-
-
-
-
-
-## 字段组件 -- `ObjectField`
-
-用于分组的字段组件，可以嵌套
-
-
-
-### 参数
-
-```tsx
-export interface ObjectFieldProps {
-  name: string | number
-
-  layout?: string
-  layoutProps?: Record<any, any>
-
-  element?: string
-  props?: Record<any, any>
-}
-```
-
-和 `PlainField` 基本一致
-
-
-
-### 插槽
-
-接受一个默认插槽，参数为入参时接收到的 `props`，以及互操作的 `actions`
-
-`const _p = { ...props.props, actions }` 两个会被这种形式合并传递
-
-```vue
-<ObjectField name="object" layout="FormItem">
-  <template #default="{ actions }">
-		<PlainField name="aaa" element="MyInput" :props="{ actions }" />
-		<PlainField name="xxx" element="MyInput" :props="{ actions }" />
-  </template>
-</ObjectField>
-```
-
-`actions` 参数有，`get/set/subscribe/getFormData`，效果同 `Form` 组件同名的内容
-
-补充
-
-- 该组件同时支持 element 参数和插槽，优先级前者大于后者
-- 组件本身的开销很小，为了方便推荐使用插槽写法
-
-
-
-
-
-## 高级字段组件 -- `ArrayField`
-
-数组组件的作用同 `ObjectField` 一致都是分组用的，但是内部存储的形式不同，允许嵌套
-
-主要用于动态表单的场景，使用起来相对会更复杂些
-
-
-
-### 参数
-
-参数同 `ObjectField`
-
-```ts
-export interface ArrayFieldProps {
-  name: string
-
-  layout?: string
-  layoutProps?: Record<any, any>
-
-  element?: string
-  props?: Record<any, any>
-}
-```
-
-传递给填充组件的参数
-
-```ts
-export type ArrayFieldAttrs = {
-  fields: any[]
-  actions: {
-    push: (e: Record<any, any>) => void
-    unshift: (e: Record<any, any>) => void
-    pop: () => void
-    shift: () => void
-  } & ArrayFieldActions
-} & Record<any, any>
-```
-
-
-
-### 使用
-
-使用方式 1
-
-```vue
-<ArrayField name="array">
-  <template #default="{ fields, actions }">
-    <div v-for="(item, i) in fields" :key="item.id">
-      <PlainField :name="i" layout="FormItem" :layout-props="{ label: '名称', required: true }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
-    </div>
-    <ElSpace>
-      <ElButton @click="actions.push({ id: Math.random(), value: '11111111' })">add</ElButton>
-      <ElButton @click="actions.pop()">pop</ElButton>
-      <ElButton @click="actions.unshift({ id: Math.random(), value: '2222' })">unshift</ElButton>
-      <ElButton @click="actions.shift()">shift</ElButton>
-      <ElButton @click="actions.swap(0, fields.length - 1)">swap</ElButton>
-    </ElSpace>
-  </template>
-</ArrayField>
-```
-
-使用方式 2
-
-```vue
-<script lang="ts" setup>
-  //假设名字是 MyArray
-import { PlainField } from "@usaform/element-plus"
-import { ElButton, ElSpace } from "element-plus"
-import {} from "vue"
-
-defineOptions({
-  inheritAttrs: false
-})
-const props = defineProps<{ fields: any[]; actions: any }>()
-</script>
-
-<template>
-  <div v-for="(item, i) in fields" :key="item.id">
-    <!-- 如果有多个字字段，需要用到非 PlainField 进行分组，不然多个指向同个下标的会发生覆盖 -->
-    <!-- 目前能嵌套的只有两个 ObjectField ArrayField -->
-    <ObjectField :name="i">
-      <PlainField name="aaa" element="ElInput" :props="{ placeholder: '请输入名称' }" />
-      <PlainField name="bbb" element="ElInput" :props="{ placeholder: '请输入名称' }" />
-  	</ObjectField>
-  </div>
-  <ElSpace>
-    <ElButton @click="props.actions.push({ id: Math.random(), value: '11111111' })">add</ElButton>
-    <ElButton @click="props.actions.pop()">pop</ElButton>
-    <ElButton @click="props.actions.unshift({ id: Math.random(), value: '2222' })">unshift</ElButton>
-    <ElButton @click="props.actions.shift()">shift</ElButton>
-    <ElButton @click="props.actions.swap(0, fields.length - 1)">swap</ElButton>
-  </ElSpace>
-</template>
-```
-
-```vue
-<ArrayField name="array" element="MyArray" />
-```
-
-写法上的区别
-
-- 该组件同时支持 `element/slot` 两种写法，优先级前者大于后者，推荐使用`element`写法
-- 因为既然会用到数组形式，说明会经常动态变化（插槽内容更新，父组件一定跟着更新），使用 `element` 把内容单独写到一个组件，更利于维护，也有着更好的性能
-
-
-
-### 数组项
-
-传递的 `fields` 是一个 `Ref<any[]>`数组，内部可以循环它创建更多子字段内容，但需要注意以下内容，写法参考 demo 的注释部分，放弃思考的可以 cv 照葫芦画瓢
-
-- **name 属性此时必须是循环的下标，不然内部不知道当前创建的字段是数组哪一项的内容**
-- **子字段有且仅有一个，如果有多个会发生覆盖，因为如果子字段指向一个下标会发生冲突，所以有多个时请用 ObjectField 嵌套**
-- **请使用提供的 actions 对象里的方法来操作数组，如果直接修改响应式变量 fields 会发生许多意外情况**
-- **请保证数组每一项都有一个唯一的 id，不然会发现数据错位的情况，没有 id可以直接 Math.random 整个随机 数字**
-
-
-
-### 互操作 
-
-actions 是数组组件内部的互操作对象
-
-内部方法 `get/set/subscribe/getFormData`，效果同 `Form` 组件同名的内容
-
-其他方法
-
-```typescript
-interfalce Methods {
-  push: (e: Record<any, any>) => void         //尾部添加，等同于 setValue(fields.length,e)
-  unshift: (e: Record<any, any>) => void       //头部添加，等同于 setValue(-1,e)
-  pop: () => void  //尾部删除
-  shift: () => void   //头部删除
-  setValue: (index: number, e: any) => void // >数组长度是尾部添加，<0是头部添加，其他等同于替换下标处
-  delValue: (index: number) => void;  //>数组长度是尾部删除，<0是头部删除，其他等同于删除指定下标
-  swap: (i1: number, i2: number) => void; //交换两个下标的内容
-}
-```
-
-整体替换替换使用 `actions.set('', 你的新数组)`
-
-
-
-
-
-## 布局、逻辑 组件
-
-布局组件只有一个 `FormItem`
+内部提供的布局组件只有一个 `FormItem`
 
 字段组件本身并不提供校验和布局能力，这些都是由 `FormItem` 组件提供
 
@@ -588,7 +674,7 @@ defineComponent({
 
 接受到来自字段组件的参数
 
-- `Rules` 这是全局配置的校验项对象
+- `Rules` 这是表单配置的校验项对象
 - `children` 接收一个可选传对象的函数，返回实际内容的插槽执行结果
 - 外部传递的 `layoutProps`
 

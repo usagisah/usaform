@@ -120,6 +120,9 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
   }
   const swap: Swap = (i1, i2) => {
     const { struct } = _field
+    if (i1 < 0 || i2 >= struct.length) {
+      return console.error("arrayField.swap 要交换的下标越界")
+    }
     const t = struct[i1]
     struct[i1] = struct[i2]
     struct[i2] = t
