@@ -3,6 +3,7 @@ import { Field, FieldName } from "../form.helper"
 export interface FormActionCallInfo {
   name: FieldName
   path: string
+  [x: string | number | symbol]: any
 }
 
 export function callFieldAction(field: Field, key: string, point: any, params: any[]) {

@@ -1,6 +1,6 @@
-import { useFormPlainField } from "@usaform/vue"
-import { RuleItem } from "async-validator"
-import { SlotsType, defineComponent, h, ref } from "vue"
+import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usaform/vue"
+import { Ref, SlotsType, defineComponent, h, ref } from "vue"
+import { CFormRuleItem } from "./Form"
 import { CFormItemExpose } from "./FormItem"
 
 export interface CPlainFieldProps {
@@ -15,6 +15,14 @@ export interface CPlainFieldProps {
   props?: Record<any, any>
 }
 
+export interface CPlainFieldLayoutInfo {
+  type: "plain"
+  fieldValue: Ref<any>
+  actions: PlainFieldActions
+  Rules: Record<any, CFormRuleItem>
+  children: (p: Record<any, any>) => any
+}
+
 export const PlainField = defineComponent({
   name: "PlainField",
   props: ["name", "initValue", "layout", "layoutProps", "element", "props"],
@@ -27,14 +35,14 @@ export const PlainField = defineComponent({
       throw "非法的使用方式，请正确使用 PlainField 组件"
     }
 
-    const fieldLayoutRef = ref<CFormItemExpose | null>(null)
+    const fieldLayoutRef = ref<(CFormItemExpose & Record<any, any>) | null>(null)
 
     let FieldLayout: any = null
     let FieldElement: any = null
-    let gFieldRules: Record<any, RuleItem>
+    let gFieldRules: Record<any, CFormRuleItem>
     let gLayoutProps: any
     let FieldSlot = slots.default
-    const { fieldValue } = useFormPlainField(name, ({ initValue, formConfig }) => {
+    const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig }) => {
       const { Elements, Rules, layoutProps, defaultValue } = formConfig
       FieldLayout = Elements![layout as any]
       FieldElement = Elements![element as any]
@@ -45,10 +53,18 @@ export const PlainField = defineComponent({
         initValue: initValue ?? props.initValue,
         reset: () => {
           fieldValue.value = defaultValue
-          fieldLayoutRef.value!.setValidateState({ error: false, message: "" })
+          fieldLayoutRef.value?.setValidateState({ error: false, message: "" })
         },
-        validate({ path }: any) {
-          return fieldLayoutRef.value!.validate(path, fieldValue.value)
+        validate({ path }: FormActionCallInfo) {
+          return fieldLayoutRef.value?.validate(path, fieldValue.value)
+        },
+        callLayout({ key, point, params }: FormActionCallInfo) {
+          try {
+            const f = fieldLayoutRef.value?.[key]
+            if (typeof f === "function") f.apply(point, params)
+          } catch (e) {
+            console.error(e)
+          }
         }
       }
     })
@@ -67,12 +83,12 @@ export const PlainField = defineComponent({
 
     return () => {
       if (FieldLayout) {
+        const info: CPlainFieldLayoutInfo = { type: "plain", fieldValue, actions, Rules: gFieldRules, children: resolveElement }
         return h(FieldLayout, {
           ...gLayoutProps,
           ...props.layoutProps,
-          Rules: gFieldRules,
-          ref: fieldLayoutRef,
-          children: resolveElement
+          __fieldInfo: info,
+          ref: fieldLayoutRef
         })
       }
       return resolveElement()

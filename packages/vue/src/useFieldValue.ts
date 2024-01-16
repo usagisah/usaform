@@ -4,8 +4,9 @@ export type FieldGetter = () => any
 export type FieldSetter = (value: any) => any
 
 export type FieldSubscribeHandle = (newValue: any, oldValue: any) => any
+export type FieldSubscribeConfig = { immediate?: boolean }
 export type FieldUnSubscribe = () => void
-export type FieldSubscribe = (handle: FieldSubscribeHandle, skip?: boolean) => FieldUnSubscribe
+export type FieldSubscribe = (handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) => FieldUnSubscribe
 export type FieldClearSubscribes = () => void
 
 export type FieldValue = {
@@ -38,8 +39,18 @@ export function useFieldValue(value: any): FieldValue {
       fieldValue.value = _value
     })
   }
-  const subscribe: FieldSubscribe = handle => {
+  const subscribe: FieldSubscribe = (handle, config = {}) => {
     subscribers.push(handle)
+
+    const { immediate } = config
+    if (immediate) {
+      try {
+        handle(unref(fieldValue), undefined)
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
     return () => {
       const i = subscribers.indexOf(handle)
       if (i > -1) subscribers.splice(i, 1)

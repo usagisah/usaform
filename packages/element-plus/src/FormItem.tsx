@@ -1,43 +1,46 @@
-import Schema, { RuleItem } from "async-validator"
-import { SlotsType, computed, defineComponent, h, reactive, watchEffect } from "vue"
+import Schema from "async-validator"
+import { SlotsType, computed, defineComponent, h, reactive, watch, watchEffect } from "vue"
+import { CArrayFieldLayoutInfo } from "./ArrayField"
+import { CFormRuleItem } from "./Form"
+import { CObjectFieldLayoutInfo } from "./ObjectField"
+import { CPlainFieldLayoutInfo } from "./PlainField"
 
 export interface CFormItemProps {
   label?: string
   labelWith?: string | number
   size?: "small" | "large" | "default"
-  required?: boolean
-  rules?: (RuleItem | string)[]
-  Rules?: Record<string, RuleItem>
   disabled?: boolean
   inline?: boolean
   position?: "left" | "right" | "top"
   showError?: boolean
-  children?: (p: any) => any[]
+  required?: boolean
+  rules?: (CFormRuleItem | string)[]
+  __fieldInfo?: CPlainFieldLayoutInfo | CObjectFieldLayoutInfo | CArrayFieldLayoutInfo
 }
 
 export interface CFormItemAttrs {
   id: string
   disabled: boolean
   size: "small" | "large" | "default"
-  onChange: (e: any) => void
+  onBlur: (e: any) => void
 }
 
 export interface CFormItemExpose {
-  validate: Validate
+  validate: (name: string, value: any) => Promise<any>
   setValidateState: (state: { error: boolean; message: string }) => void
 }
 
 let randomIdCount = 0
 export const FormItem = defineComponent({
   name: "FormItem",
-  props: ["label", "labelWith", "size", "required", "rules", "Rules", "disabled", "inline", "position", "showError", "children"],
+  props: ["label", "labelWith", "size", "disabled", "inline", "position", "showError", "required", "rules", "fieldInfo"],
   inheritAttrs: true,
   slots: Object as SlotsType<{
-    default?: { id: string; size: string; disabled: boolean }
+    default: { id: string; size: string; disabled: boolean }
   }>,
   setup(props: CFormItemProps, { slots, expose }) {
     const { showError, errorState, setValidateState } = useError(props)
-    const { onChange, validate } = useRules(props, setValidateState)
+    const { onBlur, validate } = useRules(props, setValidateState)
     expose({ validate, setValidateState })
 
     const id = "ufi-id-" + randomIdCount++
@@ -60,14 +63,15 @@ export const FormItem = defineComponent({
       else style.width = "auto"
       return style
     })
-    const contentProps = computed<any>(() => {
-      const p: any = { id, size: size.value, disabled: !!props.disabled, onChange }
-      p.bind = p
-      return p
-    })
 
     return () => {
-      const children = (props.children ? props.children(contentProps.value) : slots.default?.(contentProps.value)) ?? []
+      const childrenProps: any = { id, size: size.value, disabled: !!props.disabled, onBlur }
+      childrenProps.bind = childrenProps
+
+      const _children1 = props.__fieldInfo?.children
+      const _children2 = _children1 ? _children1(childrenProps) : slots.default?.(childrenProps)
+      const children = (_children2 ?? []).map((c: any) => h(c, !!props.disabled))
+
       return (
         <div class={classNames.value}>
           {typeof props.label === "string" && (
@@ -76,7 +80,7 @@ export const FormItem = defineComponent({
             </label>
           )}
           <div class={"ufi-content"}>
-            {children.map(c => h(c, contentProps.value))}
+            {children}
             {showError.value && errorState.error && <div class="ufi-content-error">{errorState.message}</div>}
           </div>
         </div>
@@ -85,43 +89,59 @@ export const FormItem = defineComponent({
   }
 })
 
-type Validate = (name: string, value: any) => Promise<any>
 function useRules(props: CFormItemProps, setErrorState: (p: ErrorState) => any) {
-  let rules: RuleItem[] = []
+  let _changeRules: CFormRuleItem[] = []
+  let _blurRules: CFormRuleItem[] = []
   watchEffect(() => {
-    const { Rules, required } = props
-    const _rules = (props.rules ?? []) as RuleItem[]
-    rules = []
-    _rules.forEach(r => {
+    const { required, rules = [], __fieldInfo } = props
+    if (!__fieldInfo) return
+
+    const { Rules, fieldValue } = __fieldInfo
+    _changeRules = []
+    _blurRules = []
+
+    rules.forEach(r => {
       const _rule = typeof r === "string" ? Rules![r] : r
       if (required) _rule.required = true
-      rules.push(_rule)
+      _rule.trigger === "change" ? _changeRules.push(_rule) : _blurRules.push(_rule)
     })
     if (required && rules.length === 0) {
-      rules.push({
-        message: "The field is required",
+      const requiredRule: CFormRuleItem = {
+        message: "",
         validator: (_, v) => {
           return Array.isArray(v) ? v.length !== 0 : (v + "").length !== 0
         }
-      })
+      }
+      _changeRules.push(requiredRule)
+      _blurRules.push(requiredRule)
+    }
+
+    if (_changeRules.length > 0) {
+      return watch(fieldValue, v => handleEventValidate(_changeRules, v))
     }
   })
 
-  const validate: Validate = (name: string, value: any) => {
-    return new Schema({ [name]: rules }).validate({ [name]: value }).catch((e: any) => {
-      throw e.errors
-    })
+  const validate = (rules: CFormRuleItem[], name = "", value: any) => {
+    return new Schema({ [name]: rules })
+      .validate({ [name]: value })
+      .catch((e: any) => {
+        throw e.errors
+      })
+      .then(
+        () => setErrorState({ error: false, message: "" }),
+        e => {
+          setErrorState({ error: true, message: e[0].message })
+          throw e
+        }
+      )
   }
 
-  const onChange = (e: any) => {
+  const handleEventValidate = (rules: CFormRuleItem[], e: any) => {
     if (e instanceof Event) return
-    if (rules.length === 0) return
-    validate("f", e).then(
-      () => setErrorState({ error: false, message: "" }),
-      e => setErrorState({ error: true, message: e[0].message })
-    )
+    if (rules.length === 0 && !props.required) return
+    validate(rules, "", e).catch(() => {})
   }
-  return { onChange, validate }
+  return { validate, onBlur: (e: any) => handleEventValidate(_blurRules, e) }
 }
 
 type ErrorState = {

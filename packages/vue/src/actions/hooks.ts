@@ -1,5 +1,5 @@
 import { Field } from "../form.helper"
-import { FieldSubscribeHandle } from "../useFieldValue"
+import { FieldSubscribeConfig, FieldSubscribeHandle } from "../useFieldValue"
 import { callFieldAction } from "./call"
 import { mapFieldToRecord } from "./mapToRecord"
 import { resolveFields } from "./resolve"
@@ -22,16 +22,15 @@ export function useFormActions(field: Field, root: Field): FormBaseActions {
     return mapFieldToRecord(root)
   }
 
-  function subscribe(path: string, handle: FieldSubscribeHandle) {
+  function subscribe(path: string, handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) {
     const unSubscribe: Function[] = []
     if (path.length === 0) {
-      unSubscribe.push(field.subscribe(handle))
+      unSubscribe.push(field.subscribe(handle, config))
     } else {
       resolveFields(path, field, root, false).forEach(f => {
-        unSubscribe.push(f.subscribe(handle))
+        unSubscribe.push(f.subscribe(handle, config))
       })
     }
-
     return () => {
       unSubscribe.forEach(f => f())
     }

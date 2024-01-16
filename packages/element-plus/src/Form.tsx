@@ -1,8 +1,19 @@
 import { FormActions, FormConfig, useForm } from "@usaform/vue"
-import { App, defineComponent, hasInjectionContext, inject, provide } from "vue"
+import { RuleItem } from "async-validator"
+import { App, defineComponent, hasInjectionContext, inject, provide, toRaw } from "vue"
+
+export interface CFormRuleItem extends RuleItem {
+  trigger?: "change" | "blur"
+}
+
+export interface CFormConfig extends FormConfig {
+  Elements?: Record<any, any>
+  Rules?: Record<any, CFormRuleItem>
+  layoutProps?: Record<any, any>
+}
 
 export interface CFormProps {
-  config?: FormConfig
+  config?: CFormConfig
 }
 
 export interface CFormValidateError {
@@ -14,6 +25,7 @@ export interface CFormValidateError {
 export interface CFormExpose extends FormActions {
   validate: () => Promise<CFormValidateError[]>
   reset: () => void
+  callLayout: (key: string, point: any, ...params: any[]) => Record<string, any>
 }
 
 export const Form = defineComponent({
@@ -24,7 +36,7 @@ export const Form = defineComponent({
     const { actions, render } = useForm(config)
     actions.provide()
 
-    async function validate() {
+    const validate: CFormExpose["validate"] = async () => {
       const res = actions.call("validate", null)
       const ps: Promise<any>[] = []
       const errs: CFormValidateError[] = []
@@ -43,11 +55,15 @@ export const Form = defineComponent({
       return errs
     }
 
-    function reset() {
+    const reset = () => {
       actions.call("reset", null)
     }
 
-    expose({ ...actions, validate, reset })
+    const callLayout: CFormExpose["callLayout"] = (key, point, ...params) => {
+      return actions.call(key, point, ...params)
+    }
+
+    expose({ ...actions, validate, reset, callLayout })
 
     return render(() => {
       return <div class="u-form">{slots.default?.()}</div>
@@ -55,22 +71,22 @@ export const Form = defineComponent({
   }
 })
 
-export const FormContextKey = Symbol()
-export function useFormConfigProvide(config: FormConfig): FormConfig
-export function useFormConfigProvide(config: FormConfig, app: App): FormConfig
-export function useFormConfigProvide(config: FormConfig, app?: App) {
-  const conf = normalizeFormConfig(config ?? {})
-  app ? app.provide(FormContextKey, conf) : provide(FormContextKey, conf)
+const FormContextConfigKey = Symbol()
+export function useFormConfigProvide(config: CFormConfig): CFormConfig
+export function useFormConfigProvide(config: CFormConfig, app: App): CFormConfig
+export function useFormConfigProvide(config: CFormConfig, app?: App) {
+  const conf = normalizeFormConfig(toRaw(config))
+  app ? app.provide(FormContextConfigKey, conf) : provide(FormContextConfigKey, conf)
   return conf
 }
 
-export function normalizeFormConfig(c: FormConfig): FormConfig {
+export function normalizeFormConfig(c: CFormConfig): CFormConfig {
   const config = { ...c }
   config.Elements = { ...(config.Elements ?? {}) }
   config.Rules = { ...(config.Rules ?? {}) }
   config.layoutProps = { ...(config.layoutProps ?? {}) }
   if (hasInjectionContext()) {
-    const ctxConfig = inject<FormConfig>(FormContextKey)
+    const ctxConfig = inject<CFormConfig | null>(FormContextConfigKey, null)
     if (ctxConfig) {
       for (const key in ctxConfig) {
         const ctxVal = ctxConfig[key]

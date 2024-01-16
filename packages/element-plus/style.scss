@@ -114,6 +114,9 @@
     line-height: 1;
     left: 0;
     padding-top: 4px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .el-input__wrapper,
