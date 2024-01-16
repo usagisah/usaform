@@ -48,13 +48,19 @@ function parse(path: string) {
   if (path.startsWith("~/")) {
     path = path.substring(2)
     startRoot = true
+    matches.push(getReg(".*"))
   } else if (!path.startsWith("../")) {
     matches.push(getReg(".*"))
   }
   if (path.length === 0) return { matches: [], startRoot }
 
   for (const p of path.split("/")) {
-    matches.push(p === ".." ? p : getReg(p))
+    if (p === "..") {
+      matches.push("..")
+      matches.push(getReg(".*"))
+      continue
+    } 
+    matches.push(getReg(p))
   }
   return { matches, startRoot }
 }

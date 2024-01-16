@@ -1,6 +1,7 @@
 import { ArrayFieldActions, FormActionCallInfo, useFormArrayField } from "@usaform/vue"
 import { Ref, SlotsType, defineComponent, h, ref } from "vue"
 import { CFormRuleItem } from "./Form"
+import { callFuncWithError } from "./helper"
 
 export interface CArrayFieldProps {
   name: string
@@ -43,6 +44,7 @@ export const ArrayField = defineComponent({
   setup(props: CArrayFieldProps, { slots }) {
     const { name, layout, element } = props
     const fieldLayoutRef = ref<Record<any, any> | null>(null)
+    const fieldElementRef = ref<Record<any, any> | null>(null)
     let FieldLayout: any
     let FieldElement: any
     let FieldSlot = slots.default
@@ -59,13 +61,17 @@ export const ArrayField = defineComponent({
         reset() {
           actions.set("", [])
         },
-        callLayout({ key, point, params }: FormActionCallInfo) {
-          try {
+        callLayout(_: any, { key, point, params }: FormActionCallInfo) {
+          return callFuncWithError(() => {
             const f = fieldLayoutRef.value?.[key]
             if (typeof f === "function") f.apply(point, params)
-          } catch (e) {
-            console.error(e)
-          }
+          })
+        },
+        callElement(_: any, { key, point, params }: FormActionCallInfo) {
+          return callFuncWithError(() => {
+            const f = fieldElementRef.value?.[key]
+            if (typeof f === "function") f.apply(point, params)
+          })
         }
       }
     })
@@ -78,7 +84,7 @@ export const ArrayField = defineComponent({
 
     const resolveElement = (p: any = {}) => {
       const { bind, ..._p } = p
-      const _props = { ..._p, ...props.props, fieldValue: fieldValue.value, actions: cActions }
+      const _props = { ..._p, ...props.props, fieldValue: fieldValue.value, actions: cActions, ref: fieldElementRef }
       return FieldElement ? [h(FieldElement, _props)] : FieldSlot?.(_props)
     }
     return render(() => {

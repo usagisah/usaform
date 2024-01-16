@@ -9,4 +9,9 @@ export type { CObjectFieldLayoutInfo, CObjectFieldProps } from "./ObjectField.js
 export { PlainField } from "./PlainField.jsx"
 export type { CPlainFieldLayoutInfo, CPlainFieldProps } from "./PlainField.jsx"
 
+import { CArrayFieldLayoutInfo } from "./ArrayField.jsx"
+import { CObjectFieldLayoutInfo } from "./ObjectField.jsx"
+import { CPlainFieldLayoutInfo } from "./PlainField.jsx"
+export type CFieldLayoutInfo = CPlainFieldLayoutInfo | CObjectFieldLayoutInfo | CArrayFieldLayoutInfo
+
 export * from "@usaform/vue"

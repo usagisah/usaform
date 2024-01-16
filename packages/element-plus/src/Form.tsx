@@ -26,6 +26,7 @@ export interface CFormExpose extends FormActions {
   validate: () => Promise<CFormValidateError[]>
   reset: () => void
   callLayout: (key: string, point: any, ...params: any[]) => Record<string, any>
+  callElement: (key: string, point: any, ...params: any[]) => Record<string, any>
 }
 
 export const Form = defineComponent({
@@ -60,10 +61,15 @@ export const Form = defineComponent({
     }
 
     const callLayout: CFormExpose["callLayout"] = (key, point, ...params) => {
-      return actions.call(key, point, ...params)
+      return actions.call("callLayout", globalThis, { key, point, params })
     }
 
-    expose({ ...actions, validate, reset, callLayout })
+    const callElement: CFormExpose["callElement"] = (key, point, ...params) => {
+      return actions.call("callElement", globalThis, { key, point, params })
+    }
+
+    const formExpose: CFormExpose = { ...actions, validate, reset, callLayout, callElement }
+    expose(formExpose)
 
     return render(() => {
       return <div class="u-form">{slots.default?.()}</div>

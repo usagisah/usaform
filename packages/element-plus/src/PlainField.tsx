@@ -2,6 +2,7 @@ import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usafo
 import { Ref, SlotsType, defineComponent, h, ref } from "vue"
 import { CFormRuleItem } from "./Form"
 import { CFormItemExpose } from "./FormItem"
+import { callFuncWithError } from "./helper"
 
 export interface CPlainFieldProps {
   name: string | number
@@ -36,6 +37,7 @@ export const PlainField = defineComponent({
     }
 
     const fieldLayoutRef = ref<(CFormItemExpose & Record<any, any>) | null>(null)
+    const fieldElementRef = ref<Record<any, any> | null>(null)
 
     let FieldLayout: any = null
     let FieldElement: any = null
@@ -58,13 +60,17 @@ export const PlainField = defineComponent({
         validate({ path }: FormActionCallInfo) {
           return fieldLayoutRef.value?.validate(path, fieldValue.value)
         },
-        callLayout({ key, point, params }: FormActionCallInfo) {
-          try {
+        callLayout(_: any, { key, point, params }: FormActionCallInfo) {
+          return callFuncWithError(() => {
             const f = fieldLayoutRef.value?.[key]
             if (typeof f === "function") f.apply(point, params)
-          } catch (e) {
-            console.error(e)
-          }
+          })
+        },
+        callElement(_: any, { key, point, params }: FormActionCallInfo) {
+          return callFuncWithError(() => {
+            const f = fieldElementRef.value?.[key]
+            if (typeof f === "function") f.apply(point, params)
+          })
         }
       }
     })
@@ -75,9 +81,9 @@ export const PlainField = defineComponent({
     const resolveElement = (p: any = {}) => {
       const { bind, ..._p } = p
       if (FieldElement) {
-        return [h(FieldElement, { ..._p, ...props.props, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, actions })]
+        return [h(FieldElement, { ..._p, ...props.props, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, actions, ref: fieldElementRef })]
       } else {
-        return FieldSlot?.({ ..._p, ...props.props, bind: { ...bind, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue } })
+        return FieldSlot?.({ ..._p, ...props.props, ref: fieldElementRef, bind: { ...bind, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, ref: fieldElementRef } })
       }
     }
 
