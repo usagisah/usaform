@@ -73,10 +73,10 @@ export const PlainField = defineComponent({
     }
 
     const resolveElement = (p: any = {}) => {
+      const { bind, ..._p } = p
       if (FieldElement) {
-        return [h(FieldElement, { ...p, ...props.props, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue })]
+        return [h(FieldElement, { ..._p, ...props.props, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, actions })]
       } else {
-        const { bind, ..._p } = p
         return FieldSlot?.({ ..._p, ...props.props, bind: { ...bind, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue } })
       }
     }

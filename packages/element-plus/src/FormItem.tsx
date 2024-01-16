@@ -33,7 +33,7 @@ export interface CFormItemExpose {
 let randomIdCount = 0
 export const FormItem = defineComponent({
   name: "FormItem",
-  props: ["label", "labelWith", "size", "disabled", "inline", "position", "showError", "required", "rules", "fieldInfo"],
+  props: ["label", "labelWith", "size", "disabled", "inline", "position", "showError", "required", "rules", "__fieldInfo"],
   inheritAttrs: true,
   slots: Object as SlotsType<{
     default: { id: string; size: string; disabled: boolean }
@@ -90,58 +90,73 @@ export const FormItem = defineComponent({
 })
 
 function useRules(props: CFormItemProps, setErrorState: (p: ErrorState) => any) {
-  let _changeRules: CFormRuleItem[] = []
-  let _blurRules: CFormRuleItem[] = []
+  let _rules: CFormRuleItem[] = []
+  let changeCount = 0
+  let blurCount = 0
   watchEffect(() => {
     const { required, rules = [], __fieldInfo } = props
     if (!__fieldInfo) return
 
     const { Rules, fieldValue } = __fieldInfo
-    _changeRules = []
-    _blurRules = []
+    _rules = []
+    changeCount = blurCount = 0
 
     rules.forEach(r => {
       const _rule = typeof r === "string" ? Rules![r] : r
+      if (!_rule) return
       if (required) _rule.required = true
-      _rule.trigger === "change" ? _changeRules.push(_rule) : _blurRules.push(_rule)
+      if (!_rule.trigger) _rule.trigger = "blur"
+      _rules.push(_rule)
+      _rule.trigger === "change" ? changeCount++ : blurCount++
     })
+
     if (required && rules.length === 0) {
       const requiredRule: CFormRuleItem = {
         message: "",
+        trigger: "blur",
         validator: (_, v) => {
-          return Array.isArray(v) ? v.length !== 0 : (v + "").length !== 0
+          if (Array.isArray(v) || typeof v === "string") return v.length !== 0
+          if (v === undefined || v === null || v === false) return false
+          return true
         }
       }
-      _changeRules.push(requiredRule)
-      _blurRules.push(requiredRule)
+      _rules.push(requiredRule)
     }
 
-    if (_changeRules.length > 0) {
-      return watch(fieldValue, v => handleEventValidate(_changeRules, v))
+    if (changeCount > 0) {
+      return watch(fieldValue, v => {
+        return validate(
+          _rules.filter(r => r.trigger === "change"),
+          "",
+          v
+        ).catch(() => null)
+      })
     }
   })
 
   const validate = (rules: CFormRuleItem[], name = "", value: any) => {
-    return new Schema({ [name]: rules })
-      .validate({ [name]: value })
-      .catch((e: any) => {
-        throw e.errors
-      })
-      .then(
-        () => setErrorState({ error: false, message: "" }),
-        e => {
-          setErrorState({ error: true, message: e[0].message })
-          throw e
-        }
-      )
+    if (rules.length === 0) return Promise.resolve()
+    return new Schema({ [name]: rules }).validate({ [name]: value }).then(
+      () => setErrorState({ error: false, message: "" }),
+      ({ errors }) => {
+        setErrorState({ error: true, message: errors[0].message })
+        throw errors
+      }
+    )
   }
 
-  const handleEventValidate = (rules: CFormRuleItem[], e: any) => {
-    if (e instanceof Event) return
-    if (rules.length === 0 && !props.required) return
-    validate(rules, "", e).catch(() => {})
+  return {
+    validate: (n: string, v: any) => {
+      return validate(_rules, n, v)
+    },
+    onBlur: () => {
+      validate(
+        _rules.filter(r => r.trigger === "blur"),
+        "",
+        props.__fieldInfo!.fieldValue.value
+      ).catch(() => null)
+    }
   }
-  return { validate, onBlur: (e: any) => handleEventValidate(_blurRules, e) }
 }
 
 type ErrorState = {

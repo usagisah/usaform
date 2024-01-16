@@ -11,7 +11,7 @@ export interface FormActionGetConfig {
 
 export interface FormBaseActions {
   getFormData: () => Record<string, any>
-  subscribe: (paths: string, handle: FieldSubscribeHandle) => () => void
+  subscribe: (paths: string, handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) => () => void
   get: (path: string, config?: FormActionGetConfig) => any[]
   set: (path: string, value: any) => void
   call: (key: string, point: any, ...params: any[]) => Record<string, any>
@@ -22,7 +22,7 @@ export function useFormActions(field: Field, root: Field): FormBaseActions {
     return mapFieldToRecord(root)
   }
 
-  function subscribe(path: string, handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) {
+  const subscribe: FormBaseActions["subscribe"] = (path, handle, config) => {
     const unSubscribe: Function[] = []
     if (path.length === 0) {
       unSubscribe.push(field.subscribe(handle, config))
@@ -36,7 +36,7 @@ export function useFormActions(field: Field, root: Field): FormBaseActions {
     }
   }
 
-  function get(path: string, config?: FormActionGetConfig) {
+  const get: FormBaseActions["get"] = (path: string, config?: FormActionGetConfig) => {
     const _first = !!config?.first
     const _shallow = config?.shallow ?? true
 
@@ -47,12 +47,12 @@ export function useFormActions(field: Field, root: Field): FormBaseActions {
     return _fields.map(mapFieldToRecord)
   }
 
-  function set(path: string, value: any) {
+  const set: FormBaseActions["set"] = (path: string, value: any) => {
     if (path.length === 0) return field.setter(value)
     resolveFields(path, field, root, false).forEach(f => f.setter(value))
   }
 
-  function call(key: string, point: any, ...params: any[]) {
+  const call: FormBaseActions["call"] = (key: string, point: any, ...params: any[]) => {
     return callFieldAction(field, key, point, params)
   }
 
