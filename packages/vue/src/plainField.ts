@@ -2,7 +2,6 @@ import { inject, onBeforeUnmount, provide } from "vue"
 import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
-import { createFieldRender } from "./fieldRender"
 import { BaseFiled, FieldName, FieldWrapper, FormConfig, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 

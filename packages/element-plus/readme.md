@@ -236,10 +236,10 @@ export interface PlainFieldProps {
 
   initValue?: any   //字段的初始值，优先级大于配置的默认值，不传或传递undefined数据会自动透传
 
-  layout?: string    //布局组件 key，如果传就用
+  layout?: string | Record<any, any>    //布局组件 key，字符串时使用配置中的组件，对象则直接当做组件使用
   layoutProps?: Record<any, any> //转发给布局组件的参数
 
-  element?: string   //填充组件的 key
+  element?: string | Record<any, any>   //填充组件的 key，字符串时使用配置中的组件，对象则直接当做组件使用
   props?: Record<any, any> //填充组件的参数
 }
 ```
@@ -272,17 +272,16 @@ ps：key 值就是表单配置或者 `form` 组件配置中的 `Elements` 对象
 
 区别在于把放在插槽的内容放到了别处（通常是一个新的组件文件），通过配置表单的 `Elements`，再用 `element` 属性进行引用
 
-尽量让其保持高优先级，不然可能会导致意外的 bug
+如果传的是一个对象（比如一个 vue 文件，一段 tsx 代码，被 vue 插件编译后就是一个对象），则会当做组件使用
 
-### 封装 element 指向的组件文件
+### 自定义 element 指向的组件文件
 
 ```vue
 <script lang="ts" setup>
 import { ElOption, ElSelect } from "element-plus"
-import { watch } from "vue";
-const props = defineProps<{ onChange: any }>()
+const props = defineProps<{actions: any}>()
+const api: CArrayFieldActions = props.actions
 const value = defineModel<string>()
-watch(value, v => props.onChange?.(v))
 </script>
 
 <template>
@@ -294,12 +293,15 @@ watch(value, v => props.onChange?.(v))
 </template>
 ```
 
-以上写法是一个参考，该文件接收的参数来源于 2 个地方
+参数来源于 2 个地方
 
-- [布局组件](#布局组件)
-- 框架内部的数据绑定，如果
+- [布局组件](#布局组件)，主要是些是否禁用之类的，具体内容查看该章节
+- `PlainField`
+  -  `v-model` 所需的参数，使用 `defineModel` 绑定即可
+  - `actions` 表单的互操作对象，只有非插槽写法下才会传递
 
-参数可能会比较多，不想控制台警告可以做如下设置
+
+建议布局组件的参数自动继承，其他的正常接收，如果不想自动继承，可以使用以下设置，禁止自动继承
 
 ```vue
 <script setup lang="ts">
@@ -309,7 +311,17 @@ defineOptions({
 </script>
 ```
 
+### 修改值
 
+有 2 种方式
+
+1. `actions.set('', 新的值)`
+
+2. `value.value = 新值` 
+
+对于 `PlainField` 推荐使用第二种，`actions.set` 会干掉所有内容在重新创建，第二种则不会
+
+接收到的（`defineModel`使用的）值是一个 `shallowRef`，所以只有修改 `.value` 该能触发更新
 
 
 
@@ -325,23 +337,21 @@ export interface PlainFieldProps {
 
   initValue?: any   //字段的初始值，优先级大于配置的默认值，不传或传递undefined数据会自动透传
 
-  layout?: string    //布局组件 key，如果传就用
+  layout?: string | Record<any, any>    //布局组件 key，字符串时使用配置中的组件，对象则直接当做组件使用
   layoutProps?: Record<any, any> //转发给布局组件的参数
 
-  element?: string   //填充组件的 key
+  element?: string | Record<any, any>   //填充组件的 key，字符串时使用配置中的组件，对象则直接当做组件使用
   props?: Record<any, any> //填充组件的参数
 }
 ```
-
-和 `PlainField` 基本一致
 
 ### 插槽写法
 
 ```vue
 <ObjectField name="object" layout="FormItem">
   <template #default="{ actions, fieldValue, ...other }">
-		<PlainField name="aaa" element="MyInput" :props="{ actions }" />
-		<PlainField name="xxx" element="MyInput" :props="{ actions }" />
+		<PlainField name="aaa" element="MyInput" />
+		<PlainField name="xxx" element="MyInput" />
   </template>
 </ObjectField>
 ```
@@ -360,9 +370,7 @@ export interface PlainFieldProps {
 
 `ObjectField` 组件开销很小，为了方便可以多使用插槽写法
 
-### 自定义文件
-
-参数和插槽一样，写法上没有任何要求，当正常组件写即可
+### 自定义 element 指向的文件
 
 ```vue
 <script setup>
@@ -374,7 +382,28 @@ const props = defineProps<{ actions: any, fieldValue: any }>()
 </template>
 ```
 
+对于所有参数，接收的参数来源于 2 个地方
 
+- [布局组件](#布局组件)，主要是些是否禁用之类的，具体内容查看该章节
+- `ObjectField`
+  - `fieldValue`  初始化时的值转成 `Ref`，一般不会用到
+  - `actions` 表单交互对象，方法同[通用的互操作实例方法](#通用的互操作实例方法)
+
+如果不想自动继承，可以使用以下设置，只接收需要的参数
+
+```vue
+<script setup lang="ts">
+defineOptions({
+  inheritAttrs: false
+})
+</script>
+```
+
+### 修改值
+
+请不要直接修改 `fieldValue`，这会导致内部数据混乱出现 bug
+
+请使用 `set` 方法修改， `action.set("", 新值)`
 
 
 
@@ -394,15 +423,13 @@ export interface PlainFieldProps {
 
   initValue?: any   //字段的初始值，优先级大于配置的默认值，不传或传递undefined数据会自动透传
 
-  layout?: string    //布局组件 key，如果传就用
+  layout?: string | Record<any, any>    //布局组件 key，字符串时使用配置中的组件，对象则直接当做组件使用
   layoutProps?: Record<any, any> //转发给布局组件的参数
 
-  element?: string   //填充组件的 key
+  element?: string | Record<any, any>   //填充组件的 key，字符串时使用配置中的组件，对象则直接当做组件使用
   props?: Record<any, any> //填充组件的参数
 }
 ```
-
-和 `PlainField` 基本一致
 
 ### 插槽写法
 
@@ -426,23 +453,25 @@ export interface PlainFieldProps {
 <ArrayField name="array" element="MyArrayComponent" />
 ```
 
-### 接受参数
+### 参数
 
 插槽和自定义组件的参数一致
 
 ```ts
 export type CArrayFieldAttrs = {
   fieldValue: any[]
-  actions: {
-    push: (e: Record<any, any>) => void
-    unshift: (e: Record<any, any>) => void
-    pop: () => void
-    shift: () => void
-    setValue: (index: number, e: any) => void
-    delValue: (index: number) => void;
-    swap: (i1: number, i2: number) => void;
-  }
+  actions: CArrayFieldActions
 } & Record<any, any>
+  
+export interface CArrayFieldActions {
+  push: (e: Record<any, any>) => void
+  unshift: (e: Record<any, any>) => void
+  pop: () => void
+  shift: () => void
+  setValue: (index: number, e: any) => void
+  delValue: (index: number) => void;
+  swap: (i1: number, i2: number) => void;
+}
 ```
 
 - `fieldValue` 数组组件内的数组，可以循环它创建视图
@@ -456,11 +485,13 @@ export type CArrayFieldAttrs = {
   - `swap` 交换指定下标位置
 - 其他参数为布局组件传递
 
-如果要修改整个数组的内容，可以使用公共方法中的 set
+### 修改值
 
-```ts
-actions.set("", newArray)
-```
+请不要直接修改 `fieldValue`，这会导致内部数据混乱出现 bug
+
+修改整个数组的内容，可以使用公共方法中的 set， `actions.set("", 新数组)`
+
+其他修改可以使用 `actions` 提供的方法
 
 ### 唯一性的要求
 
@@ -476,7 +507,19 @@ actions.set("", newArray)
 
    没有 id可以直接 Math.random 整个随机 数字
 
-
+```html
+<ArrayField name="">
+  <!-- 嵌套的深度无所谓 -->
+	<div>
+    <div>
+      <!-- 内部会根据 name（此时一定是下标）进行赋值，所以后者会覆盖前者 -->
+      <!-- key 一定要唯一，不然使用 actions.unshift 头部添加，会导致错位匹配 -->
+      <ObjectField :name="0" :key="Math.random()"></ObjectField>
+      <ArrayField :name="0" :key="Math.random()""></ArrayField>
+    </div>
+  </div>
+</ArrayField>
+```
 
 
 
@@ -484,8 +527,9 @@ actions.set("", newArray)
 
 表单数据通过配置 `defaultFormData` 实现
 
-```ts
-const formConfig: FormConfig = {
+```vue
+<script>
+const formConfig: CFormConfig = {
   defaultFormData: {
     field1: 1,
     field2: 2,
@@ -514,15 +558,59 @@ const formConfig: FormConfig = {
     ]
   }
 }
+</script>
+<template>
+	<Form :config="formConfig"></Form>
+</template>
 ```
 
 内部会根据给的数据结构自动匹配，如果匹配不到，或者值是 `undefined/null` 会自动跳过
 
-**对于数组来说比较特别，框架需要数组项必须有唯一标识**，而数组中的字段用的是具体的值（不一定就是标识字段），所以当遇到数组时会进行解构处理
+### 特殊情况--数组项
 
-比如例子中的 `array1/array2`，它们的标识用的是 `id`，值用的是 `value/children`，当循环到数组时会判断是否存在指定的字段，有就用，没有就使用原始的数据。查找规则是按照配置顺序找，默认优先级为 `value > children` ，可通过配置改变顺序 [`config.arrayUnwrapKey`](#表单配置)
+**对于数组来说比较特别，框架需要数组项必须有唯一标识，不然数组在更新时会发生错位匹配**，所以数组项中就必须要有两个值，一个是唯一标识符（id），另一个才是具体的数组的值
 
+```vue
+<template>
+<Form>
+  <ArrayField name="arr">
+  	<PlainField :name="0" element="ElInput" />
+  </ArrayField>
+ </Form>
+</template>
+```
 
+使用数组时可以很轻松的写出这种代码，因为必须存在值和唯一标识，我们可以根据组件结构写出以下数据结构
+
+```ts
+const initFormData = {
+  arr: [//对应 name=arr
+    { //数组的每一项，对应 :name=0
+      id: 0, //数组项唯一标识 id
+      value: "xxx" //数组项实际的值
+    }
+  ]
+}
+```
+
+此时会发现，使用 `ElInput` 填充的 `PlainField` 组件对应的数据成了对象，而真正应该对应的应该是 `value` 字段才对，所以**数组项为了支持初始化数据的开箱即用，必须要解构赋值，把对象中的 value 字段提取出来**
+
+可框架内部并不知道要提取哪个，所以需要进行配置
+
+```ts
+const config: CFormConfig = {
+  arrayUnwrapKey: ['value', 'children']
+}
+```
+
+`arrayUnwrapKey` 是一个字符串数组，框架内部会循环数组，逐个尝试，找到就用，找不到会使用原始的数据项，默认值是`[value, children]`
+
+对于这个例子来说
+
+- 因为有 `value` 所以会用 `value` 传递给 `PlainField` 作为初始值使用
+- 如果没有 `value`，那么此时会使用 `{id: 0}` 这个对象本身
+
+**巩固：`ArrayField` 的 `fieldValue` 此时是 `[{id:0, value:xxx}]`。解构赋值只作用于，数组中每一项向下传递的组件，例如这里的 `PlainField`**
 
 
 
@@ -585,16 +673,129 @@ defineComponent({
 
 ## 通用的互操作实例方法
 
-| 属性        | 类型                                                                                      | 描述                                                       |
-| ----------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| reset       | () => void                                                                                | 清空所有组件的值                                           |
-| validate    | () => Promise<FormValidateError[]>                                                        | 触发所有 `PlainField` 组件的校验，只返回校验失败的字段信息 |
-| getFormData | Record<string, any>                                                                       | 不触发校验，返回表单内部所有的值                           |
-| subscribe   | (*paths*: string, *handle*: import("./useFieldValue").FieldSubscribeHandle) => () => void | 订阅匹配字段的修改，返回取消订阅的函数                     |
-| get         | (*path*: string) => any[]                                                                 | 获取匹配字段的值                                           |
-| set         | (*path*: string, *value*: any) => void                                                    | 设置匹配字段的值                                           |
+操作时用到的路径属于[路径系统内容](#路径系统)
 
-- `get/set/subscribe` 方法的 `path` 都依赖于路径系统，详细规则往后看
+空路径字符串等于操作自身
+
+### `reset`
+
+类型 
+
+ `() => void`
+
+描述
+
+清空所有组件的值，`ArrayField` 统一清空成空数组，`PlainField` 清空成 `config.defaultValue`
+
+### `validate`
+
+类型
+
+`() => Promise<FormValidateError[]>`
+
+```ts
+type validate: () => Promise<{
+  path: string  //根字段到异常字段的路径
+  field: string //字段 name
+  message: string //异常信息
+}[]>
+```
+
+描述
+
+框架提供的一个开箱即用的批量校验方法
+
+方法只会存在校验失败的字段，空数组表示全部成功
+
+方法只会触发 `PlainField` 组件中，布局组件中存在 `validate` 方法的字段，`FormItem` 字段中就有，自定义方式看[布局组件内容](#布局组件)
+
+### `getFormData`
+
+类型 `() => Record<string, any>`
+
+描述
+
+返回表单中的数据内容
+
+### `subscribe`
+
+类型
+
+```ts
+type S = (
+	paths: string  //路径字符串
+	handle: (newValue, oldValue) => any //订阅函数，接收一个最新值和上一次的值
+	config?: {immediate?: boolean} //是否立即执行一次
+)
+=> unSubscribe //解除所有的订阅的函数
+```
+
+描述
+
+订阅匹配字段的修改，返回取消订阅的函数
+
+订阅失败，找不到订阅的字段相当于无任何效果，不报错，如果订阅失败可能有 2 种可能
+
+1. 路径不对
+2. 订阅的字段尚未挂载，可以尝试在 `nextTick/onMounted` 中调用
+
+### `get`
+
+类型
+
+```ts
+type Get = (
+	path: string //路径
+) => any[] //获取到的所有值
+```
+
+描述
+
+获取匹配字段的值，空字符串表示获取当前字段
+
+### `set`
+
+类型
+
+描述
+
+设置匹配字段的值，空字符串表示修改当前字段
+
+### `callLayout`
+
+类型
+
+```ts
+type CallElement = (
+	key: string,  //调用的方法名
+	point: any,   //指定 this
+	...params: any[] //传递参数
+) 
+=> Record<string, any> //返回所有匹配路径下的，方法的返回值
+```
+
+描述
+
+调用所有字段组件中的布局组件中，指定的的方法，如果不是函数会自动跳过
+
+### `callElement`
+
+类型
+
+```ts
+type CallElement = (
+	key: string,  //调用的方法名
+	point: any,   //指定 this
+	...params: any[] //传递参数
+) 
+=> Record<string, any> //返回所有匹配路径下的，方法的返回值
+```
+
+描述
+
+调用所有字段组件中的填充组件中，指定的的方法，如果不是函数会自动跳过
+
+
 
 
 
@@ -623,15 +824,7 @@ defineComponent({
   - `../a` 找父节点下的 a
 - 返回自己
   - `""` 空字符会返回自身
-  - 因为直接修改暴露出来的响应式变量会存在很多未知的边界情况，建议始终使用内部提供的操作方式，来修改自身或者其他字段的值
-
-
-
-
-
-
-
-
+  - 因为直接修改暴露出来的响应式变量会存在很多未知的边界情况，建议除了 `PlainField` 始终使用内部提供的操作方式，来修改自身或者其他字段的值
 
 
 
@@ -641,7 +834,7 @@ defineComponent({
 
 内部提供的布局组件只有一个 `FormItem`
 
-字段组件本身并不提供校验和布局能力，这些都是由 `FormItem` 组件提供
+字段组件本身并不提供校验和布局能力，这些都是由布局组件提供
 
 该组件是仿照 `element-plus` 的 `FormItem` 组件的仿品，内部逻辑截然不同，在功能上会尽量做到还原
 
@@ -656,16 +849,22 @@ export interface FormItemProps {
   size?: "small" | "large" | "default"  //尺寸，默认 small
   required?: boolean       //是否必传
   rules?: (RuleItem | string)[] //如果是字符串，会从 form.config.Rules 中取，RuleItem规则同async-validator,element-plus的form-item
-  Rules?: Record<string, RuleItem> 
   disabled?: boolean       //是否禁用
   inline?: boolean         //是否是行内，默认是 display:flex 行内变成 display:inline-flex
   position?: "left" | "right" | "top"  //效果同 element-plus formItem
   showError?: boolean        //是否在校验失败时展示错误信息
-  children?: (p: any) => any[] //
+  __fieldInfo?: CPlainFieldLayoutInfo | CObjectFieldLayoutInfo | CArrayFieldLayoutInfo //字段组件一定会传递的，操作字段相关的一些内容
+}
+
+//内容基本都一致
+type CPlainFieldLayoutInfo = {
+  type: "plain" //什么类型的字段进来的
+  fieldValue: Ref<any> //通过 shallowRef 创建的字段内的变量
+  actions: PlainFieldActions  //不同类型字段组件的互操作方法
+  Rules: Record<any, CFormRuleItem>  //全局配置中的对象
+  children: (p: Record<any, any>) => any //对填充组件包装后的函数，可以在调用时动态混进去一些参数
 }
 ```
-
-
 
 ### 传递给插槽的参数
 
@@ -674,103 +873,296 @@ export interface FormItemAttrs {
   id: string       //label 会使用 label 标签包裹，for 指向的 id，用于点击标签聚焦到表单组件
   disabled: boolean  //禁用状态
   size: "small" | "large" | "default" //尺寸
-  onChange: (e: any) => void //当表单内容变化时，触发校验
+  onBlur: () => void //当表单内容变化时，触发校验
 }
 ```
-
-表单字段的值是在字段组件中维护的，布局组件就需要通过单独的方式`onChange` 来拿到最新状态
-
-所以它会覆盖用户的 `onChange`，如果需要观察值的变化请使用交互对象的 `subscribe` 方法
-
-
 
 ### 自定义布局组件
 
-#### 参数
+自定义布局组件的意义在于，在提供布局的同时，会提供一些额外的逻辑，否则可以直接自定义填充组件即可
 
-布局组件会在字段组件中渲染，类似于这样
+布局组件会比填充组件多接收一个 `__fieldInfo` 参数，使用它可以做些逻辑上的操作
 
-```tsx
-defineComponent({
-  setup() {
-    return () => (
-    	<FieldLayout 
-        {...props.layoutProps} 
-        children={(p = {}) => [slots.default({ ...p, ...xxx })]} 
-        ref={fieldLayoutRef} />
-    )
-  }
+渲染 `ui` 推荐使用 `tsx` 语法，因为渲染实际填充内容需要指定 `children` 函数，它的作用可以看成是一个插槽函数
+
+- 模版中使用标签写法，和 `<slot />` 用法一致
+- 完全的 `tsx` 写法中可以直接函数调用 `<div>{children()}</div>`
+
+也可以暴漏一些方法出去，供用户使用 `callLayout` 方法调用，这样可以做些更高级的操作
+
+```vue
+<script lang="tsx" setup>
+import { ref } from "vue"
+import { CFieldLayoutInfo } from "@usaform/element-plus"
+import { ElCard, ElDivider } from "element-plus"
+
+const props = defineProps<{ __fieldInfo: any }>()
+const { children }: CFieldLayoutInfo = props.__fieldInfo
+const count = ref(0)
+defineExpose({
+  increase: () => count.value++
 })
+</script>
+
+<template>
+  <ElCard style="width: 800px">
+    <template #header>
+      <h1>自定义布局</h1>
+    </template>
+    <ElDivider content-position="center">布局自定义事件调用次数：{{ count }}</ElDivider>
+    <div><children /></div>
+  </ElCard>
+</template>
 ```
 
-接受到来自字段组件的参数
-
-- `Rules` 这是表单配置的校验项对象
-- `children` 接收一个可选传对象的函数，返回实际内容的插槽执行结果
-- 外部传递的 `layoutProps`
-
-
-
-#### expose
-
-内部可以渲染性暴露如下方式用于校验
+### 特殊的暴露方法
 
 ```ts
-export interface FormItemExpose {
-  validate: (name: string, value: any) => Promise<any>
-  setValidateState: (state: { error: boolean; message: string }) => void
+export interface CFormItemExpose {
+  validate: (name: string, value: any) => Promise<any> //校验
+  setValidateState: (state: { error: boolean; message: string }) => void //重置异常
 }
 ```
 
-字段组件会在用户调用，`form[validate/reset]` 时调用调用同名组件
+当用户调用 `actions[validate/reset]`时，需要做校验和情况操作，前者调用 `validate` 进行校验，后者调用 `setValidateState` 清空异常，如果布局组件不提供在对应的功能将会自动失效
+
+当校验和重试时，只有在  `PlainField`  内部的布局组件才会被调用
 
 
 
-#### 渲染实际内容
+## 自定义校验
 
-不考虑复杂的情况，渲染实际内容时只需要把 `children` 放进去即可
+内部校验方式和市面上大多数  `ui` 库保持一致，都是用的 `async-validator`，校验的逻辑为，调用所有 `PlainField` 内的 `validate` 函数，然后在手动调用布局组件内部的检验方式
+
+如果觉得灵活度不够，或者是麻烦，可以直接获取表单内容`getFormData` 后自行校验，`async-validator` 被暴漏在 
+
+`import { Schema } from '@usaform/element-plus/validator'` 路径下
+
+
+
+## typescript 支持
+
+文档中的类型都是演示用的假类型
+
+内部源码是有 `@usaform/element-plus` 和 `@usaform/vue` 组成，前者提供组件，后者提供逻辑，用户使用的都是用前者经过二次封装后的类型
+
+在类型上，`@usaform/element-plus` 的类型都是以 `C` 开头的，需要手动编写类型时，可以写个相关的组件看看 ide 提示，然后复制粘贴出来用。类型很多，就不一一列举了
+
+
+
+## 自定义 `hook`
+
+底层逻辑是由 `@usaform/vue` 提供的一些列自定义 `hook` 做到的，大多数情况都不太推荐单独用这个 `npm` 包，1 是用起来繁琐，2 是不和二次封装的组件混用时很麻烦不好用
+
+
+
+### `useForm`
+
+创建表单上下文
+
+```ts
+//接收一个配置，返回 操作实例actions 渲染组件FieldRender
+type form = (config: FormConfig) => { actions, FieldRender }
+
+type FormConfig ={
+  defaultValue?: any   //字段中的默认值
+  defaultFormData?: Record<any, any>  //初始化的表单数据
+  arrayUnwrapKey?: string | string[] //数组项中的结构赋值数组
+  [x: string]: any  //自定义配置项
+}
+
+type actions = {
+    getFormData: () => Record<string, any>
+  subscribe: (paths: string, handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) => () => void
+  get: (path: string, config?: FormActionGetConfig) => any[]
+  set: (path: string, value: any) => void
+  call: (key: string, point: any, ...params: any[]) => Record<string, any>
+}
+```
+
+tsx 中使用
 
 ```tsx
 defineComponent({
   setup() {
-return () => {
-      const children = (
-        props.children ? 
-					props.children({/*这里的内容会被间接的传递给实际组件的 props 中*/}) : 
-					slots.default?.()
-      ) ?? []
-      return (
-        <div class="form-item">
-           <label class="label" style={labelStyle.value} for={id}>
-              {props.label}
-            </label>
-          <div class="content">
-						{children}
-          </div>
-        </div>
-      )
+    const {FieldRender} = useForm({})
+    return () => {
+      const render = () => {
+        return <div class="u-form">{slots.default?.()}</div>
+      }
+      return <FieldRender render={render}></FieldRender>
     }
   }
 })
 ```
 
+模版中
+
+```vue
+<script>
+const {FieldRender} = useForm({})
+</script>
+<template>
+	<FieldRender>
+  	<slot />
+ 	</FieldRender>
+</template>
+```
+
+
+
+### `useFormPlainField`
+
+`plainField` 用于创建基础值字段，例如 `input/select` ，它只负责生产值，而不提供嵌套
+
+```ts
+export interface actions {
+  getFormData: () => Record<string, any>
+  subscribe: (paths: string, handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) => () => void
+  get: (path: string, config?: FormActionGetConfig) => any[]
+  set: (path: string, value: any) => void
+  call: (key: string, point: any, ...params: any[]) => Record<string, any>
+  provide: () => void //注入上下文
+}
+
+export interface PlainFieldInitInfo {
+  initValue: any      //从 form.defaultFormData 解出来当前字段的匹配值
+  formConfig: FormConfig //创建时的配置
+}
+
+export interface PlainFieldConfig<T = any> {
+  initValue?: T    //最终采用的初始值，不返回默认采用上边的 initValue
+  [x: string]: any
+}
+
+type useFormPlainField = (
+	name: FieldName,    // 字段名
+	init: (info: PlainFieldInitInfo) => PlainFieldConfig //初始函数
+): {
+  fieldValue: Ref<T> //一个用 init 中的初始值创建的 shallowRef
+  actions:  actions  //操作实例，与前文中通用操作实例同名的，效果一致
+  FieldRender: null
+}
+```
+
+```tsx
+setup(props) {
+  const { fieldValue, actions } = useFormPlainField("input", ({ formConfig, initValue }) => {
+  	return { initValue: props.initValue ?? initValue ?? 1 }
+	})
+  actions.provide() //一定要记得调用
+  return () => {
+      const render = () => {
+        return <div>...</div>
+      }
+      return <FieldRender render={render}></FieldRender>
+  }
+}
+```
 
 
 
 
-## 表单校验
 
-### 自定义校验
+### `useFormObjectField`
 
-内部校验方式和市面上大多数  `ui` 库保持一致，都是用的 `async-validator`，校验的逻辑为，调用所有 `PlainField` 内的 `validate` 函数，然后在手动调用布局组件内部的检验方式
+用来做对象嵌套
 
-流程上会挺麻烦，如果觉得灵活度不够可以直接获取表单内容，自行校验，`async-validator` 被暴漏在 
+```ts
+export interface ObjectFieldInitInfo {
+  initValue: any      //从 form.defaultFormData 解出来当前字段的匹配值
+  formConfig: FormConfig //创建时的配置
+}
 
-`import {} from '@usaform/element-plus/validator'` 路径下
+export interface ObjectFieldConfig<T = any> {
+  initValue?: T    //最终采用的初始值，不返回默认采用上边的 initValue
+  [x: string]: any
+}
+
+type useFormObjectField(
+	name: FieldName, 
+	init: ObjectFieldInit<T>
+): {
+  fieldValue: Ref<T> //一个用 init 中的初始值创建的 shallowRef
+  actions    //操作实例，同 form.actions
+  FieldRender: //vue 组件
+}
+```
+
+```tsx
+setup(props) {
+  const { fieldValue, actions, FieldRender } = useFormObjectField("object", ({ formConfig, initValue }) => {
+  	return { initValue: props.initValue ?? initValue ?? 1 }
+	})
+  return () => {
+      const render = () => {
+        return <div>...</div>
+      }
+      return <FieldRender render={render}></FieldRender>
+  }
+}
+```
 
 
 
-### 触发校验的异常
 
-目前内部结构只支持当字段内容发生改变时触发，数据是否发生改变依赖 `onChange` 函数的调用
+
+### `useFormArrayField`
+
+用来做数组嵌套
+
+```ts
+export interface ArrayFieldInitInfo {
+  initValue: any      //从 form.defaultFormData 解出来当前字段的匹配值
+  formConfig: FormConfig //创建时的配置
+}
+
+export interface ArrayFieldConfig<T = any> {
+  initValue?: T[]    //最终采用的初始值，不返回默认采用上边的 initValue
+  [x: string]: any
+}
+
+type useFormArrayField(
+	name: FieldName, 
+	init: ObjectFieldInit<T>
+): {
+  fieldValue: Ref<T[]> //一个用 init 中的初始值创建的 shallowRef
+  actions: ArrayFieldActions   //操作实例，同 form.actions，多的三个和前文中同名的效果一致
+  FieldRender: //vue 组件
+}
+
+export interface ArrayFieldActions extends FormBaseActions {
+  setValue
+  delValue
+  swap
+}
+```
+
+
+
+```tsx
+setup(props) {
+  const { fieldValue, actions, FieldRender } = useFormArrayField("array", ({ formConfig, initValue }) => {
+  	return { initValue: props.initValue ?? initValue ?? 1 }
+	})
+  return () => {
+      const render = () => {
+        return <div>...</div>
+      }
+      return <FieldRender render={render}></FieldRender>
+  }
+}
+```
+
+
+
+
+
+### `createGlobalFormProvide`
+
+创建全局表单配置，参数和 `useForm` 一样，提供的内容会被 `useForm` 自动合并
+
+```ts
+type createGlobalFormProvide = (config: FormConfig) => void
+```
 
