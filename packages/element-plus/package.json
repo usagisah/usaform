@@ -1,6 +1,6 @@
 {
   "name": "@usaform/element-plus",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "",
   "type": "module",
   "exports": {
@@ -38,7 +38,6 @@
     "async-validator": "^4.2.5"
   },
   "peerDependencies": {
-    "vue": "^3.3.0",
     "@usaform/vue": "workspace:^"
   }
 }

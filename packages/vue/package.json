@@ -1,6 +1,6 @@
 {
   "name": "@usaform/vue",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "用于创建表单类别结构的 hooks 库",
   "type": "module",
   "exports": {
@@ -28,8 +28,5 @@
     "url": "https://github.com/usagisah/usaform.git"
   },
   "author": "顾弦笙/usagisah",
-  "license": "MIT",
-  "peerDependencies": {
-    "vue": "^3.3.0"
-  }
+  "license": "MIT"
 }
