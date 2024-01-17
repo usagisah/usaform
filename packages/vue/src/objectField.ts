@@ -48,7 +48,7 @@ export function useFormObjectField<T = any>(name: FieldName, init: ObjectFieldIn
   return {
     fieldValue: _field.fieldValue,
     actions: useFormActions(_field, root),
-    render: createFieldRender(_field.fieldKey, _field.fieldValue)
+    FieldRender: createFieldRender(_field.fieldKey, _field.fieldValue)
   }
 }
 

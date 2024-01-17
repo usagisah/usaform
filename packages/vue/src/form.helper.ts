@@ -1,4 +1,4 @@
-import { Ref, toRaw, unref } from "vue"
+import { DefineComponent, Ref, toRaw, unref } from "vue"
 import { ArrayField } from "./arrayField"
 import { ArrayItemInitParams } from "./arrayItem"
 import { FormContext } from "./context"
@@ -28,7 +28,7 @@ export type FieldName = string | number
 export type FieldWrapper<T, A, Plain extends boolean> = {
   fieldValue: Ref<T>
   actions: A
-  render: Plain extends false ? (fn: () => any) => any : null
+  FieldRender: Plain extends false ? DefineComponent<{ render?: () => any }, any, any> : null
 }
 
 export function isPlainObject(target: any): target is Record<string, any> {

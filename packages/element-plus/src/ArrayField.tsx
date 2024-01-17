@@ -50,7 +50,7 @@ export const ArrayField = defineComponent({
     let FieldSlot = slots.default
     let gLayoutProps: any
     let gFieldRules: any
-    const { fieldValue, actions, render } = useFormArrayField(name, ({ initValue, formConfig }) => {
+    const { fieldValue, actions, FieldRender } = useFormArrayField(name, ({ initValue, formConfig }) => {
       const { Elements, layoutProps, Rules } = formConfig
       FieldLayout = Elements![layout as any]
       FieldElement = Elements![element as any]
@@ -87,17 +87,20 @@ export const ArrayField = defineComponent({
       const _props = { ..._p, ...props.props, fieldValue: fieldValue.value, actions: cActions, ref: fieldElementRef }
       return FieldElement ? [h(FieldElement, _props)] : FieldSlot?.(_props)
     }
-    return render(() => {
-      if (FieldLayout) {
-        const info: CArrayFieldLayoutInfo = { type: "array", fieldValue, actions: cActions, Rules: gFieldRules, children: resolveElement }
-        return h(FieldLayout, {
-          ...gLayoutProps,
-          ...props.layoutProps,
-          __fieldInfo: info,
-          ref: fieldLayoutRef
-        })
+    return () => {
+      const render = () => {
+        if (FieldLayout) {
+          const info: CArrayFieldLayoutInfo = { type: "array", fieldValue, actions: cActions, Rules: gFieldRules, children: resolveElement }
+          return h(FieldLayout, {
+            ...gLayoutProps,
+            ...props.layoutProps,
+            __fieldInfo: info,
+            ref: fieldLayoutRef
+          })
+        }
+        return resolveElement()
       }
-      return resolveElement()
-    })
+      return <FieldRender render={render}></FieldRender>
+    }
   }
 })

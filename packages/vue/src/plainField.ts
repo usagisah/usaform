@@ -46,7 +46,7 @@ export function useFormPlainField<T = any>(name: FieldName, init: PlainFieldInit
   return {
     fieldValue: _field.fieldValue,
     actions: useFormActions(_field, root),
-    render: null
+    FieldRender: null
   }
 }
 

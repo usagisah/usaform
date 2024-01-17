@@ -34,7 +34,7 @@ export const Form = defineComponent({
   props: ["config"],
   setup(props: CFormProps, { slots, expose }) {
     const config = normalizeFormConfig(props.config ?? {})
-    const { actions, render } = useForm(config)
+    const { actions, FieldRender } = useForm(config)
     actions.provide()
 
     const validate: CFormExpose["validate"] = async () => {
@@ -71,9 +71,12 @@ export const Form = defineComponent({
     const formExpose: CFormExpose = { ...actions, validate, reset, callLayout, callElement }
     expose(formExpose)
 
-    return render(() => {
-      return <div class="u-form">{slots.default?.()}</div>
-    })
+    return () => {
+      const render = () => {
+        return <div class="u-form">{slots.default?.()}</div>
+      }
+      return <FieldRender render={render}></FieldRender>
+    }
   }
 })
 

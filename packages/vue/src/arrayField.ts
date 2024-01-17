@@ -57,7 +57,7 @@ export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit
   return {
     fieldValue: _field.fieldValue,
     actions: { ...useFormActions(_field, root), ..._actions },
-    render: createFieldRender(_field.fieldKey, _field.fieldValue)
+    FieldRender: createFieldRender(_field.fieldKey, _field.fieldValue)
   }
 }
 

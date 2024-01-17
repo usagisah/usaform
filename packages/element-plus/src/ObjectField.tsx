@@ -42,7 +42,7 @@ export const ObjectField = defineComponent({
     let FieldSlot = slots.default
     let gLayoutProps: any
     let gFieldRules: any
-    const { fieldValue, render, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
+    const { fieldValue, FieldRender, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
       const { Elements, layoutProps, Rules } = formConfig
       FieldLayout = Elements![layout as any]
       FieldElement = Elements![element as any]
@@ -65,23 +65,26 @@ export const ObjectField = defineComponent({
       }
     })
 
-    return render(() => {
-      if (FieldLayout) {
-        const children = (p: any) => {
-          const { bind, ..._p } = p
-          const _props = { ..._p, ...props.props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
-          return FieldElement ? [h(FieldElement, _props)] : FieldSlot?.(_props)
+    return () => {
+      const render = () => {
+        if (FieldLayout) {
+          const children = (p: any) => {
+            const { bind, ..._p } = p
+            const _props = { ..._p, ...props.props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
+            return FieldElement ? [h(FieldElement, _props)] : FieldSlot?.(_props)
+          }
+          const info: CObjectFieldLayoutInfo = { type: "object", fieldValue, actions, Rules: gFieldRules, children }
+          return h(FieldLayout, {
+            ...gLayoutProps,
+            ...props.layoutProps,
+            __fieldInfo: info,
+            ref: fieldLayoutRef
+          })
         }
-        const info: CObjectFieldLayoutInfo = { type: "object", fieldValue, actions, Rules: gFieldRules, children }
-        return h(FieldLayout, {
-          ...gLayoutProps,
-          ...props.layoutProps,
-          __fieldInfo: info,
-          ref: fieldLayoutRef
-        })
+        const _props = { ...props.props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
+        return FieldElement ? h(FieldElement, _props) : FieldSlot?.(_props)
       }
-      const _props = { ...props.props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
-      return FieldElement ? h(FieldElement, _props) : FieldSlot?.(_props)
-    })
+      return <FieldRender render={render}></FieldRender>
+    }
   }
 })

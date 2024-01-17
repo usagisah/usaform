@@ -39,6 +39,6 @@ export function useFormArrayItem({ ctx, init, afterInit, index }: ArrayItemConfi
   return {
     fieldValue: _field.fieldValue,
     actions: { ...useFormActions(_field, root), ..._actions },
-    render: _field.type === "plain" ? null : createFieldRender(_field.fieldKey, _field.fieldValue)
+    FieldRender: _field.type === "plain" ? null : createFieldRender(_field.fieldKey, _field.fieldValue)
   }
 }

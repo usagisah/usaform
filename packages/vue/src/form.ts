@@ -40,7 +40,7 @@ export function useForm(formConfig: FormConfig) {
 
   return {
     actions: { ...useFormActions(field, field), provide: formProvide },
-    render: createFieldRender(field.fieldKey, field.fieldValue)
+    FieldRender: createFieldRender(field.fieldKey, field.fieldValue)
   }
 }
 
