@@ -2,17 +2,17 @@ import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usafo
 import { Ref, SlotsType, defineComponent, h, ref } from "vue"
 import { CFormRuleItem } from "./Form"
 import { CFormItemExpose } from "./FormItem"
-import { callFuncWithError } from "./helper"
+import { callFuncWithError, isPlainObject } from "./helper"
 
 export interface CPlainFieldProps {
   name: string | number
 
   initValue?: any
 
-  layout?: string
+  layout?: string | Record<any, any>
   layoutProps?: Record<any, any>
 
-  element?: string
+  element?: string | Record<any, any>
   props?: Record<any, any>
 }
 
@@ -41,15 +41,18 @@ export const PlainField = defineComponent({
 
     let FieldLayout: any = null
     let FieldElement: any = null
-    let gFieldRules: Record<any, CFormRuleItem>
-    let gLayoutProps: any
     let FieldSlot = slots.default
+
+    let gLayoutProps: any = {}
+    let gFieldRules: Record<any, CFormRuleItem>
+
     const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig }) => {
       const { Elements, Rules, layoutProps, defaultValue } = formConfig
-      FieldLayout = Elements![layout as any]
-      FieldElement = Elements![element as any]
-      gFieldRules = Rules!
+      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements![layout]
+      if (element) FieldElement = isPlainObject(element) ? element : Elements![element]
+
       gLayoutProps = layoutProps!
+      gFieldRules = Rules!
 
       return {
         initValue: initValue ?? props.initValue,

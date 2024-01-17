@@ -1,17 +1,17 @@
 import { FormActionCallInfo, ObjectFieldActions, useFormObjectField } from "@usaform/vue"
 import { Ref, SlotsType, defineComponent, h, ref } from "vue"
 import { CFormRuleItem } from "./Form"
-import { callFuncWithError } from "./helper"
+import { callFuncWithError, isPlainObject } from "./helper"
 
 export interface CObjectFieldProps {
   name: string | number
 
   initValue?: any
 
-  layout?: string
+  layout?: string | Record<any, any>
   layoutProps?: Record<any, any>
 
-  element?: string
+  element?: string | Record<any, any>
   props?: Record<any, any>
 }
 
@@ -37,17 +37,22 @@ export const ObjectField = defineComponent({
 
     const fieldLayoutRef = ref<Record<any, any> | null>(null)
     const fieldElementRef = ref<Record<any, any> | null>(null)
+
     let FieldLayout: any
     let FieldElement: any
     let FieldSlot = slots.default
-    let gLayoutProps: any
-    let gFieldRules: any
+
+    let gLayoutProps: any = {}
+    let gFieldRules: any = {}
+
     const { fieldValue, FieldRender, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
       const { Elements, layoutProps, Rules } = formConfig
-      FieldLayout = Elements![layout as any]
-      FieldElement = Elements![element as any]
+      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements![layout]
+      if (element) FieldElement = isPlainObject(element) ? element : Elements![element]
+
       gLayoutProps = layoutProps
       gFieldRules = Rules
+
       return {
         initValue: initValue ?? props.initValue,
         callLayout(_: any, { key, point, params }: FormActionCallInfo) {

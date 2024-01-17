@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
+    "@faker-js/faker": "^8.3.1",
     "@usaform/element-plus": "workspace:^",
     "element-plus": "^2.4.4",
     "sass": "^1.69.7",

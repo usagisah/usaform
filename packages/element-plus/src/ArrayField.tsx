@@ -1,17 +1,17 @@
 import { ArrayFieldActions, FormActionCallInfo, useFormArrayField } from "@usaform/vue"
 import { Ref, SlotsType, defineComponent, h, ref } from "vue"
 import { CFormRuleItem } from "./Form"
-import { callFuncWithError } from "./helper"
+import { callFuncWithError, isPlainObject } from "./helper"
 
 export interface CArrayFieldProps {
   name: string
 
   initValue?: any[]
 
-  layout?: string
+  layout?: string | Record<any, any>
   layoutProps?: Record<any, any>
 
-  element?: string
+  element?: string | Record<any, any>
   props?: Record<any, any>
 }
 
@@ -43,19 +43,28 @@ export const ArrayField = defineComponent({
   }>,
   setup(props: CArrayFieldProps, { slots }) {
     const { name, layout, element } = props
+    if (!(typeof name === "number")) {
+      throw "非法的使用方式，请正确使用 VoidField 组件"
+    }
+
     const fieldLayoutRef = ref<Record<any, any> | null>(null)
     const fieldElementRef = ref<Record<any, any> | null>(null)
+
     let FieldLayout: any
     let FieldElement: any
     let FieldSlot = slots.default
+
     let gLayoutProps: any
     let gFieldRules: any
+
     const { fieldValue, actions, FieldRender } = useFormArrayField(name, ({ initValue, formConfig }) => {
       const { Elements, layoutProps, Rules } = formConfig
-      FieldLayout = Elements![layout as any]
-      FieldElement = Elements![element as any]
-      gLayoutProps = layoutProps
-      gFieldRules = Rules
+      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements![layout]
+      if (element) FieldElement = isPlainObject(element) ? element : Elements![element]
+
+      gLayoutProps = layoutProps!
+      gFieldRules = Rules!
+
       return {
         initValue: initValue ?? props.initValue,
         reset() {

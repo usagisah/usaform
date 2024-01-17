@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { ElSelect, ElOption, ElInput, ElRadio, ElRadioGroup, ElCheckbox, ElCheckboxGroup, ElInputNumber, ElDivider, ElCard, ElButton, ElDatePicker, ElCascader, ElSpace } from "element-plus"
-import { Form, FormItem, PlainField, CFormExpose, FormConfig } from "@usaform/element-plus"
+import { Form, FormItem, PlainField, CFormExpose } from "@usaform/element-plus"
 
 const CascaderOptions = [
   {
@@ -327,7 +327,7 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
             </el-checkbox-group>
           </template>
         </PlainField>
-        <PlainField name="DatePicker" layout="FormItem" :layout-props="{ label: '时间' }">
+        <PlainField name="DatePicker" :layout="FormItem" :layout-props="{ label: '时间' }">
           <template #default="{ bind }">
             <ElDatePicker v-bind="bind" type="date" placeholder="Pick a day" />
           </template>
@@ -352,7 +352,7 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
         <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }" element="Radio" />
         <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联' }" element="ElCascader" :props="{ options: CascaderOptions, props: { expandTrigger: 'hover' } }" />
         <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选' }" element="Checkbox" />
-        <PlainField name="DatePicker" layout="FormItem" :layout-props="{ label: '时间' }" element="ElDatePicker" :props="{ type: 'date', placeholder: 'Pick a day' }" />
+        <PlainField name="DatePicker" :layout="FormItem" :layout-props="{ label: '时间' }" element="ElDatePicker" :props="{ type: 'date', placeholder: 'Pick a day' }" />
 
         <ElDivider content-position="center">(布局样式) 提交</ElDivider>
         <FormItem>
