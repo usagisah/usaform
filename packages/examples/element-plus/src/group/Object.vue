@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { ElSelect, ElOption, ElInput, ElRadio, ElRadioGroup, ElCheckbox, ElCheckboxGroup, ElInputNumber, ElDivider, ElCard, ElButton, ElDatePicker, ElCascader, ElSpace } from "element-plus"
-import { Form, FormItem, PlainField, CFormExpose } from "@usaform/element-plus"
+import { Form, FormItem, PlainField, CFormExpose, ObjectField } from "@usaform/element-plus"
 
 const CascaderOptions = [
   {
@@ -273,9 +273,9 @@ const CascaderOptions = [
 ]
 
 const formSlot = ref<CFormExpose | null>(null)
-const callSlot = (key: string) => console.log(formSlot.value![key]())
+const callSlot = async (key: string) => console.log(await formSlot.value![key]())
 const formKey = ref<CFormExpose | null>(null)
-const callKey = (key: string) => console.log(formKey.value![key]())
+const callKey = async (key: string) => console.log(await formKey.value![key]())
 </script>
 
 <template>
@@ -284,54 +284,60 @@ const callKey = (key: string) => console.log(formKey.value![key]())
       <template #header>插槽</template>
       <Form ref="formSlot">
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
-        <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', required: true }">
-          <template #default="{ bind }">
-            <ElInput v-bind="bind" placeholder="请输入名称" />
-          </template>
-        </PlainField>
-        <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量' }" :init-value="0">
-          <template #default="{ bind }">
-            <ElInputNumber v-bind="bind" placeholder="请输入数量" />
-          </template>
-        </PlainField>
-        <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉' }">
-          <template #default="{ bind }">
-            <ElSelect v-bind="bind" placeholder="请选择">
-              <ElOption label="1" value="1" />
-              <ElOption label="2" value="2" />
-              <ElOption label="3" value="3" />
-            </ElSelect>
-          </template>
-        </PlainField>
-        <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }">
-          <template #default="{ bind }">
-            <el-radio-group v-bind="bind">
-              <el-radio label="1" size="large">Option 1</el-radio>
-              <el-radio label="2" size="large">Option 2</el-radio>
-            </el-radio-group>
-          </template>
-        </PlainField>
-        <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联' }">
-          <template #default="{ bind }">
-            <ElCascader v-bind="bind" :options="CascaderOptions" :props="{ expandTrigger: 'hover' }" />
-          </template>
-        </PlainField>
-        <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选' }">
-          <template #default="{ bind }">
-            <el-checkbox-group v-bind="bind">
-              <el-checkbox label="Option A" />
-              <el-checkbox label="Option B" />
-              <el-checkbox label="Option C" />
-              <el-checkbox label="disabled" disabled />
-              <el-checkbox label="selected and disabled" disabled />
-            </el-checkbox-group>
-          </template>
-        </PlainField>
-        <PlainField name="DatePicker" layout="FormItem" :layout-props="{ label: '时间' }">
-          <template #default="{ bind }">
-            <ElDatePicker v-bind="bind" type="date" placeholder="Pick a day" />
-          </template>
-        </PlainField>
+        <ObjectField name="object">
+          <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', required: true }">
+            <template #default="{ bind }">
+              <ElInput v-bind="bind" placeholder="请输入名称" />
+            </template>
+          </PlainField>
+          <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量' }" :init-value="0">
+            <template #default="{ bind }">
+              <ElInputNumber v-bind="bind" placeholder="请输入数量" />
+            </template>
+          </PlainField>
+          <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉' }">
+            <template #default="{ bind }">
+              <ElSelect v-bind="bind" placeholder="请选择">
+                <ElOption label="1" value="1" />
+                <ElOption label="2" value="2" />
+                <ElOption label="3" value="3" />
+              </ElSelect>
+            </template>
+          </PlainField>
+          <ObjectField name="object2">
+            <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }">
+              <template #default="{ bind }">
+                <el-radio-group v-bind="bind">
+                  <el-radio label="1" size="large">Option 1</el-radio>
+                  <el-radio label="2" size="large">Option 2</el-radio>
+                </el-radio-group>
+              </template>
+            </PlainField>
+            <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联' }">
+              <template #default="{ bind }">
+                <ElCascader v-bind="bind" :options="CascaderOptions" :props="{ expandTrigger: 'hover' }" />
+              </template>
+            </PlainField>
+            <ObjectField name="object3">
+              <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选' }">
+                <template #default="{ bind }">
+                  <el-checkbox-group v-bind="bind">
+                    <el-checkbox label="Option A" />
+                    <el-checkbox label="Option B" />
+                    <el-checkbox label="Option C" />
+                    <el-checkbox label="disabled" disabled />
+                    <el-checkbox label="selected and disabled" disabled />
+                  </el-checkbox-group>
+                </template>
+              </PlainField>
+              <PlainField name="DatePicker" layout="FormItem" :layout-props="{ label: '时间' }">
+                <template #default="{ bind }">
+                  <ElDatePicker v-bind="bind" type="date" placeholder="Pick a day" />
+                </template>
+              </PlainField>
+            </ObjectField>
+          </ObjectField>
+        </ObjectField>
 
         <ElDivider content-position="center">(布局样式) 提交</ElDivider>
         <FormItem>
@@ -349,10 +355,14 @@ const callKey = (key: string) => console.log(formKey.value![key]())
         <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', required: true }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
         <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量' }" element="ElInputNumber" :props="{ placeholder: '请输入数量' }" />
         <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉' }" element="Select" :props="{ placeholder: '请选择' }" />
-        <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }" element="Radio" />
-        <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联' }" element="ElCascader" :props="{ options: CascaderOptions, props: { expandTrigger: 'hover' } }" />
-        <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选' }" element="Checkbox" />
-        <PlainField name="DatePicker" layout="FormItem" :layout-props="{ label: '时间' }" element="ElDatePicker" :props="{ type: 'date', placeholder: 'Pick a day' }" />
+        <ObjectField name="object2">
+          <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }" element="Radio" />
+          <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联' }" element="ElCascader" :props="{ options: CascaderOptions, props: { expandTrigger: 'hover' } }" />
+          <ObjectField name="object3">
+            <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选' }" element="Checkbox" />
+            <PlainField name="DatePicker" layout="FormItem" :layout-props="{ label: '时间' }" element="ElDatePicker" :props="{ type: 'date', placeholder: 'Pick a day' }" />
+          </ObjectField>
+        </ObjectField>
 
         <ElDivider content-position="center">(布局样式) 提交</ElDivider>
         <FormItem>

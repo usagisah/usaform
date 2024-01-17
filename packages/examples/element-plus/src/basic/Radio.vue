@@ -1,9 +1,6 @@
 <script lang="ts" setup>
 import { ElRadioGroup, ElRadio } from "element-plus"
-import { watch } from "vue";
-const props = defineProps<{ onChange: any }>()
 const value = defineModel<string>()
-watch(value, v => props.onChange?.(v))
 </script>
 
 <template>

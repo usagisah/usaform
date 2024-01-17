@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import { ElCheckbox, ElCheckboxGroup } from "element-plus"
-import { computed, watch } from "vue"
-const props = defineProps<{ onChange: any }>()
+import { useAttrs } from "vue";
 const value = defineModel<string[]>()
-watch(value, v => props.onChange?.(v))
 </script>
 
 <template>

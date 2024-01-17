@@ -4,9 +4,9 @@ import { ElInput, ElDivider, ElCard, ElButton, ElSpace } from "element-plus"
 import { Form, FormItem, PlainField, CFormExpose, ArrayField } from "@usaform/element-plus"
 
 const formSlot = ref<CFormExpose | null>(null)
-const callSlot = (key: string) => console.log(formSlot.value![key]())
+const callSlot = async (key: string) => console.log(await formSlot.value![key]())
 const formKey = ref<CFormExpose | null>(null)
-const callKey = (key: string) => console.log(formKey.value![key]())
+const callKey = async (key: string) => console.log(await formKey.value![key]())
 </script>
 
 <template>
