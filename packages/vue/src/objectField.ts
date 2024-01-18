@@ -28,7 +28,7 @@ type ObjectFieldInit<T> = (info: ObjectFieldInitInfo) => ObjectFieldConfig<T>
 
 export function useFormObjectField<T = any>(name: FieldName, init: ObjectFieldInit<T>): FieldWrapper<T, ObjectFieldActions, false> {
   const ctx: FormContext = inject(formContext)!
-  const { field, root } = ctx
+  const { field, root, arrayUnwrapKey } = ctx
   if (field.type === "plain") throw GlobalInfo.nullPlainField
   if (field.type === "ary") {
     return useFormArrayItem({
@@ -47,7 +47,7 @@ export function useFormObjectField<T = any>(name: FieldName, init: ObjectFieldIn
 
   return {
     fieldValue: _field.fieldValue,
-    actions: useFormActions(_field, root),
+    actions: useFormActions(_field, root, arrayUnwrapKey),
     FieldRender: createFieldRender(_field.fieldKey, _field.fieldValue)
   }
 }

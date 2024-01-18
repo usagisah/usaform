@@ -8,6 +8,7 @@ import { useFieldValue } from "./useFieldValue"
 export interface RootField extends BaseFiled {
   type: "root"
   struct: Map<FieldName, Field>
+  userConfig: Record<any, any>
 }
 
 export interface FormActions extends FormBaseActions {
@@ -16,11 +17,13 @@ export interface FormActions extends FormBaseActions {
 
 export function useForm(formConfig: FormConfig) {
   const { defaultValue, defaultFormData, arrayUnwrapKey, arrayUnwrapArrayKey } = toRaw(formConfig)
+  const _arrayUnwrapArrayKey = arrayUnwrapKey ? (Array.isArray(arrayUnwrapKey) ? arrayUnwrapKey : [arrayUnwrapArrayKey]) : ["value", "children"]
   const field: RootField = {
     type: "root",
     name: "root",
     struct: new Map(),
     parent: null,
+    userConfig: {},
     __uform_field: true,
     ...useFieldValue({ ...defaultFormData })
   }
@@ -29,7 +32,7 @@ export function useForm(formConfig: FormConfig) {
     root: field,
     defaultValue,
     currentInitValue: { ...defaultFormData },
-    arrayUnwrapKey: arrayUnwrapKey ? (Array.isArray(arrayUnwrapKey) ? arrayUnwrapKey : [arrayUnwrapArrayKey]) : ["value", "children"],
+    arrayUnwrapKey: _arrayUnwrapArrayKey,
     formConfig
   }
 
@@ -39,7 +42,7 @@ export function useForm(formConfig: FormConfig) {
   }
 
   return {
-    actions: { ...useFormActions(field, field), provide: formProvide },
+    actions: { ...useFormActions(field, field, _arrayUnwrapArrayKey), provide: formProvide },
     FieldRender: createFieldRender(field.fieldKey, field.fieldValue)
   }
 }

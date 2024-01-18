@@ -1,4 +1,3 @@
-export type { FormActionCallInfo } from "./actions/call"
 export type { Field, FieldName, FormConfig } from "./form.helper"
 
 export { useForm } from "./form"
@@ -13,4 +12,8 @@ export type { ObjectField, ObjectFieldActions, ObjectFieldConfig, ObjectFieldIni
 export { useFormArrayField } from "./arrayField"
 export type { ArrayField, ArrayFieldActions, ArrayFieldConfig, ArrayFieldInitInfo } from "./arrayField"
 
+export type { FormActionCallConfig, FormActionCallInfo, FormActionGetConfig } from "./actions/hooks"
+
 export { createGlobalFormProvide } from "./context"
+
+export { onNextTick } from "./helper/onNextTick"

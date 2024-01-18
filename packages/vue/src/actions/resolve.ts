@@ -1,76 +1,77 @@
 import { Field } from "../form.helper"
+import { MatchPath, parsePath } from "./path"
 
-type MatchPath = ".." | RegExp
+export interface ResolveConfig {
+  path: string
+  field: Field
+  rootField: Field
+  first: boolean
+}
 
-export function resolveFields(path: string, cur: Field, root: Field, first: boolean): Field[] {
-  const { matches, startRoot } = parse(path)
+export interface MatchedFields {
+  path: string
+  name: string
+  field: Field
+}
+
+export function resolveFields({ path, field, rootField, first = false }: ResolveConfig) {
+  const { matches, startRoot } = parsePath(path)
   if (matches.length === 0) return []
 
-  const result: Field[] = []
-  function resolve(matches: (RegExp | "..")[], name: string, field?: Field | null): unknown {
-    if (first && result.length === 1) return
-    if (!field) return
+  const matchedFields: MatchedFields[] = []
+  const startField = startRoot ? rootField : field
+  resolve({ matches, path: [], name: startField.name.toString(), field: startField, first, matchedFields })
 
-    const [m, ...ms] = matches
-
-    if (m === "..") {
-      return resolve(ms, field.parent?.name + "", field.parent)
-    }
-
-    if (!m.test(name)) {
-      return
-    }
-
-    if (ms.length === 0) {
-      return result.push(field)
-    }
-
-    if (field.type === "root" || field.type === "object") {
-      return field.struct.forEach(f => resolve(ms, f.name as string, f))
-    }
-
-    if (field.type === "ary") {
-      return field.struct.forEach((f, i) => {
-        if (!f.__uform_field) return
-        resolve(ms, i + "", f)
-      })
-    }
-  }
-
-  const startField = startRoot ? root : cur
-  return resolve(matches, startField.name + "", startField), result
+  return matchedFields
 }
 
-function parse(path: string) {
-  let startRoot = false
-  let matches: MatchPath[] = []
-
-  if (path.startsWith("~/")) {
-    path = path.substring(2)
-    startRoot = true
-    matches.push(getReg(".*"))
-  } else if (!path.startsWith("../")) {
-    matches.push(getReg(".*"))
-  }
-  if (path.length === 0) return { matches: [], startRoot }
-
-  for (const p of path.split("/")) {
-    if (p === "..") {
-      matches.push("..")
-      matches.push(getReg(".*"))
-      continue
-    } 
-    matches.push(getReg(p))
-  }
-  return { matches, startRoot }
+interface ResolveContext {
+  matches: MatchPath[]
+  path: string[]
+  name: string
+  field?: Field
+  first: boolean
+  matchedFields: MatchedFields[]
 }
 
-const regCache = new Map<string, RegExp>([
-  [".*", /.*/],
-  ["", /\b/]
-])
-function getReg(p: string) {
-  let r = regCache.get(p)
-  if (!r) regCache.set(p, (r = new RegExp(p)))
-  return r
+function resolve({ matches, path, name, field, first, matchedFields }: ResolveContext) {
+  if (first && matchedFields.length === 1) return
+  if (!field) return
+
+  let [m, ...ms] = matches
+
+  if (m === "..") {
+    return resolve({ matches: ms, path, name: field.parent?.name.toString() as string, field: field.parent!, first, matchedFields })
+  }
+
+  path.push(name)
+
+  if (m !== "all" && !m.test(name)) {
+    return
+  }
+
+  if (ms.length === 0) {
+    let _path = path.join("/")
+    if (_path.startsWith("root")) {
+      _path = _path.slice(4)
+      if (_path.startsWith("/")) _path = _path.slice(1)
+    }
+    matchedFields.push({ name, field, path: _path })
+
+    if (m !== "all") return
+    ms = ["all"]
+  }
+
+  if (field.type === "root" || field.type === "object") {
+    return field.struct.forEach(f => {
+      resolve({ matches: ms, path, name: f.name.toString(), field: f, first, matchedFields })
+    })
+  }
+
+  if (field.type === "ary") {
+    return field.struct.forEach((f, i) => {
+      if (!f.__uform_field) return
+      resolve({ matches: ms, path, name: i.toString(), field: f, first, matchedFields })
+    })
+  }
 }

@@ -37,7 +37,7 @@ type ArrayFieldInit<T> = (info: ArrayFieldInitInfo) => ArrayFieldConfig<T>
 
 export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit<T>): FieldWrapper<T[], ArrayFieldActions, false> {
   const ctx: FormContext = inject(formContext)!
-  const { field, root } = ctx
+  const { field, root, arrayUnwrapKey } = ctx
   if (field.type === "plain") throw GlobalInfo.nullPlainField
   if (field.type === "ary") {
     return useFormArrayItem({
@@ -56,7 +56,7 @@ export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit
 
   return {
     fieldValue: _field.fieldValue,
-    actions: { ...useFormActions(_field, root), ..._actions },
+    actions: { ...useFormActions(_field, root, arrayUnwrapKey), ..._actions },
     FieldRender: createFieldRender(_field.fieldKey, _field.fieldValue)
   }
 }
@@ -101,7 +101,7 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
       _fieldValue.push(item.__uform_aryItem_field ? item.__aryValue : item)
     }
     _field.struct = _fieldStruct
-    _field.setter(_fieldValue)
+    _field.fieldValue.value = _fieldValue
   }
   const setValue: SetValue = (index, e) => {
     e = toRaw(e)

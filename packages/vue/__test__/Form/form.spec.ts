@@ -64,3 +64,8 @@ describe("useForm actions", () => {
     expect(c.html()).toBe(`<button>10</button>\n<button>90</button>`)
   })
 })
+
+/* 
+call path 完整性
+数组增删改查
+*/

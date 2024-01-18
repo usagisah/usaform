@@ -25,7 +25,7 @@ export interface PlainFieldActions extends FormBaseActions {}
 type PlainFieldInit<T> = (info: PlainFieldInitInfo) => PlainFieldConfig<T>
 export function useFormPlainField<T = any>(name: FieldName, init: PlainFieldInit<T>): FieldWrapper<T, PlainFieldActions, true> {
   const ctx: FormContext = inject(formContext)!
-  const { field, root } = ctx
+  const { field, root, arrayUnwrapKey } = ctx
 
   if (field.type === "plain") throw GlobalInfo.nullPlainField
   if (field.type === "ary") {
@@ -44,7 +44,7 @@ export function useFormPlainField<T = any>(name: FieldName, init: PlainFieldInit
   })
   return {
     fieldValue: _field.fieldValue,
-    actions: useFormActions(_field, root),
+    actions: useFormActions(_field, root, arrayUnwrapKey),
     FieldRender: null
   }
 }

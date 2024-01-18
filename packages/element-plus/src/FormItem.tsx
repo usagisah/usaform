@@ -1,5 +1,5 @@
 import Schema from "async-validator"
-import { SlotsType, computed, defineComponent, mergeProps, reactive, watch, watchEffect } from "vue"
+import { SlotsType, computed, defineComponent, h, reactive, watch, watchEffect } from "vue"
 import { CArrayFieldLayoutInfo } from "./ArrayField"
 import { CFormRuleItem } from "./Form"
 import { CObjectFieldLayoutInfo } from "./ObjectField"
@@ -75,7 +75,7 @@ export const FormItem = defineComponent({
 
       const _children1 = props.__fieldInfo?.children
       const _children2 = _children1 ? _children1(childrenProps) : slots.default?.(childrenProps)
-      const children = (_children2 ?? []).map((c: any) => mergeProps(c, { disabled: disabled.value }))
+      const children = (_children2 ?? []).map((c: any) => h(c, { disabled: disabled.value }))
 
       return (
         <div class={classNames.value}>

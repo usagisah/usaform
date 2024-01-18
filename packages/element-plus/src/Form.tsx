@@ -25,8 +25,8 @@ export interface CFormValidateError {
 export interface CFormExpose extends FormActions {
   validate: () => Promise<CFormValidateError[]>
   reset: () => void
-  callLayout: (key: string, point: any, ...params: any[]) => Record<string, any>
-  callElement: (key: string, point: any, ...params: any[]) => Record<string, any>
+  callLayout: (path: string, key: string, ...params: any[]) => Record<string, any>
+  callElement: (path: string, key: string, ...params: any[]) => Record<string, any>
 }
 
 export const Form = defineComponent({
@@ -38,7 +38,7 @@ export const Form = defineComponent({
     actions.provide()
 
     const validate: CFormExpose["validate"] = async () => {
-      const res = actions.call("validate", null)
+      const res = actions.call("all", "validate", { fieldTypes: ["plain"] })
       const ps: Promise<any>[] = []
       const errs: CFormValidateError[] = []
       for (const path in res) {
@@ -57,15 +57,15 @@ export const Form = defineComponent({
     }
 
     const reset = () => {
-      actions.call("reset", null)
+      actions.call("all", "reset", { fieldTypes: ["plain"] })
     }
 
-    const callLayout: CFormExpose["callLayout"] = (key, point, ...params) => {
-      return actions.call("callLayout", globalThis, { key, point, params })
+    const callLayout: CFormExpose["callLayout"] = (path, key, point, ...params) => {
+      return actions.call(path, "callLayout", { params: [{ key, point, params }] })
     }
 
-    const callElement: CFormExpose["callElement"] = (key, point, ...params) => {
-      return actions.call("callElement", globalThis, { key, point, params })
+    const callElement: CFormExpose["callElement"] = (path, key, point, ...params) => {
+      return actions.call(path, "callElement", { params: [{ key, point, params }] })
     }
 
     const formExpose: CFormExpose = { ...actions, validate, reset, callLayout, callElement }
