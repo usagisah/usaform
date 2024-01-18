@@ -352,13 +352,13 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
       <template #header>指定 key</template>
       <Form ref="formKey">
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
-        <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', required: true }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
-        <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量' }" element="ElInputNumber" :props="{ placeholder: '请输入数量' }" />
-        <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉' }" element="Select" :props="{ placeholder: '请选择' }" />
-        <ObjectField name="object2">
+        <ObjectField name="object">
+          <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', required: true }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
+          <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量' }" element="ElInputNumber" :props="{ placeholder: '请输入数量' }" />
+          <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉' }" element="Select" :props="{ placeholder: '请选择' }" />
           <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }" element="Radio" />
           <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联' }" element="ElCascader" :props="{ options: CascaderOptions, props: { expandTrigger: 'hover' } }" />
-          <ObjectField name="object3">
+          <ObjectField name="object2">
             <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选' }" element="Checkbox" />
             <PlainField name="DatePicker" layout="FormItem" :layout-props="{ label: '时间' }" element="ElDatePicker" :props="{ type: 'date', placeholder: 'Pick a day' }" />
           </ObjectField>

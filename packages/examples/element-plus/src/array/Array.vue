@@ -28,7 +28,7 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
               <ElButton @click="actions.pop()">尾部删除</ElButton>
               <ElButton @click="actions.unshift({ id: Math.random(), value: '2222' })">头部添加</ElButton>
               <ElButton @click="actions.shift()">头部删除</ElButton>
-              <ElButton @click="actions.swap(0, fieldValue.length - 1)" v-if="fieldValue.length >= 2">交换收尾</ElButton>
+              <ElButton @click="actions.swap(0, fieldValue.length - 1)" v-if="fieldValue.length >= 2">首尾交换</ElButton>
             </ElSpace>
           </template>
         </ArrayField>

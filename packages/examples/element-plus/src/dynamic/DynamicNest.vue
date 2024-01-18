@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { provide, reactive, ref } from "vue"
+import { onUnmounted, provide, reactive, ref } from "vue"
 import { ElDivider, ElCard, ElButton } from "element-plus"
 import { Form, FormConfig, FormItem, CFormExpose, ArrayField } from "@usaform/element-plus"
 
@@ -50,7 +50,9 @@ const reset = () => {
 }
 
 /* -------------- 动态更新 -------------- */
-setTimeout(() => {
+const t = ref(6)
+const id = setInterval(() => {
+  if (t.value <= 0) return clearInterval(id)
   form.value?.set("dynamic", [
     {
       groupId: 1,
@@ -66,10 +68,15 @@ setTimeout(() => {
       ]
     }
   ])
-}, 5000)
+  t.value--
+}, 1000)
+onUnmounted(() => {
+  clearInterval(id)
+})
 </script>
 
 <template>
+  <ElDivider content-position="center">首屏 {{ t }} 秒后，模拟接口动态更新表单，注意第一条的内容变化</ElDivider>
   <ElCard style="width: 1000px">
     <template #header>指定 key</template>
     <Form :config="formConfig" ref="form">

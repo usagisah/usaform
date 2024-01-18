@@ -17,7 +17,7 @@ const props = defineProps<{ fieldValue: any[]; actions: any }>()
     <ElButton @click="props.actions.pop()">尾部删除</ElButton>
     <ElButton @click="props.actions.unshift({ id: Math.random(), value: '2222' })">头部添加</ElButton>
     <ElButton @click="props.actions.shift()">头部删除</ElButton>
-    <ElButton @click="props.actions.swap(0, fieldValue.length - 1)" v-if="fieldValue.length >= 2">交换收尾</ElButton>
+    <ElButton @click="props.actions.swap(0, fieldValue.length - 1)" v-if="fieldValue.length >= 2">首尾交换</ElButton>
   </ElSpace>
 </template>
 

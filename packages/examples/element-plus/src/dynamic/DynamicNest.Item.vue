@@ -3,8 +3,16 @@ import { ObjectField, PlainField, CArrayFieldActions } from "@usaform/element-pl
 import { ElButton, ElSpace } from "element-plus"
 const props = defineProps<{ fieldValue: any[]; actions: any }>()
 const api: CArrayFieldActions = props.actions
+
 const add = () => {
-  api.push({ itemId: Math.random() })
+  api.push({
+    itemId: Math.random(),
+    children: {
+      type: 1,
+      operate: "*",
+      value: "添加文本"
+    }
+  })
 }
 const remove = (i: number) => {
   api.delValue(i)

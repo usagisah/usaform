@@ -273,7 +273,9 @@ const CascaderOptions = [
 ]
 
 const formSlot = ref<CFormExpose | null>(null)
-const callSlot = async (key: string) => console.log(await formSlot.value![key]())
+const callSlot = async (key: string) => {
+  console.log(await formSlot.value![key]())
+}
 const formKey = ref<CFormExpose | null>(null)
 const callKey = async (key: string) => console.log(await formKey.value![key]())
 </script>

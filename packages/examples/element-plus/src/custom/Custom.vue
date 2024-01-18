@@ -10,10 +10,10 @@ const config: CFormConfig = {
 }
 const form = ref<CFormExpose>()
 const layoutIncrease = () => {
-  form.value!.callLayout("increase", null)
+  form.value!.callLayout("all", "increase")
 }
 const elementIncrease = () => {
-  form.value!.callElement("increase", null)
+  form.value!.callElement("all", "increase")
 }
 </script>
 
