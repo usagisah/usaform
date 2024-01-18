@@ -32,7 +32,7 @@ export const ObjectField = defineComponent({
   setup(props: CObjectFieldProps, { slots }) {
     const { name, layout, element } = props
     if (name !== 0 && !name) {
-      throw "非法的使用方式，请正确使用 VoidField 组件"
+      throw "非法的使用方式，请正确使用 ObjectField 组件"
     }
 
     const fieldLayoutRef = ref<Record<any, any> | null>(null)

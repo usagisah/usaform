@@ -45,11 +45,11 @@ export const PlainField = defineComponent({
 
 export const BasicForm = defineComponent({
   setup(props, { expose }) {
-    const { actions, render } = useForm({})
+    const { actions, FieldRender } = useForm({})
     actions.provide()
     expose(actions)
-    return render(() => {
-      return <ArrayField />
-    })
+    return () => {
+      return <FieldRender render={() => <ArrayField />} />
+    }
   }
 })

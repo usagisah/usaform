@@ -1,5 +1,5 @@
 import Schema from "async-validator"
-import { SlotsType, computed, defineComponent, h, reactive, watch, watchEffect } from "vue"
+import { SlotsType, computed, defineComponent, mergeProps, reactive, watch, watchEffect } from "vue"
 import { CArrayFieldLayoutInfo } from "./ArrayField"
 import { CFormRuleItem } from "./Form"
 import { CObjectFieldLayoutInfo } from "./ObjectField"
@@ -45,12 +45,17 @@ export const FormItem = defineComponent({
 
     const id = "ufi-id-" + randomIdCount++
     const size = computed(() => props.size ?? "default")
+    const disabled = computed(() => {
+      const { disabled } = props as any
+      if (typeof disabled === "string") return disabled.length === 0
+      return !!disabled
+    })
     const classNames = computed(() => {
-      const { inline, position, required, disabled, label } = props
+      const { inline, position, required, label } = props
       const _inline = `ufi-${inline ? "inline" : "block"}`
       const _position = `ufi-pos-${position ?? "right"}`
       const _required = required === true && label?.length !== 0 ? "ufi-required" : ""
-      const _disabled = disabled ? "ufi-disabled" : ""
+      const _disabled = disabled.value ? "ufi-disabled" : ""
       const _size = `ufi-size-${size.value}`
       const _error = showError.value && errorState.error ? "ufi-error" : ""
       return ["ufi", _size, _inline, _position, _required, _disabled, _error].join(" ").trim()
@@ -65,12 +70,12 @@ export const FormItem = defineComponent({
     })
 
     return () => {
-      const childrenProps: any = { id, size: size.value, disabled: !!props.disabled, onBlur }
+      const childrenProps: any = { id, size: size.value, disabled: disabled.value, onBlur }
       childrenProps.bind = childrenProps
 
       const _children1 = props.__fieldInfo?.children
       const _children2 = _children1 ? _children1(childrenProps) : slots.default?.(childrenProps)
-      const children = (_children2 ?? []).map((c: any) => h(c, !!props.disabled))
+      const children = (_children2 ?? []).map((c: any) => mergeProps(c, { disabled: disabled.value }))
 
       return (
         <div class={classNames.value}>

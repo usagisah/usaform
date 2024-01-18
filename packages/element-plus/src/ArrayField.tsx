@@ -4,7 +4,7 @@ import { CFormRuleItem } from "./Form"
 import { callFuncWithError, isPlainObject } from "./helper"
 
 export interface CArrayFieldProps {
-  name: string
+  name: string | number
 
   initValue?: any[]
 
@@ -43,8 +43,8 @@ export const ArrayField = defineComponent({
   }>,
   setup(props: CArrayFieldProps, { slots }) {
     const { name, layout, element } = props
-    if (!(typeof name === "number")) {
-      throw "非法的使用方式，请正确使用 VoidField 组件"
+    if (name !== 0 && !name) {
+      throw "非法的使用方式，请正确使用 ArrayField 组件"
     }
 
     const fieldLayoutRef = ref<Record<any, any> | null>(null)

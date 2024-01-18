@@ -877,6 +877,42 @@ export interface FormItemAttrs {
 }
 ```
 
+建议不需要显示的接收，让它们自动继承给填充组件即可
+
+### 校验
+
+如果配置了 `required || rules` 两个参数则会进入校验判断
+
+#### 触发方法
+
+校验提供了两种触发方法（同 `element-plus`）
+
+- `blur` 失去焦点时触发 （默认）
+
+  给填充组件提供一个 `onBlur` 函数，调用时触发，否则则不会触发
+
+- `change` 输入内容变化触发
+
+  直接监听 `PlainField` 的 `fieldValue` 变化触发
+
+#### 编写自定义规则
+
+规则的写法参考 `async-validator`，想省事直接看 `element-plus 的 rule` 写法也行
+
+如果开启 `required` 相当于自动添加了一个默认规则，代码如下，自定义规则时可以参考这个写法
+
+```ts
+const requiredRule: CFormRuleItem = {
+  message: "", //异常信息
+  trigger: "blur", //触发校验的方式
+  validator: (_, v) => {  //自定义校验函数，返回 true 是通过，false 失败
+    if (Array.isArray(v) || typeof v === "string") return v.length !== 0
+    if (v === undefined || v === null || v === false) return false
+    return true
+  }
+}
+```
+
 ### 自定义布局组件
 
 自定义布局组件的意义在于，在提供布局的同时，会提供一些额外的逻辑，否则可以直接自定义填充组件即可

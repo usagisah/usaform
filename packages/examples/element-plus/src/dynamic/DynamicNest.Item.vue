@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { ObjectField, PlainField, CArrayFieldAttrs } from "@usaform/element-plus"
+import { ObjectField, PlainField, CArrayFieldActions } from "@usaform/element-plus"
 import { ElButton, ElSpace } from "element-plus"
 const props = defineProps<{ fieldValue: any[]; actions: any }>()
-const api: CArrayFieldAttrs["actions"] = props.actions
+const api: CArrayFieldActions = props.actions
 const add = () => {
   api.push({ itemId: Math.random() })
 }

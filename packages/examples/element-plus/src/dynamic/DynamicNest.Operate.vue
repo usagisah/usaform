@@ -7,7 +7,6 @@ const value = defineModel<string>()
 const _data = inject<any>("formData")!
 const operates = ref<any>([])
 const { subscribe }: CArrayFieldAttrs["actions"] = props.actions
-debugger
 subscribe(
   "../type",
   v => {

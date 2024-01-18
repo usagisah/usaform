@@ -51,7 +51,7 @@ const reset = () => {
 
 /* -------------- 动态更新 -------------- */
 setTimeout(() => {
-  form.value!.set("dynamic", [
+  form.value?.set("dynamic", [
     {
       groupId: 1,
       children: [

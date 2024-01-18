@@ -12,7 +12,7 @@ import Page from "./page/Page.vue"
 const list = shallowReactive([
   { n: "普通平铺", d: "基本的平铺写法，与直接使用 ElForm 差不多", c: Basic },
   { n: "对象嵌套", d: "以对象的形式深层次嵌套", c: Obj },
-  { n: "数据嵌套", d: "数组形式的动态表单", c: Arr },
+  { n: "数组表单", d: "数组形式的动态表单", c: Arr },
   { n: "复杂嵌套", d: "3者混合的动态表单，演示功能：多层嵌套，多字段联动，动态更新，跨字段监听", c: Dynamic },
   { n: "自定义", d: "", c: Custom },
   { n: "分步表单", d: "", c: Step },
