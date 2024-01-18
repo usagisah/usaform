@@ -1,6 +1,6 @@
 # @usaform/element-plus
 
-文档请以[仓库](https://github.com/usagisah/usaform/tree/main/packages/element-plus)最新的内容为准
+文档请以[仓库](https://github.com/usagisah/usaform/tree/main/packages/element-plus)最新的内容为准，当前为非正式体验版
 
 
 
@@ -715,7 +715,7 @@ type validate: () => Promise<{
 
 描述
 
-返回表单中的数据内容
+返回表单中的数据对象
 
 ### `subscribe`
 
@@ -723,7 +723,7 @@ type validate: () => Promise<{
 
 ```ts
 type S = (
-	paths: string  //路径字符串
+	path: string  //路径字符串
 	handle: (newValue, oldValue) => any //订阅函数，接收一个最新值和上一次的值
 	config?: {immediate?: boolean} //是否立即执行一次
 )
@@ -734,10 +734,30 @@ type S = (
 
 订阅匹配字段的修改，返回取消订阅的函数
 
-订阅失败，找不到订阅的字段相当于无任何效果，不报错，如果订阅失败可能有 2 种可能
+当订阅失败，或者找不到订阅的字段时，相当于无任何效果，不报错，如果订阅失败可能有 2 种可能
 
 1. 路径不对
 2. 订阅的字段尚未挂载，可以尝试在 `nextTick/onMounted` 中调用
+
+如果操作正确大概率是第二种方式引起的，可以尝试使用内部的帮助函数
+
+`onNextTick` 封装了`nextTick && onBeforeUnMount` ，确保在组件全部挂载后立即执行，并判断如果返回值是一个函数，则会在当前组件卸载后调用，防止内存泄漏
+
+```ts
+import {onNextTick} from "@usaform/element-plus"
+onNextTick(() => {
+  return subscribe(
+    "../type",
+    v => {
+      const o = (operates.value = _data.operates[v])
+      value.value = o[0]
+    },
+    { immediate: true }
+  )
+})
+```
+
+
 
 ### `get`
 
@@ -746,7 +766,16 @@ type S = (
 ```ts
 type Get = (
 	path: string //路径
-) => any[] //获取到的所有值
+	config?: FormActionGetConfig
+) => Record<string, any>[] //获取到的所有值的数组
+
+export interface FormActionGetConfig {
+  //默认 false, 是否在找到第一个匹配的结果后立即返回
+  first?: boolean  
+  //默认 false, 是否将找到的字段展开获取
+  //内部数据不同层级都是互相独立的，下级字段修改不同同步给上级。是否展开的区别在于，是否把下级的内容给拼到最终结果里
+  shallow?: boolean 
+}
 ```
 
 描述
@@ -755,7 +784,9 @@ type Get = (
 
 ### `set`
 
-类型
+类型 
+
+`(path: string, value: any) => void`
 
 描述
 
@@ -767,16 +798,16 @@ type Get = (
 
 ```ts
 type CallElement = (
-	key: string,  //调用的方法名
-	point: any,   //指定 this
-	...params: any[] //传递参数
-) 
-=> Record<string, any> //返回所有匹配路径下的，方法的返回值
+	path: string,  //路径
+	key: string,   //方法名
+	point?: any    //this 指向
+	...params: any[] //参数
+) => Record<string, any> //返回所有匹配路径下的，方法的返回值
 ```
 
 描述
 
-调用所有字段组件中的布局组件中，指定的的方法，如果不是函数会自动跳过
+调用路径字段组件中的布局组件中，指定的的方法，如果不是函数会自动跳过
 
 ### `callElement`
 
@@ -784,18 +815,38 @@ type CallElement = (
 
 ```ts
 type CallElement = (
-	key: string,  //调用的方法名
-	point: any,   //指定 this
-	...params: any[] //传递参数
-) 
-=> Record<string, any> //返回所有匹配路径下的，方法的返回值
+	path: string,  //路径
+	key: string,   //方法名
+	point?: any    //this 指向
+	...params: any[] //参数
+) => Record<string, any> //返回所有匹配路径下的，方法的返回值
 ```
 
 描述
 
-调用所有字段组件中的填充组件中，指定的的方法，如果不是函数会自动跳过
+调用路径字段组件中的填充组件中，指定的的方法，如果不是函数会自动跳过
 
+### `call`
 
+类型
+
+```ts
+type Call = (
+	path: string, //路径
+	key: string,  //方法名
+	config?: FormActionCallConfig) 
+=> Record<string, any> //返回所有匹配路径下的，方法的返回值
+export interface FormActionCallConfig {
+  point?: any            // this 指向，默认是 globalThis
+  params?: any[]    //参数，内部会通过 apply 展开传递给方法
+  first?: boolean     //是否在找到第一个后结束
+  fieldTypes?: ("plain" | "object" | "array" | "array-item")[] //字段类型数组，用于筛选是否想要指定哪些字段类型中的方法
+}
+```
+
+描述
+
+调用路径字段中的指定方法，如果不是函数会自动跳过，其他所有调用某某方法都是基于它的封装
 
 
 
@@ -809,19 +860,24 @@ type CallElement = (
 
 路径系统的写法类似于文件路径，写法上是一个字符串，以 `/` 分割，默认是从发起者字段为起点开始查找
 
-为了易用性和支持批量，分割出来的每块都会转成正则和每个字段名称匹配，正则会进行缓存，性能可以得以保障
+为了易用性和支持批量，内部会将路径字符串分割`split`，分出来的每块都会转成正则和每个字段名称匹配，正则会进行缓存，性能可以得以保障
 
 查找规则如下，找不到会直接退出
 
 - 一般查找
   - `a/b/c` 找自己下边的 a，a下边的 b，b下边的c
-- 正则查找
+- 正则查找 && 批量查找
   - `a/.*/c`  找自己下边的 a，a 下边所有的字段，所有字段下边的 c
   - `a/[0-9]/c` 找自己下边的 a，a 下边 0-9 的字段（通常用于数组），所有字段下边的 c
 - 根部查找
   - `~/a` 从最顶层找下边的 a
 - 向上找
   - `../a` 找父节点下的 a
+- 搜索全部
+  - `xx/xx/all` 
+    - 必须是以 `all` 结尾才会找全部，否则会视为一般查找被转成正则
+    - 通常用于方法调用中`call/callLayout/callElement`，它可以无视表单的深度查找所有
+  
 - 返回自己
   - `""` 空字符会返回自身
   - 因为直接修改暴露出来的响应式变量会存在很多未知的边界情况，建议除了 `PlainField` 始终使用内部提供的操作方式，来修改自身或者其他字段的值
@@ -912,6 +968,10 @@ const requiredRule: CFormRuleItem = {
   }
 }
 ```
+
+#### 触发指定路径的校验方法
+
+在公共的互操作方法中可以选用 `callLayout`，用来执行指定字段中的方法
 
 ### 自定义布局组件
 

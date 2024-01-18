@@ -22,7 +22,7 @@ export interface FormActionCallInfo {
 
 export interface FormBaseActions {
   getFormData: () => Record<string, any>
-  subscribe: (paths: string, handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) => () => void
+  subscribe: (path: string, handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) => () => void
   get: (path: string, config?: FormActionGetConfig) => Record<string, any>[]
   set: (path: string, value: any) => void
   call: (path: string, key: string, config?: FormActionCallConfig) => Record<string, any>
