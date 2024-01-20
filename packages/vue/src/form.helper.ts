@@ -56,3 +56,11 @@ export function resolveFieldDefaultValue(name: FieldName, { currentInitValue, de
   if (p) return p.initValue
   return getProperty(currentInitValue, name) ?? defaultValue
 }
+
+export function resolveArrayItem(target: Record<any, any>, arrayUnwrapKey: string[]) {
+  for (const k of arrayUnwrapKey) {
+    const v = target[k]
+    if (v) return v
+  }
+  return target
+}

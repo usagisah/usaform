@@ -16,4 +16,13 @@ export type { FormActionCallConfig, FormActionCallInfo, FormActionGetConfig } fr
 
 export { createGlobalFormProvide } from "./context"
 
-export { onNextTick } from "./helper/onNextTick"
+import { getCurrentInstance, nextTick, onBeforeUnmount } from "vue"
+export function onNextTick(fn: () => any) {
+  const ins = getCurrentInstance()
+  nextTick(() => {
+    const f = fn()
+    if (typeof f === "function") {
+      onBeforeUnmount(f, ins)
+    }
+  })
+}

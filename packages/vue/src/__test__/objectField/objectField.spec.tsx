@@ -1,6 +1,6 @@
 import { flushPromises, mount } from "@vue/test-utils"
 import { reactive } from "vue"
-import { FormObjectPlainField, FormObjectPlainFieldExpose } from "../components/basic"
+import { FormObjectPlainField, FormObjectPlainFieldExpose } from "../components/compose"
 
 describe("basic", () => {
   it("view html", () => {
@@ -40,8 +40,8 @@ describe("actions get/set", () => {
 
   it("isolate plain data", async () => {
     const wrapper = mount(<FormObjectPlainField names={["o"]} initValue={reactive({ input: "99" })} />)
-    const { get, set } = (wrapper.vm as any as FormObjectPlainFieldExpose).fields[0].e
-    set("input", "0")
+    const { get } = (wrapper.vm as any as FormObjectPlainFieldExpose).fields[0].e
+    wrapper.find("input").setValue("0")
     await flushPromises()
     expect(get("")).toEqual([{ input: "99" }])
   })
@@ -86,8 +86,7 @@ describe("actions call", () => {
 
 describe("actions getFormData", () => {
   it("getFormData", () => {
-    const fn = vi.fn()
-    const wrapper = mount(<FormObjectPlainField names={["o1", "o2"]} plainInitFns={{ fn }} />)
+    const wrapper = mount(<FormObjectPlainField names={["o1", "o2"]} />)
     const { getFormData } = (wrapper.vm as any as FormObjectPlainFieldExpose).fields[0].e
     expect(getFormData()).toEqual({
       o1: { input: undefined },

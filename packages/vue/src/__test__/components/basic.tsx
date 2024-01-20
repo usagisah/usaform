@@ -1,5 +1,5 @@
-import { PropType, defineComponent } from "vue"
-import { FormActions, FormConfig, ObjectFieldActions, useForm, useFormObjectField, useFormPlainField } from "../../index"
+import { PropType, defineComponent, h } from "vue"
+import { FormConfig, useForm, useFormArrayField, useFormObjectField, useFormPlainField } from "../../index"
 import { useModel } from "../hooks/useModel"
 
 export const BasicForm = defineComponent({
@@ -33,6 +33,7 @@ export const BasicPlainField = defineComponent({
       type: Object
     }
   },
+  inheritAttrs: false,
   setup(props, { expose }) {
     const { fieldValue, actions } = useFormPlainField(props.name, ({ initValue }) => {
       return { initValue: props.initValue ?? initValue, ...props.initFns }
@@ -59,6 +60,7 @@ export const BasicObjectField = defineComponent({
       type: Object
     }
   },
+  inheritAttrs: false,
   setup(props, { expose, slots }) {
     const { actions, FieldRender } = useFormObjectField(props.name, ({ initValue }) => {
       return { initValue: props.initValue ?? initValue, ...props.initFns }
@@ -70,38 +72,44 @@ export const BasicObjectField = defineComponent({
   }
 })
 
-export type FormObjectPlainFieldExpose = { form: FormActions; fields: { n: string; e: ObjectFieldActions }[] }
-export const FormObjectPlainField = defineComponent({
-  name: "FormObjectField",
+export const BasicArrayField = defineComponent({
+  name: "BasicArrayField",
   props: {
-    config: {
-      type: Object as PropType<FormConfig>
+    name: {
+      type: String,
+      required: true
     },
-    names: {
-      type: Array as PropType<string[]>,
+    render: {
+      type: Function,
       required: true
     },
     initValue: {
-      type: Object
+      type: Array
+    },
+    count: {
+      type: Number
     },
     initFns: {
       type: Object
     },
-    plainInitFns: {
-      type: Object
+    unWrapperKey: {
+      type: String
     }
   },
+  inheritAttrs: false,
   setup(props, { expose }) {
-    const _expose: any = { form: null, fields: [] }
-    expose(_expose)
-    return () => (
-      <BasicForm config={props.config} ref={e => (_expose.form = e)}>
-        {props.names.map(n => (
-          <BasicObjectField name={n} key={n} ref={e => _expose.fields.push({ n, e })} initFns={props.initFns} initValue={props.initValue}>
-            <BasicPlainField name="input" initFns={props.plainInitFns} />
-          </BasicObjectField>
-        ))}
-      </BasicForm>
-    )
+    const { fieldValue, actions, FieldRender } = useFormArrayField(props.name, ({ initValue }) => {
+      return {
+        initValue: props.initValue ?? initValue ?? new Array(props.count).fill(0).map((_, i) => ({ id: i, [props.unWrapperKey ?? "value"]: i.toString() })),
+        ...props.initFns
+      }
+    })
+    expose(actions)
+    return () => {
+      const _render = () => {
+        return fieldValue.value.map((item, index) => h(props.render(item, index), { key: item.id }))
+      }
+      return <FieldRender render={_render} />
+    }
   }
 })
