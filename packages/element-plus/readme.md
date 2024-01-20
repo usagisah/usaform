@@ -1,6 +1,8 @@
 # @usaform/element-plus
 
-文档请以[仓库](https://github.com/usagisah/usaform/tree/main/packages/element-plus)最新的内容为准，当前为非正式体验版
+**文档请以[仓库](https://github.com/usagisah/usaform/tree/main/packages/element-plus)最新的内容为准**
+
+**不懂英文，写文档水平有限，文档站点计划再搞，先将就着看吧，如有 bug 或者好的意见请反馈给我，或者一起维护它**
 
 
 
@@ -44,7 +46,23 @@
 
 ## 内容导航
 
-
+- [必看内容](#必看内容)
+- [内容导航](#内容导航)
+- [项目配置](#项目配置)
+- [组件理念](#组织理念)
+- [表单组件----form](#表单组件----form)
+- [字段组件----plainfield](#字段组件----plainfield)
+- [字段组件----objectfield](#字段组件----objectfield)
+- [高级字段组件----arrayfield](#高级字段组件----arrayfield)
+- [初始表单数据](#初始表单数据)
+- [表单配置](#表单配置)
+- [通用的互操作实例方法](#通用的互操作实例方法)
+- [路径系统](#路径系统)
+- [布局组件](#布局组件)
+- [自定义校验](#自定义校验)
+- [typescript-支持](#typescript-支持)
+- [元 hooks](#元 hooks)
+- [反馈 & Q & A](#反馈 & Q & A)
 
 
 
@@ -87,6 +105,8 @@ pnpm add @usaform/element-plus element-plus @vitejs/plugin-vue-jsx sass
 配置 vite
 
 ```js
+import vue from "@vitejs/plugin-vue"
+import jsx from "@vitejs/plugin-vue-jsx"
 export default defineConfig({
   plugins: [vue(), jsx()]
 })
@@ -1046,9 +1066,11 @@ export interface CFormItemExpose {
 
 
 
-## 自定义 `hook`
+## 元 hooks
 
-底层逻辑是由 `@usaform/vue` 提供的一些列自定义 `hook` 做到的，大多数情况都不太推荐单独用这个 `npm` 包，1 是用起来繁琐，2 是不和二次封装的组件混用时很麻烦不好用
+对外提供的所有组件和方法，底层逻辑都是由内部包 `@usaform/vue` 提供的一些列自定义 `hook` 做到的，大多数情况都不太推荐单独用这个 `npm` 包，因为单独用起来繁琐，很麻烦
+
+暴露出来的目的是，给予不满足现状的开发者，有能力自定义属于自己的表单框架。`@usaform/vue` 这个包提供了比较精简的组织逻辑，并做了大量的单元测试。可以从 `@usaform/element-plus` 中引用，也可以直接下载它（这是一个独立的包，其文档暂时只在这里提供）
 
 
 
@@ -1261,4 +1283,32 @@ setup(props) {
 ```ts
 type createGlobalFormProvide = (config: FormConfig) => void
 ```
+
+
+
+
+
+## 反馈 & Q & A
+
+反馈 `bug` 或者优化意见可以通过以下3个方式联系到我
+
+1. [掘金](https://juejin.cn/user/1143138325132862/posts)
+2. [github](https://github.com/usagisah/usaform/tree/main)
+3. 邮箱 `1286791152@qq.com`
+
+
+
+- 后续计划
+  - 暂时会以稳定和改 bug 为主
+  - 后续 `2.0` 的计划主要是做到 `ui <-> json` 的双向互转，主要是能通过自定义的 `json` 结构做到
+    - 在保持当前体积的前提下，做到和当前组件开发一样的效果，这对低代码，表单持久化
+    - 让 `json` 和 `组件 ui` 的协同工作，这对于从接口中拿到 `json`，还原回组件形态之后的继续开发，会非常有帮助，纯粹的 `json` 是死的，规则多了维护就会产生巨大的压力
+  - 再考虑的事情（如果你有好的建议，可以联系我共同考虑）
+    - 是否需要提供一些辅助用的 `hooks` 和 组件，比如
+      - 递归组件
+      - 异步表单
+      - 超大表单（1w+ 的表单项）
+- 可以放心使用吗
+  - 这个东西我自己在用，朋友在用，属于个人项目，主要用于解决后台管理系统中的表单场景。它可以帮我解决很多相关问题，所以有着天然的驱动力支持我去维护好它
+  - 没有任何 `kpi` 成分，也不会归并到任何公司的产物里
 
