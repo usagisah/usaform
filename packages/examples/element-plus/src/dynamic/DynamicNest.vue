@@ -52,22 +52,24 @@ const reset = () => {
 /* -------------- 动态更新 -------------- */
 const t = ref(6)
 const id = setInterval(() => {
-  if (t.value <= 0) return clearInterval(id)
-  form.value?.set("dynamic", [
-    {
-      groupId: 1,
-      children: [
-        {
-          itemId: 11,
-          children: {
-            type: 2,
-            operate: "+",
-            value: "动态修改"
+  if (t.value <= 0) {
+    form.value?.set("dynamic", [
+      {
+        groupId: 1,
+        children: [
+          {
+            itemId: 11,
+            children: {
+              type: 2,
+              operate: "+",
+              value: "动态修改"
+            }
           }
-        }
-      ]
-    }
-  ])
+        ]
+      }
+    ])
+    return clearInterval(id)
+  }
   t.value--
 }, 1000)
 onUnmounted(() => {
