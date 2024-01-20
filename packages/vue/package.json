@@ -10,7 +10,7 @@
     }
   },
   "scripts": {
-    "dev": "tsc -w",
+    "dev": "tsc -p tsconfig.dev.json -w",
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "test": "vitest"
   },

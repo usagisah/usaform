@@ -86,52 +86,58 @@ describe("actions swap", () => {
 describe("actions setValue", () => {
   it("add first", async () => {
     const wrapper = mount(<FormArrayPlanField name="array" count={2} />)
-    const { setValue } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
+    const { setValue, getFormData } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
     setValue(-1, { id: 99, value: "99" })
     await flushPromises()
     expect(wrapper.findAll("input").map(v => v.element.value)).toEqual(["99", "0", "1"])
+    expect(getFormData()).toEqual({ array: ["99", "0", "1"] })
   })
 
   it("add last", async () => {
     const wrapper = mount(<FormArrayPlanField name="array" count={2} />)
-    const { setValue } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
+    const { setValue, getFormData } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
     setValue(99, { id: 99, value: "99" })
     await flushPromises()
     expect(wrapper.findAll("input").map(v => v.element.value)).toEqual(["0", "1", "99"])
+    expect(getFormData()).toEqual({ array: ["0", "1", "99"] })
   })
 
   it("set media", async () => {
     const wrapper = mount(<FormArrayPlanField name="array" count={3} />)
-    const { setValue } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
+    const { setValue, getFormData } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
     setValue(1, { id: 99, value: "99" })
     await flushPromises()
     expect(wrapper.findAll("input").map(v => v.element.value)).toEqual(["0", "99", "2"])
+    expect(getFormData()).toEqual({ array: ["0", "99", "2"] })
   })
 })
 
 describe("actions delValue", () => {
   it("delValue first", async () => {
     const wrapper = mount(<FormArrayPlanField name="array" count={3} />)
-    const { delValue } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
+    const { delValue, getFormData } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
     delValue(-1)
     await flushPromises()
     expect(wrapper.findAll("input").map(v => v.element.value)).toEqual(["1", "2"])
+    expect(getFormData()).toEqual({ array: ["1", "2"] })
   })
 
   it("delValue last", async () => {
     const wrapper = mount(<FormArrayPlanField name="array" count={3} />)
-    const { delValue } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
+    const { delValue, getFormData } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
     delValue(99)
     await flushPromises()
     expect(wrapper.findAll("input").map(v => v.element.value)).toEqual(["0", "1"])
+    expect(getFormData()).toEqual({ array: ["0", "1"] })
   })
 
   it("delValue media", async () => {
     const wrapper = mount(<FormArrayPlanField name="array" count={3} />)
-    const { delValue } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
+    const { delValue, getFormData } = (wrapper.vm as any as FormArrayPlanFieldExpose).ary
     delValue(1)
     await flushPromises()
     expect(wrapper.findAll("input").map(v => v.element.value)).toEqual(["0", "2"])
+    expect(getFormData()).toEqual({ array: ["0", "2"] })
   })
 })
 
