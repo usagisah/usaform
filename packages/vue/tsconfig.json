@@ -5,13 +5,13 @@
     "incremental": true,
     "jsx": "preserve",
     "outDir": "dist",
+    "types": [
+      "vitest/globals",
+      "vue/jsx"
+    ],
   },
   "include": [
-    "src/**/*.ts"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.test.json"
-    }
+    "src/**/*.ts",
+    "src/__test__"
   ]
 }

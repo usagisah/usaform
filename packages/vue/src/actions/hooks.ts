@@ -29,7 +29,7 @@ export interface FormBaseActions {
 }
 
 export function useFormActions(field: Field, rootField: Field, arrayUnwrapKey: string[]): FormBaseActions {
-  function getFormData(): Record<string, any> {
+  const getFormData = () => {
     return mapFieldToRecord(rootField, arrayUnwrapKey)
   }
 

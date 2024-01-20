@@ -38,25 +38,34 @@ function resolve({ matches, path, name, field, first, matchedFields }: ResolveCo
   if (first && matchedFields.length === 1) return
   if (!field) return
 
+  const _path = [...path]
   let [m, ...ms] = matches
 
   if (m === "..") {
-    return resolve({ matches: ms, path, name: field.parent?.name.toString() as string, field: field.parent!, first, matchedFields })
+    _path.push("..")
+    return resolve({
+      matches: ms,
+      path: _path,
+      name: field.parent?.name.toString() as string,
+      field: field.parent!,
+      first,
+      matchedFields
+    })
   }
-
-  path.push(name)
 
   if (m !== "all" && !m.test(name)) {
     return
   }
 
+  _path.push(name)
+
   if (ms.length === 0) {
-    let _path = path.join("/")
-    if (_path.startsWith("root")) {
-      _path = _path.slice(4)
-      if (_path.startsWith("/")) _path = _path.slice(1)
+    let p = _path.join("/")
+    if (p.startsWith("root")) {
+      p = p.slice(4)
+      if (p.startsWith("/")) p = p.slice(1)
     }
-    matchedFields.push({ name, field, path: _path })
+    matchedFields.push({ name, field, path: p })
 
     if (m !== "all") return
     ms = ["all"]
@@ -64,14 +73,28 @@ function resolve({ matches, path, name, field, first, matchedFields }: ResolveCo
 
   if (field.type === "root" || field.type === "object") {
     return field.struct.forEach(f => {
-      resolve({ matches: ms, path, name: f.name.toString(), field: f, first, matchedFields })
+      resolve({
+        matches: ms,
+        path: _path,
+        name: f.name.toString(),
+        field: f,
+        first,
+        matchedFields
+      })
     })
   }
 
   if (field.type === "ary") {
     return field.struct.forEach((f, i) => {
       if (!f.__uform_field) return
-      resolve({ matches: ms, path, name: i.toString(), field: f, first, matchedFields })
+      resolve({
+        matches: ms,
+        path: _path,
+        name: i.toString(),
+        field: f,
+        first,
+        matchedFields
+      })
     })
   }
 }

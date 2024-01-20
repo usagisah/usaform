@@ -5,6 +5,6 @@
     "incremental": false
   },
   "exclude": [
-    "__test__"
+    "src/__test__"
   ],
 }
