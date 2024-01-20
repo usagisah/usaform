@@ -67,7 +67,7 @@ export function useFormActions(field: Field, rootField: Field, arrayUnwrapKey: s
 
   const call: FormBaseActions["call"] = (path, key, config) => {
     const { fieldTypes = [], first, point = globalThis, params = [] } = config ?? {}
-    const _fields = resolveFields({ path, field, rootField, first: !!first })
+    const _fields = path.length === 0 ? [{ path: "", name: field.name.toString(), field }] : resolveFields({ path, field, rootField, first: !!first })
     const result: Record<string, any> = {}
     _fields.forEach(({ path, name, field }) => {
       for (const fieldType of fieldTypes) {

@@ -15,7 +15,7 @@ export interface FormActions extends FormBaseActions {
   provide: () => void
 }
 
-export function useForm(formConfig: FormConfig) {
+export function useForm(formConfig: FormConfig = {}) {
   const { defaultValue, defaultFormData, arrayUnwrapKey, arrayUnwrapArrayKey } = toRaw(formConfig)
   const _arrayUnwrapArrayKey = arrayUnwrapKey ? (Array.isArray(arrayUnwrapKey) ? arrayUnwrapKey : [arrayUnwrapArrayKey]) : ["value", "children"]
   const field: RootField = {

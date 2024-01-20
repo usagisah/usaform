@@ -162,18 +162,31 @@ describe("actions subscribe", () => {
 })
 
 describe("actions call", () => {
-  it("call self method", () => {
+  it("self method", () => {
     const vm = ref<PlainFieldActions>()
-    const fn1 = vi.fn()
+    const fn = vi.fn()
     mount(
       <BasicForm>
-        <BasicPlainField name="input" ref={vm} initFns={{ fn1 }} />
+        <BasicPlainField name="input" ref={vm} initFns={{ fn }} />
       </BasicForm>
     )
-    expect(fn1).not.toBeCalled()
+    vm.value!.call("", "fn")
+    expect(fn).toBeCalled()
   })
 
-  it("call other field method from the same level", () => {
+  it("done't exist method", () => {
+    const vm = ref<PlainFieldActions>()
+    const fn = vi.fn()
+    mount(
+      <BasicForm>
+        <BasicPlainField name="input" ref={vm} />
+      </BasicForm>
+    )
+    vm.value!.call("", "fn")
+    expect(fn).not.toBeCalled()
+  })
+
+  it("other field method from the same level", () => {
     const vm1 = ref<PlainFieldActions>()
     const fn1 = vi.fn()
     const fn2 = vi.fn()
@@ -189,7 +202,7 @@ describe("actions call", () => {
     expect(fn2).toHaveBeenCalledOnce()
   })
 
-  it("call params/return", () => {
+  it("params/return", () => {
     const vm1 = ref<PlainFieldActions>()
     const vm2 = ref<PlainFieldActions>()
     const obj = { m: 1 }
@@ -262,7 +275,7 @@ describe("actions call", () => {
 })
 
 describe("actions getFormData", () => {
-  it("get FormData", () => {
+  it("getFormData", () => {
     const vm = ref<PlainFieldActions>()
     mount(
       <BasicForm>
@@ -274,7 +287,29 @@ describe("actions getFormData", () => {
   })
 })
 
-describe("use from.actions to field", () => {
+describe("use from[actions|config] to field", () => {
+  it("form config defaultValue", () => {
+    const wrapper = mount(
+      <BasicForm config={{ defaultValue: "77" }}>
+        <BasicPlainField name="input1" />
+        <BasicPlainField name="input2" />
+      </BasicForm>
+    )
+    expect(wrapper.findAll("input").map(v => v.element.value)).toEqual(["77", "77"])
+    expect((wrapper.vm as any).getFormData()).toEqual({ input1: "77", input2: "77" })
+  })
+
+  it("form config defaultFormData", () => {
+    const wrapper = mount(
+      <BasicForm config={{ defaultFormData: { input1: "89", input2: "90" } }}>
+        <BasicPlainField name="input1" />
+        <BasicPlainField name="input2" />
+      </BasicForm>
+    )
+    expect(wrapper.findAll("input").map(v => v.element.value)).toEqual(["89", "90"])
+    expect((wrapper.vm as any).getFormData()).toEqual({ input1: "89", input2: "90" })
+  })
+
   it("getFormData", () => {
     const wrapper = mount(
       <BasicForm>
@@ -301,7 +336,7 @@ describe("use from.actions to field", () => {
     expect(actions.get("input")).toEqual([undefined])
   })
 
-  it("set", async () => {
+  it("set subfield's value", async () => {
     const wrapper = mount(
       <BasicForm>
         <BasicPlainField name="input" />
@@ -315,6 +350,19 @@ describe("use from.actions to field", () => {
     actions.set!("input", "22")
     await flushPromises()
     expect(actions.get("input")).toEqual(["22"])
+  })
+
+  it("set formData", async () => {
+    const wrapper = mount(
+      <BasicForm>
+        <BasicPlainField name="input" />
+      </BasicForm>
+    )
+    const actions = wrapper.vm as any as FormActions
+    actions.set("", { input: "99" })
+    await flushPromises()
+    expect(wrapper.find("input").element.value).toBe("99")
+    expect(actions.get("input")[0]).toBe("99")
   })
 
   it("subscribe", async () => {
