@@ -2,7 +2,7 @@ import { useFormActions } from "./actions/hooks"
 import { ArrayEmptyItem, ArrayField } from "./arrayField"
 import { FormContext } from "./context"
 import { createFieldRender } from "./fieldRender"
-import { Field, FieldWrapper, getProperty, resolveArrayItem } from "./form.helper"
+import { FieldWrapper, FormField, resolveArrayItem, safeGetProperty } from "./form.helper"
 
 export interface ArrayItemInitParams {
   initValue: any
@@ -10,7 +10,7 @@ export interface ArrayItemInitParams {
 
 export interface ArrayItemConfig {
   ctx: FormContext
-  init: (p: ArrayItemInitParams) => { _field: Field; _actions?: any }
+  init: (p: ArrayItemInitParams) => { _field: FormField; _actions?: any }
   afterInit: (_field: any, ctx: FormContext, clean: Function) => any
   index: number
 }
@@ -20,7 +20,7 @@ export function useFormArrayItem({ ctx, init, afterInit, index }: ArrayItemConfi
   const { struct } = field as ArrayField
 
   const record: any = struct[index]
-  if (getProperty(record, "__uform_field", false)) throw "array-field 检测到意外的重复，请检测是否进行了错误嵌套"
+  if (safeGetProperty(record, "__uform_field")) throw "array-field 检测到意外的重复，请检测是否进行了错误嵌套"
 
   const { _field, _actions } = init({ initValue: resolveArrayItem(record, arrayUnwrapKey) })
   _field.__aryValue = record

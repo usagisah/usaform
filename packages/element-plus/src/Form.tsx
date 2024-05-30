@@ -85,7 +85,8 @@ export function useFormConfigProvide(config: CFormConfig): CFormConfig
 export function useFormConfigProvide(config: CFormConfig, app: App): CFormConfig
 export function useFormConfigProvide(config: CFormConfig, app?: App) {
   const conf = normalizeFormConfig(toRaw(config))
-  app ? app.provide(FormContextConfigKey, conf) : provide(FormContextConfigKey, conf)
+  if (app) app.provide(FormContextConfigKey, conf)
+  else if (hasInjectionContext()) provide(FormContextConfigKey, conf)
   return conf
 }
 

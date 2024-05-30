@@ -1,9 +1,9 @@
 import { provide } from "vue"
-import { Field, FormConfig } from "./form.helper"
+import { FormConfig, FormField, NestField } from "./form.helper"
 
 export interface FormContext {
-  root: Field
-  field: Field
+  root: FormField
+  field: NestField
 
   defaultValue: any
   currentInitValue: any
@@ -21,5 +21,6 @@ export const createGlobalFormProvide = (config: FormConfig) => {
 }
 
 export let GlobalInfo = {
-  nullPlainField: "非法的 PlainField 嵌套"
+  invalidField: "非法嵌套",
+  nullVoidFieldIndex: "非法嵌套数组字段"
 }

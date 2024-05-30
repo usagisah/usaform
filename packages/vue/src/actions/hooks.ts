@@ -1,4 +1,4 @@
-import { Field } from "../form.helper"
+import { FormField } from "../form.helper"
 import { FieldSubscribeConfig, FieldSubscribeHandle } from "../useFieldValue"
 import { mapFieldToRecord } from "./mapToRecord"
 import { resolveFields } from "./resolve"
@@ -28,7 +28,7 @@ export interface FormBaseActions {
   call: (path: string, key: string, config?: FormActionCallConfig) => Record<string, any>
 }
 
-export function useFormActions(field: Field, rootField: Field, arrayUnwrapKey: string[]): FormBaseActions {
+export function useFormActions(field: FormField, rootField: FormField, arrayUnwrapKey: string[]): FormBaseActions {
   const getFormData = () => {
     return mapFieldToRecord(rootField, arrayUnwrapKey)
   }

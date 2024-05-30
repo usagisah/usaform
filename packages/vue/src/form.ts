@@ -2,10 +2,10 @@ import { onBeforeUnmount, provide, toRaw } from "vue"
 import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { FormContext, formContext } from "./context"
 import { createFieldRender } from "./fieldRender"
-import { BaseFiled, Field, FieldName, FormConfig } from "./form.helper"
+import { Field, FieldName, FormBaseFiled, FormConfig } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
-export interface RootField extends BaseFiled {
+export interface RootField extends FormBaseFiled {
   type: "root"
   struct: Map<FieldName, Field>
   userConfig: Record<any, any>

@@ -1,4 +1,4 @@
-import { Ref, nextTick, shallowRef, unref, watch } from "vue"
+import { Ref, ShallowRef, nextTick, shallowRef, unref, watch } from "vue"
 
 export type FieldGetter = () => any
 export type FieldSetter = (value: any) => any
@@ -10,7 +10,7 @@ export type FieldSubscribe = (handle: FieldSubscribeHandle, config?: FieldSubscr
 export type FieldClearSubscribes = () => void
 
 export type FieldValue = {
-  fieldKey: Ref<number>
+  fieldKey: ShallowRef<number>
   fieldValue: Ref<any>
   getter: () => any
   setter: FieldSetter

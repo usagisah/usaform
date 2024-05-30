@@ -1,4 +1,4 @@
-import { Field } from "../form.helper"
+import { Field, FormField } from "../form.helper"
 import { MatchPath, parsePath } from "./path"
 
 export interface ResolveConfig {
@@ -11,7 +11,7 @@ export interface ResolveConfig {
 export interface MatchedFields {
   path: string
   name: string
-  field: Field
+  field: FormField
 }
 
 export function resolveFields({ path, field, rootField, first = false }: ResolveConfig) {
@@ -36,7 +36,7 @@ interface ResolveContext {
 
 function resolve({ matches, path, name, field, first, matchedFields }: ResolveContext) {
   if (first && matchedFields.length === 1) return
-  if (!field) return
+  if (!field || field.type === "void") return
 
   const _path = [...path]
   let [m, ...ms] = matches

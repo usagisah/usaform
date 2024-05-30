@@ -3,10 +3,10 @@ import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
 import { createFieldRender } from "./fieldRender"
-import { BaseFiled, Field, FieldName, FieldWrapper, FormConfig, resolveFieldDefaultValue, setProperty } from "./form.helper"
+import { Field, FieldName, FieldWrapper, FormBaseFiled, FormConfig, resolveFieldDefaultValue, safeGetProperty, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
-export interface ArrayField extends BaseFiled {
+export interface ArrayField extends FormBaseFiled {
   type: "ary"
   struct: Field[]
   userConfig: Record<any, any>
@@ -36,9 +36,10 @@ export interface ArrayFieldActions extends FormBaseActions {
 type ArrayFieldInit<T> = (info: ArrayFieldInitInfo) => ArrayFieldConfig<T>
 
 export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit<T>): FieldWrapper<T[], ArrayFieldActions, false> {
-  const ctx: FormContext = inject(formContext)!
+  const ctx = inject<FormContext>(formContext)
+  if (!ctx) throw GlobalInfo.invalidField
+
   const { field, root, arrayUnwrapKey } = ctx
-  if (field.type === "plain") throw GlobalInfo.nullPlainField
   if (field.type === "ary") {
     return useFormArrayItem({
       ctx,
@@ -68,7 +69,7 @@ function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
 
   _field.subscribe(() => {
     _field.struct = _field.fieldValue.value.map((item: Field) => {
-      return item.__uform_aryItem_field ? item.__aryValue : item
+      return safeGetProperty(item, "__uform_aryItem_field") ? (item as any).__aryValue : item
     })
     provideContext.currentInitValue = [..._field.getter()]
   })
@@ -98,7 +99,7 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     for (const item of _field.struct) {
       if ((item as any) === ArrayEmptyItem) return
       _fieldStruct.push(item)
-      _fieldValue.push(item.__uform_aryItem_field ? item.__aryValue : item)
+      _fieldValue.push(safeGetProperty(item, "__uform_aryItem_field") ? (item as any).__aryValue : item)
     }
     _field.struct = _fieldStruct
     _field.fieldValue.value = _fieldValue

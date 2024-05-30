@@ -1,6 +1,6 @@
-import { PropType, Ref, defineComponent } from "vue"
+import { PropType, ShallowRef, defineComponent } from "vue"
 
-export function createFieldRender(fieldKey: Ref<number>, fieldValue: Ref<unknown>) {
+export function createFieldRender(fieldKey: ShallowRef<number>, fieldValue: ShallowRef<unknown>) {
   let key = fieldKey.value
   return defineComponent({
     name: "FieldRender",

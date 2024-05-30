@@ -3,10 +3,10 @@ import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
 import { createFieldRender } from "./fieldRender"
-import { BaseFiled, Field, FieldName, FieldWrapper, FormConfig, resolveFieldDefaultValue, setProperty } from "./form.helper"
+import { Field, FieldName, FieldWrapper, FormBaseFiled, FormConfig, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { useFieldValue } from "./useFieldValue"
 
-export interface ObjectField extends BaseFiled {
+export interface ObjectField extends FormBaseFiled {
   type: "object"
   struct: Map<FieldName, Field>
   userConfig: Record<any, any>
@@ -27,9 +27,10 @@ export interface ObjectFieldActions extends FormBaseActions {}
 type ObjectFieldInit<T> = (info: ObjectFieldInitInfo) => ObjectFieldConfig<T>
 
 export function useFormObjectField<T = any>(name: FieldName, init: ObjectFieldInit<T>): FieldWrapper<T, ObjectFieldActions, false> {
-  const ctx: FormContext = inject(formContext)!
+  const ctx = inject<FormContext>(formContext)
+  if (!ctx) throw GlobalInfo.invalidField
+
   const { field, root, arrayUnwrapKey } = ctx
-  if (field.type === "plain") throw GlobalInfo.nullPlainField
   if (field.type === "ary") {
     return useFormArrayItem({
       ctx,
