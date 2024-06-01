@@ -24,7 +24,7 @@ export interface FormBaseActions {
   getFormData: () => Record<string, any>
   subscribe: (path: string, handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) => () => void
   get: (path: string, config?: FormActionGetConfig) => Record<string, any>[]
-  set: (path: string, value: any) => void
+  set: (path: string, value: any, method?: string) => void
   call: (path: string, key: string, config?: FormActionCallConfig) => Record<string, any>
 }
 
@@ -60,9 +60,9 @@ export function useFormActions(field: FormField, rootField: FormField, arrayUnwr
     })
   }
 
-  const set: FormBaseActions["set"] = (path, value) => {
+  const set: FormBaseActions["set"] = (path, value, method) => {
     if (path.length === 0) return field.setter(value)
-    resolveFields({ path, field, rootField, first: false }).forEach(({ field }) => field.setter(value))
+    resolveFields({ path, field, rootField, first: false }).forEach(({ field }) => field.setter(value, method))
   }
 
   const call: FormBaseActions["call"] = (path, key, config) => {

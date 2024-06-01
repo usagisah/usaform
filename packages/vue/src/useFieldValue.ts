@@ -1,7 +1,7 @@
 import { Ref, ShallowRef, nextTick, shallowRef, unref, watch } from "vue"
 
 export type FieldGetter = () => any
-export type FieldSetter = (value: any) => any
+export type FieldSetter = (value: any, method?: string) => any
 
 export type FieldSubscribeHandle = (newValue: any, oldValue: any) => any
 export type FieldSubscribeConfig = { immediate?: boolean }
@@ -18,7 +18,7 @@ export type FieldValue = {
   clearSubscribers: FieldClearSubscribes
 }
 
-export function useFieldValue(value: any): FieldValue {
+export function useFieldValue(value: any, actions: Record<any, any> = {}): FieldValue {
   const subscribers: FieldSubscribeHandle[] = []
   const fieldValue = shallowRef(value)
   watch(fieldValue, (newValue, oldValue) => {
@@ -32,7 +32,10 @@ export function useFieldValue(value: any): FieldValue {
   })
 
   const getter: FieldGetter = () => unref(fieldValue)
-  const setter: FieldSetter = (_value: any) => {
+  const setter: FieldSetter = (_value, method) => {
+    if (method) {
+      return actions[method]?.(_value)
+    }
     const key = ++fieldKey.value
     nextTick(() => {
       if (key !== fieldKey.value) return

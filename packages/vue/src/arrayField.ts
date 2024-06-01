@@ -33,6 +33,10 @@ export interface ArrayFieldActions extends FormBaseActions {
   setValue: SetValue
   delValue: DelValue
   swap: Swap
+  pop: () => void
+  shift: () => void
+  push: (e: any) => void
+  unshift: (e: any) => void
 }
 
 type ArrayFieldInit<T> = (info: ArrayFieldInitInfo) => ArrayFieldConfig<T>
@@ -87,23 +91,12 @@ function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
 export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayFieldInit<any>, p?: ArrayItemInitParams) {
   const _defaultValue = resolveFieldDefaultValue(name, ctx, p)
   const { initValue, toJson, ..._conf } = init({ formConfig: ctx.formConfig, initValue: _defaultValue })
-  const _field: ArrayField = {
-    type: "ary",
-    name,
-    order: getFieldStructSize(ctx.field),
-    struct: toRaw([...(initValue ?? _defaultValue ?? [])]),
-    setting: false,
-    userConfig: _conf,
-    parent: ctx.field,
-    toJson,
-    __uform_field: true,
-    ...useFieldValue([...(initValue ?? _defaultValue ?? [])])
-  }
+
   const _setStruct = () => {
     const _fieldStruct: Field[] = []
     const _fieldValue: any[] = []
     for (const item of _field.struct) {
-      if ((item as any) === ArrayEmptyItem) return
+      if ((item as any) === ArrayEmptyItem) continue
       _fieldStruct.push(item)
       _fieldValue.push(safeGetProperty(item, "__uform_aryItem_field") ? (item as any).__aryValue : item)
     }
@@ -136,5 +129,26 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     struct[i2] = t
     _setStruct()
   }
-  return { _field, _actions: { setValue, delValue, swap } }
+  const pop = () => delValue(_field.fieldValue.value.length)
+  const shift = () => delValue(-1)
+  const push = (e: any) => {
+    setValue(_field.fieldValue.value.length, e)
+  }
+  const unshift = (e: any) => setValue(-1, e)
+  const _actions = { setValue, delValue, swap, pop, shift, push, unshift }
+
+  const _field: ArrayField = {
+    type: "ary",
+    name,
+    order: getFieldStructSize(ctx.field),
+    struct: toRaw([...(initValue ?? _defaultValue ?? [])]),
+    setting: false,
+    userConfig: _conf,
+    parent: ctx.field,
+    toJson,
+    __uform_field: true,
+    ...useFieldValue([...(initValue ?? _defaultValue ?? [])], _actions)
+  }
+
+  return { _field, _actions }
 }

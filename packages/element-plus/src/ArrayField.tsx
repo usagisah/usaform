@@ -15,12 +15,7 @@ export interface CArrayFieldProps {
   props?: Record<any, any>
 }
 
-export interface CArrayFieldActions extends ArrayFieldActions {
-  push: (e: Record<any, any>) => void
-  unshift: (e: Record<any, any>) => void
-  pop: () => void
-  shift: () => void
-}
+export interface CArrayFieldActions extends ArrayFieldActions {}
 
 export type CArrayFieldAttrs = {
   fieldValue: any[]
@@ -85,12 +80,7 @@ export const ArrayField = defineComponent({
         }
       }
     })
-    const { delValue, setValue, swap } = actions
-    const pop = () => delValue(fieldValue.value.length)
-    const shift = () => delValue(-1)
-    const push = (e: any) => setValue(fieldValue.value.length, e)
-    const unshift = (e: any) => setValue(-1, e)
-    const cActions: CArrayFieldActions = { ...actions, push, unshift, pop, shift, swap }
+    const cActions: CArrayFieldActions = actions
 
     const resolveElement = (p: any = {}) => {
       const { bind, ..._p } = p
