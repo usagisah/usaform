@@ -3,12 +3,13 @@ import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
 import { createFieldRender } from "./fieldRender"
-import { Field, FieldName, FieldWrapper, FormBaseFiled, FormConfig, resolveFieldDefaultValue, safeGetProperty, setProperty } from "./form.helper"
-import { useFieldValue } from "./useFieldValue"
+import { BaseFiled, Field, FieldName, FieldWrapper, FormConfig, getFieldStructSize, resolveFieldDefaultValue, safeGetProperty, setProperty } from "./form.helper"
+import { FieldValue, useFieldValue } from "./useFieldValue"
 
-export interface ArrayField extends FormBaseFiled {
+export interface ArrayField extends BaseFiled, FieldValue {
   type: "ary"
   struct: Field[]
+  setting: boolean
   userConfig: Record<any, any>
 }
 
@@ -68,6 +69,7 @@ function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
   provide(formContext, provideContext)
 
   _field.subscribe(() => {
+    if (_field.setting) return (_field.setting = false)
     _field.struct = _field.fieldValue.value.map((item: Field) => {
       return safeGetProperty(item, "__uform_aryItem_field") ? (item as any).__aryValue : item
     })
@@ -87,7 +89,9 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
   const _field: ArrayField = {
     type: "ary",
     name,
+    order: getFieldStructSize(ctx.field),
     struct: toRaw([...(initValue ?? _defaultValue ?? [])]),
+    setting: false,
     userConfig: _conf,
     parent: ctx.field,
     __uform_field: true,
@@ -101,6 +105,7 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
       _fieldStruct.push(item)
       _fieldValue.push(safeGetProperty(item, "__uform_aryItem_field") ? (item as any).__aryValue : item)
     }
+    _field.setting = true
     _field.struct = _fieldStruct
     _field.fieldValue.value = _fieldValue
   }

@@ -1,14 +1,11 @@
 import { inject, onBeforeUnmount, provide } from "vue"
 import { ArrayEmptyItem } from "./arrayField"
 import { FormContext, GlobalInfo, formContext } from "./context"
-import { FieldName, NestField } from "./form.helper"
+import { BaseFiled, FieldName, getFieldStructSize } from "./form.helper"
 
-export interface VoidField {
+export interface VoidField extends BaseFiled {
   type: "void"
-  name: FieldName
   userConfig: Record<any, any>
-  parent: NestField
-  __uform_field: boolean
 }
 
 export function useFormVoidField(name: FieldName, userConfig: Record<any, any>): void {
@@ -16,7 +13,7 @@ export function useFormVoidField(name: FieldName, userConfig: Record<any, any>):
   if (!ctx) throw GlobalInfo.invalidField
 
   const { field } = ctx
-  const voidField: VoidField = { type: "void", name, userConfig, parent: field, __uform_field: true }
+  const voidField: VoidField = { type: "void", name, order: getFieldStructSize(ctx.field), userConfig, parent: field, __uform_field: true }
   if (field.type === "ary") {
     if (typeof name !== "number") throw GlobalInfo.nullVoidFieldIndex
     field.struct[name] = voidField

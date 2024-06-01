@@ -2,10 +2,10 @@ import { inject, onBeforeUnmount, provide } from "vue"
 import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
-import { FieldName, FieldWrapper, FormBaseFiled, FormConfig, resolveFieldDefaultValue, setProperty } from "./form.helper"
-import { useFieldValue } from "./useFieldValue"
+import { BaseFiled, FieldName, FieldWrapper, FormConfig, getFieldStructSize, resolveFieldDefaultValue, setProperty } from "./form.helper"
+import { FieldValue, useFieldValue } from "./useFieldValue"
 
-export interface PlainField extends FormBaseFiled {
+export interface PlainField extends BaseFiled, FieldValue {
   type: "plain"
   userConfig: Record<any, any>
 }
@@ -64,6 +64,7 @@ export function createPlainField(name: FieldName, ctx: FormContext, init: PlainF
   const _field: PlainField = {
     type: "plain",
     name,
+    order: getFieldStructSize(ctx.field),
     userConfig: _conf,
     __uform_field: true,
     parent: ctx.field,

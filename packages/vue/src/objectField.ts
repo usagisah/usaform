@@ -3,10 +3,10 @@ import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
 import { createFieldRender } from "./fieldRender"
-import { Field, FieldName, FieldWrapper, FormBaseFiled, FormConfig, resolveFieldDefaultValue, setProperty } from "./form.helper"
-import { useFieldValue } from "./useFieldValue"
+import { BaseFiled, Field, FieldName, FieldWrapper, FormConfig, getFieldStructSize, resolveFieldDefaultValue, setProperty } from "./form.helper"
+import { FieldValue, useFieldValue } from "./useFieldValue"
 
-export interface ObjectField extends FormBaseFiled {
+export interface ObjectField extends BaseFiled, FieldValue {
   type: "object"
   struct: Map<FieldName, Field>
   userConfig: Record<any, any>
@@ -76,6 +76,7 @@ export function createObjectField(name: FieldName, ctx: FormContext, init: Objec
   const _field: ObjectField = {
     type: "object",
     name,
+    order: getFieldStructSize(ctx.field),
     struct: new Map(),
     userConfig: _conf,
     parent: ctx.field,

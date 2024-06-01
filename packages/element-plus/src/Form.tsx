@@ -1,4 +1,4 @@
-import { FormActions, FormConfig, useForm } from "@usaform/vue"
+import { FormActions, FormConfig, useForm, RootField } from "@usaform/vue"
 import { RuleItem } from "async-validator"
 import { App, defineComponent, hasInjectionContext, inject, provide, toRaw } from "vue"
 
@@ -27,6 +27,7 @@ export interface CFormExpose extends FormActions {
   reset: () => void
   callLayout: (path: string, key: string, ...params: any[]) => Record<string, any>
   callElement: (path: string, key: string, ...params: any[]) => Record<string, any>
+  field: RootField
 }
 
 export const Form = defineComponent({
@@ -34,7 +35,7 @@ export const Form = defineComponent({
   props: ["config"],
   setup(props: CFormProps, { slots, expose }) {
     const config = normalizeFormConfig(props.config ?? {})
-    const { actions, FieldRender } = useForm(config)
+    const { actions, FieldRender, field } = useForm(config)
     actions.provide()
 
     const validate: CFormExpose["validate"] = async () => {
@@ -68,7 +69,7 @@ export const Form = defineComponent({
       return actions.call(path, "callElement", { params: [{ key, point, params }] })
     }
 
-    const formExpose: CFormExpose = { ...actions, validate, reset, callLayout, callElement }
+    const formExpose: CFormExpose = { ...actions, validate, reset, callLayout, callElement, field }
     expose(formExpose)
 
     return () => {

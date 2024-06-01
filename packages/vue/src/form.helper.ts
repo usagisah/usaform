@@ -5,7 +5,6 @@ import { FormContext } from "./context"
 import { RootField } from "./form"
 import { ObjectField } from "./objectField"
 import { PlainField } from "./plainField"
-import { FieldValue } from "./useFieldValue"
 import { VoidField } from "./voidField"
 
 export interface FormConfig {
@@ -15,8 +14,9 @@ export interface FormConfig {
   [x: string]: any
 }
 
-export interface FormBaseFiled extends FieldValue {
+export interface BaseFiled {
   name: FieldName
+  order: number
   parent?: NestField | null
   __uform_field: boolean
   __aryValue?: any
@@ -55,6 +55,10 @@ export function safeGetProperty(target: any, key: string) {
   } catch {
     return target
   }
+}
+export function getFieldStructSize(target: NestField) {
+  const { type, struct } = target
+  return type === "ary" ? struct.length : struct.size
 }
 export function setProperty(target: any, key: FieldName, val: any) {
   try {

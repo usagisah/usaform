@@ -2,10 +2,10 @@ import { onBeforeUnmount, provide, toRaw } from "vue"
 import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { FormContext, formContext } from "./context"
 import { createFieldRender } from "./fieldRender"
-import { Field, FieldName, FormBaseFiled, FormConfig } from "./form.helper"
-import { useFieldValue } from "./useFieldValue"
+import { BaseFiled, Field, FieldName, FormConfig } from "./form.helper"
+import { FieldValue, useFieldValue } from "./useFieldValue"
 
-export interface RootField extends FormBaseFiled {
+export interface RootField extends BaseFiled, FieldValue {
   type: "root"
   struct: Map<FieldName, Field>
   userConfig: Record<any, any>
@@ -22,6 +22,7 @@ export function useForm(formConfig: FormConfig = {}) {
     type: "root",
     name: "root",
     struct: new Map(),
+    order: 0,
     parent: null,
     userConfig: {},
     __uform_field: true,
@@ -42,6 +43,7 @@ export function useForm(formConfig: FormConfig = {}) {
   }
 
   return {
+    field,
     actions: { ...useFormActions(field, field, _arrayUnwrapArrayKey), provide: formProvide },
     FieldRender: createFieldRender(field.fieldKey, field.fieldValue)
   }
