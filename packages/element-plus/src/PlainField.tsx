@@ -47,18 +47,19 @@ export const PlainField = defineComponent({
     let gFieldRules: Record<any, CFormRuleItem>
 
     const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig }) => {
-      const { Elements, Rules, layoutProps, defaultValue } = formConfig
+      const { Elements, Rules, layoutProps } = formConfig
       if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements![layout]
       if (element) FieldElement = isPlainObject(element) ? element : Elements![element]
 
       gLayoutProps = layoutProps!
       gFieldRules = Rules!
 
+      const _initValue = ("initValue" in props) ? props.initValue : initValue
       return {
-        initValue: initValue ?? props.initValue,
+        initValue: _initValue,
         toJson: createFormCFieldToJson(props, layout, element),
         reset: () => {
-          fieldValue.value = defaultValue
+          fieldValue.value = _initValue
           fieldLayoutRef.value?.setValidateState({ error: false, message: "" })
         },
         validate({ path }: FormActionCallInfo) {

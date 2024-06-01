@@ -1,6 +1,6 @@
 import { ObjectFieldActions, useFormVoidField } from "@usaform/vue"
 import { SlotsType, defineComponent, h } from "vue"
-import { createFormCFieldToJson } from "./helper"
+import { createFormCFieldToJson, resolveScopeElement } from "./helper"
 
 export interface CVoidFieldProps {
   name: string | number
@@ -23,7 +23,7 @@ export const VoidField = defineComponent({
 
     useFormVoidField(name, ({ formConfig }) => {
       if (typeof element === "string") {
-        element = formConfig.Elements[element]
+        element = resolveScopeElement(element, formConfig.Elements)
       }
       return {
         toJson: createFormCFieldToJson(props, null, element)

@@ -25,3 +25,24 @@ export function createFormCFieldToJson(props: Record<any, any>, layout: any, ele
   }
 }
 
+export function buildScopeElemKey(key: string) {
+  return "_scope_" + key
+}
+export function buildScopeElement(slots: Record<string, any>) {
+  const elements: Record<string, any> = {}
+  for (const key in slots) {
+    if (key === "default") continue
+    elements[buildScopeElemKey(key)] = slots[key]
+  }
+  return elements
+}
+
+export function resolveScopeElement(elem: any, Elements: Record<any, any>) {
+  let el = Elements[elem]
+  if (el) return el
+
+  el = Elements[buildScopeElemKey(elem)]
+  if (el) return el
+
+  return elem
+}

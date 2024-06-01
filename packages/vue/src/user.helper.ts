@@ -31,22 +31,8 @@ function fieldToJson(field: Field, realName?: FieldName): FormStructJson {
       return { ...toJson?.(), type, name: realName ?? name }
     }
     case "ary": {
-      const { type, name, struct, toJson } = field
-      return {
-        ...toJson?.(),
-        type,
-        name: realName ?? name,
-        children: struct
-          .filter(f => {
-            try {
-              return f["__uform_field"]
-            } catch {
-              return false
-            }
-          })
-          .sort((a, b) => a.order - b.order)
-          .map((field, index) => fieldToJson(field, index))
-      }
+      const { type, name, toJson } = field
+      return { ...toJson?.(), type, name: realName ?? name }
     }
     case "void": {
       const { type, name, userConfig, toJson } = field

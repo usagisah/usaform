@@ -1,6 +1,7 @@
 import { FormActions, FormConfig, RootField, useForm as _useForm } from "@usaform/vue"
 import { RuleItem } from "async-validator"
 import { App, defineComponent, h, hasInjectionContext, inject, provide, toRaw } from "vue"
+import { buildScopeElement } from "./helper"
 
 export interface CFormRuleItem extends RuleItem {
   trigger?: "change" | "blur"
@@ -23,7 +24,7 @@ export interface CFormValidateError {
   message: string
 }
 
-export interface CFormExpose extends FormActions {
+export interface CFormExpose extends Omit<FormActions, "provide"> {
   validate: () => Promise<CFormValidateError[]>
   reset: () => void
   callLayout: (path: string, key: string, ...params: any[]) => Record<string, any>
@@ -67,21 +68,27 @@ export function useForm(formConfig?: CFormConfig) {
   }
 
   const createFormRender = (slots: Record<any, any>, layout?: any) => {
+    Object.assign(config.Elements!, buildScopeElement(slots))
     return function FormRender() {
       return <FieldRender>{layout ? h(layout, {}, slots.default?.()) : <div class="u-form">{slots.default?.()}</div>}</FieldRender>
     }
   }
 
-  return { field, ...actions, FieldRender, validate, reset, callLayout, callElement, createFormRender }
+  const createFormExpose = (): CFormExpose => {
+    const { provide, ..._actions } = actions
+    return { ..._actions, validate, reset, callLayout, callElement, field }
+  }
+
+  return { actions, config, field, FieldRender, validate, reset, callLayout, callElement, createFormRender, createFormExpose }
 }
 
 export const Form = defineComponent({
   name: "Form",
   props: ["config", "layout"],
   setup(props: CFormProps, { slots, expose }) {
-    const { provide, createFormRender, FieldRender, ...formExpose } = useForm(props.config)
-    provide()
-    expose(formExpose as CFormExpose)
+    const { createFormRender, actions, createFormExpose } = useForm(props.config)
+    actions.provide()
+    expose(createFormExpose())
     return createFormRender(slots, props.layout)
   }
 })

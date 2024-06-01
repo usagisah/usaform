@@ -5,6 +5,7 @@ import { CFormExpose, CFormProps, useForm } from "./Form"
 import { ObjectField } from "./ObjectField"
 import { PlainField } from "./PlainField"
 import { VoidField } from "./VoidField"
+import { buildScopeElement } from "./helper"
 
 export type JsonFormStructJson = Omit<FormStructJson, "children"> & {
   type: "root" | "plain" | "object" | "ary" | "void"
@@ -18,30 +19,71 @@ export type JsonFormConfig = CFormProps & {
   struct: JsonFormStructJson
 }
 
+function createArrayItem(children: JsonFormStructJson[], deep: number, ctx: RenderJsonStructContext) {
+  return defineComponent({
+    name: "JsonArrayItem",
+    inheritAttrs: false,
+    props: ["fieldValue"],
+    setup(props) {
+      return () => {
+        const { fieldValue } = props
+        return fieldValue.map((item: any, index: number) => {
+          return (
+            <div key={item.key}>
+              {children.map(item => {
+                item.name = index
+                return renderFormItem(item, deep + 1, ctx)
+              })}
+            </div>
+          )
+        })
+      }
+    }
+  })
+}
+
+type RenderJsonStructContext = { memo: Map<string, any>; Elements: Record<string, any> }
 const renderStrategy = { plain: PlainField, object: ObjectField, ary: ArrayField, void: VoidField }
-function renderFormItem(struct: JsonFormStructJson): any {
+function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStructContext): any {
   const { type, children, ...attrs } = struct
   const FormFieldComponent = renderStrategy[type as keyof typeof renderStrategy]
   if (!FormFieldComponent) {
     throw new Error("未知的表单渲染类型")
   }
-  return h(FormFieldComponent, attrs, children ? children.map(renderFormItem) : undefined)
+
+  let _children: any = undefined
+  if (children) {
+    if (type === "ary") {
+      const { memo, Elements } = ctx
+      const key = `_json_${deep}_${type}`
+      let memoChildren = memo.get(key)
+      if (!memoChildren) memo.set(key, (memoChildren = createArrayItem(children, deep, ctx)))
+      Elements[key] = memoChildren
+      attrs.element = key
+    } else {
+      _children = { default: () => children.map(item => renderFormItem(item, deep + 1, ctx)) }
+    }
+  }
+
+  return h(FormFieldComponent, attrs, _children)
 }
 
-export function useJsonForm({ struct, layout, ...formConfig }: JsonFormConfig): CFormExpose & { Form: DefineComponent<{}, {}, any> } {
-  const { provide, createFormRender, FieldRender, ...formExpose } = useForm(formConfig)
+export function useJsonForm({ struct, layout, config: formConfig }: JsonFormConfig): CFormExpose & { Form: DefineComponent<{}, {}, any> } {
+  const { config, actions, createFormExpose, FieldRender } = useForm(formConfig)
   if (struct.type !== "root") {
     throw "非法的表单根节点"
   }
 
-  provide()
+  actions.provide()
   return {
-    ...(formExpose as CFormExpose),
+    ...createFormExpose(),
     Form: defineComponent({
       name: "Form",
-      setup() {
+      setup(_, { slots }) {
+        const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements! }
+        Object.assign(config.Elements!, buildScopeElement(slots))
         return () => {
-          const childrenSlots = struct.children ? struct.children.map(renderFormItem) : []
+          const childrenSlots = struct.children ? struct.children.map(item => renderFormItem(item, 0, ctx)) : []
           return <FieldRender>{layout ? h(layout, {}, childrenSlots) : <div class="u-form">{childrenSlots}</div>}</FieldRender>
         }
       }

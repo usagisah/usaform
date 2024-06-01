@@ -29,6 +29,7 @@ export function useForm(formConfig: FormConfig = {}) {
     __uform_field: true,
     ...useFieldValue({ ...defaultFormData })
   }
+
   const context: FormContext = {
     field,
     root: field,
