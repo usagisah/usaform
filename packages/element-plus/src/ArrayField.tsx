@@ -1,7 +1,7 @@
 import { ArrayFieldActions, FormActionCallInfo, useFormArrayField } from "@usaform/vue"
 import { Ref, SlotsType, defineComponent, h, ref } from "vue"
 import { CFormRuleItem } from "./Form"
-import { callFuncWithError, isPlainObject } from "./helper"
+import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
 
 export interface CArrayFieldProps {
   name: string | number
@@ -67,6 +67,7 @@ export const ArrayField = defineComponent({
 
       return {
         initValue: initValue ?? props.initValue,
+        toJson: createFormCFieldToJson(props, layout, element),
         reset() {
           actions.set("", [])
         },

@@ -1,6 +1,6 @@
-import { FormActions, FormConfig, useForm, RootField } from "@usaform/vue"
+import { FormActions, FormConfig, RootField, useForm as _useForm } from "@usaform/vue"
 import { RuleItem } from "async-validator"
-import { App, defineComponent, hasInjectionContext, inject, provide, toRaw } from "vue"
+import { App, defineComponent, h, hasInjectionContext, inject, provide, toRaw } from "vue"
 
 export interface CFormRuleItem extends RuleItem {
   trigger?: "change" | "blur"
@@ -14,6 +14,7 @@ export interface CFormConfig extends FormConfig {
 
 export interface CFormProps {
   config?: CFormConfig
+  layout?: any
 }
 
 export interface CFormValidateError {
@@ -30,54 +31,58 @@ export interface CFormExpose extends FormActions {
   field: RootField
 }
 
+export function useForm(formConfig?: CFormConfig) {
+  const config = normalizeFormConfig(formConfig ?? {})
+  const { actions, FieldRender, field } = _useForm({ ...config })
+
+  const validate: CFormExpose["validate"] = async () => {
+    const res = actions.call("all", "validate", { fieldTypes: ["plain"] })
+    const ps: Promise<any>[] = []
+    const errs: CFormValidateError[] = []
+    for (const path in res) {
+      const p = res[path]
+      if (p instanceof Promise) {
+        const _p = p.catch(errors => {
+          errors.forEach((e: any) => {
+            errs.push({ field: e.field, message: e.message, path })
+          })
+        })
+        ps.push(_p)
+      }
+    }
+    await Promise.all(ps)
+    return errs
+  }
+
+  const reset = () => {
+    actions.call("all", "reset", { fieldTypes: ["plain"] })
+  }
+
+  const callLayout: CFormExpose["callLayout"] = (path, key, point, ...params) => {
+    return actions.call(path, "callLayout", { params: [{ key, point, params }] })
+  }
+
+  const callElement: CFormExpose["callElement"] = (path, key, point, ...params) => {
+    return actions.call(path, "callElement", { params: [{ key, point, params }] })
+  }
+
+  const createFormRender = (slots: Record<any, any>, layout?: any) => {
+    return function FormRender() {
+      return <FieldRender>{layout ? h(layout, {}, slots.default?.()) : <div class="u-form">{slots.default?.()}</div>}</FieldRender>
+    }
+  }
+
+  return { field, ...actions, FieldRender, validate, reset, callLayout, callElement, createFormRender }
+}
+
 export const Form = defineComponent({
   name: "Form",
-  props: ["config"],
+  props: ["config", "layout"],
   setup(props: CFormProps, { slots, expose }) {
-    const config = normalizeFormConfig(props.config ?? {})
-    const { actions, FieldRender, field } = useForm(config)
-    actions.provide()
-
-    const validate: CFormExpose["validate"] = async () => {
-      const res = actions.call("all", "validate", { fieldTypes: ["plain"] })
-      const ps: Promise<any>[] = []
-      const errs: CFormValidateError[] = []
-      for (const path in res) {
-        const p = res[path]
-        if (p instanceof Promise) {
-          const _p = p.catch(errors => {
-            errors.forEach((e: any) => {
-              errs.push({ field: e.field, message: e.message, path })
-            })
-          })
-          ps.push(_p)
-        }
-      }
-      await Promise.all(ps)
-      return errs
-    }
-
-    const reset = () => {
-      actions.call("all", "reset", { fieldTypes: ["plain"] })
-    }
-
-    const callLayout: CFormExpose["callLayout"] = (path, key, point, ...params) => {
-      return actions.call(path, "callLayout", { params: [{ key, point, params }] })
-    }
-
-    const callElement: CFormExpose["callElement"] = (path, key, point, ...params) => {
-      return actions.call(path, "callElement", { params: [{ key, point, params }] })
-    }
-
-    const formExpose: CFormExpose = { ...actions, validate, reset, callLayout, callElement, field }
-    expose(formExpose)
-
-    return () => {
-      const render = () => {
-        return <div class="u-form">{slots.default?.()}</div>
-      }
-      return <FieldRender render={render}></FieldRender>
-    }
+    const { provide, createFormRender, FieldRender, ...formExpose } = useForm(props.config)
+    provide()
+    expose(formExpose as CFormExpose)
+    return createFormRender(slots, props.layout)
   }
 })
 

@@ -2,7 +2,7 @@ import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usafo
 import { Ref, SlotsType, defineComponent, h, ref } from "vue"
 import { CFormRuleItem } from "./Form"
 import { CFormItemExpose } from "./FormItem"
-import { callFuncWithError, isPlainObject } from "./helper"
+import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
 
 export interface CPlainFieldProps {
   name: string | number
@@ -56,6 +56,7 @@ export const PlainField = defineComponent({
 
       return {
         initValue: initValue ?? props.initValue,
+        toJson: createFormCFieldToJson(props, layout, element),
         reset: () => {
           fieldValue.value = defaultValue
           fieldLayoutRef.value?.setValidateState({ error: false, message: "" })

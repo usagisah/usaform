@@ -3,7 +3,7 @@ import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
 import { createFieldRender } from "./fieldRender"
-import { BaseFiled, Field, FieldName, FieldWrapper, FormConfig, getFieldStructSize, resolveFieldDefaultValue, setProperty } from "./form.helper"
+import { BaseFiled, Field, FieldName, FieldToJson, FieldWrapper, FormConfig, getFieldStructSize, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { FieldValue, useFieldValue } from "./useFieldValue"
 
 export interface ObjectField extends BaseFiled, FieldValue {
@@ -19,6 +19,7 @@ export interface ObjectFieldInitInfo {
 
 export interface ObjectFieldConfig<T = any> {
   initValue?: T
+  toJson?: FieldToJson
   [x: string]: any
 }
 
@@ -72,7 +73,7 @@ function updateField(_field: ObjectField, ctx: FormContext, clean: Function) {
 
 export function createObjectField(name: FieldName, ctx: FormContext, init: ObjectFieldInit<any>, p?: ArrayItemInitParams) {
   const _defaultValue = resolveFieldDefaultValue(name, ctx, p)
-  const { initValue, ..._conf } = init({ formConfig: ctx.formConfig, initValue: _defaultValue })
+  const { initValue, toJson, ..._conf } = init({ formConfig: ctx.formConfig, initValue: _defaultValue })
   const _field: ObjectField = {
     type: "object",
     name,
@@ -80,6 +81,7 @@ export function createObjectField(name: FieldName, ctx: FormContext, init: Objec
     struct: new Map(),
     userConfig: _conf,
     parent: ctx.field,
+    toJson,
     __uform_field: true,
     ...useFieldValue(initValue ?? _defaultValue)
   }

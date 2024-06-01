@@ -11,13 +11,17 @@ export interface FormConfig {
   defaultValue?: any
   defaultFormData?: Record<any, any>
   arrayUnwrapKey?: string | string[]
+  toJson?: FieldToJson
   [x: string]: any
 }
+
+export type FieldToJson = () => Record<string, string | number | null | (string | number)[]>
 
 export interface BaseFiled {
   name: FieldName
   order: number
   parent?: NestField | null
+  toJson?: FieldToJson
   __uform_field: boolean
   __aryValue?: any
   __uform_aryItem_field?: boolean

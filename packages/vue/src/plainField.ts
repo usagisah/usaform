@@ -2,7 +2,7 @@ import { inject, onBeforeUnmount, provide } from "vue"
 import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
-import { BaseFiled, FieldName, FieldWrapper, FormConfig, getFieldStructSize, resolveFieldDefaultValue, setProperty } from "./form.helper"
+import { BaseFiled, FieldName, FieldToJson, FieldWrapper, FormConfig, getFieldStructSize, resolveFieldDefaultValue, setProperty } from "./form.helper"
 import { FieldValue, useFieldValue } from "./useFieldValue"
 
 export interface PlainField extends BaseFiled, FieldValue {
@@ -17,6 +17,7 @@ export interface PlainFieldInitInfo {
 
 export interface PlainFieldConfig<T = any> {
   initValue?: T
+  toJson?: FieldToJson
   [x: string]: any
 }
 
@@ -60,12 +61,13 @@ function updateField(_field: PlainField, { currentInitValue }: FormContext, clea
 
 export function createPlainField(name: FieldName, ctx: FormContext, init: PlainFieldInit<any>, p?: ArrayItemInitParams) {
   const _defaultValue = resolveFieldDefaultValue(name, ctx, p)
-  const { initValue, ..._conf } = init({ formConfig: ctx.formConfig, initValue: _defaultValue })
+  const { initValue, toJson, ..._conf } = init({ formConfig: ctx.formConfig, initValue: _defaultValue })
   const _field: PlainField = {
     type: "plain",
     name,
     order: getFieldStructSize(ctx.field),
     userConfig: _conf,
+    toJson,
     __uform_field: true,
     parent: ctx.field,
     ...useFieldValue(initValue ?? _defaultValue)

@@ -11,36 +11,31 @@ export function onNextTick(fn: () => any) {
   })
 }
 
-export type FormStructJson = {
-  type: string
-  name: FieldName
-  config: Record<any, any>
-  children?: FormStructJson[]
-}
+export type FormStructJson = { type: "root" | "plain" | "object" | "ary" | "void"; name: FieldName; children?: FormStructJson[] } & Record<any, any>
 function fieldToJson(field: Field, realName?: FieldName): FormStructJson {
   switch (field.type) {
     case "root":
     case "object": {
-      const { type, name, userConfig, struct } = field
+      const { type, name, struct, toJson } = field
       return {
+        ...toJson?.(),
         type,
         name: realName ?? name,
-        config: userConfig,
         children: Array.from(struct.entries())
           .sort((a, b) => a[1].order - b[1].order)
           .map(item => fieldToJson(item[1]))
       }
     }
     case "plain": {
-      const { type, name, userConfig } = field
-      return { type, name: realName ?? name, config: userConfig }
+      const { type, name, toJson } = field
+      return { ...toJson?.(), type, name: realName ?? name }
     }
     case "ary": {
-      const { type, name, userConfig, struct } = field
+      const { type, name, struct, toJson } = field
       return {
+        ...toJson?.(),
         type,
         name: realName ?? name,
-        config: userConfig,
         children: struct
           .filter(f => {
             try {
@@ -54,8 +49,8 @@ function fieldToJson(field: Field, realName?: FieldName): FormStructJson {
       }
     }
     case "void": {
-      const { type, name, userConfig } = field
-      return { type, name: realName ?? name, config: userConfig }
+      const { type, name, userConfig, toJson } = field
+      return { ...toJson?.(), type, name: realName ?? name, config: userConfig }
     }
     default: {
       throw "非法的表单节点"

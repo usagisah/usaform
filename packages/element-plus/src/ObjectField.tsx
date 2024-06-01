@@ -1,7 +1,7 @@
 import { FormActionCallInfo, ObjectFieldActions, useFormObjectField } from "@usaform/vue"
 import { Ref, SlotsType, defineComponent, h, ref } from "vue"
 import { CFormRuleItem } from "./Form"
-import { callFuncWithError, isPlainObject } from "./helper"
+import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
 
 export interface CObjectFieldProps {
   name: string | number
@@ -55,6 +55,7 @@ export const ObjectField = defineComponent({
 
       return {
         initValue: initValue ?? props.initValue,
+        toJson: createFormCFieldToJson(props, layout, element),
         callLayout(_: any, { key, point, params }: FormActionCallInfo) {
           return callFuncWithError(() => {
             const f = fieldLayoutRef.value?.[key]

@@ -3,7 +3,7 @@ import { FormBaseActions, useFormActions } from "./actions/hooks"
 import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
 import { FormContext, GlobalInfo, formContext } from "./context"
 import { createFieldRender } from "./fieldRender"
-import { BaseFiled, Field, FieldName, FieldWrapper, FormConfig, getFieldStructSize, resolveFieldDefaultValue, safeGetProperty, setProperty } from "./form.helper"
+import { BaseFiled, Field, FieldName, FieldToJson, FieldWrapper, FormConfig, getFieldStructSize, resolveFieldDefaultValue, safeGetProperty, setProperty } from "./form.helper"
 import { FieldValue, useFieldValue } from "./useFieldValue"
 
 export interface ArrayField extends BaseFiled, FieldValue {
@@ -25,6 +25,7 @@ export interface ArrayFieldInitInfo {
 
 export interface ArrayFieldConfig<T = any> {
   initValue?: T[]
+  toJson?: FieldToJson
   [x: string]: any
 }
 
@@ -85,7 +86,7 @@ function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
 
 export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayFieldInit<any>, p?: ArrayItemInitParams) {
   const _defaultValue = resolveFieldDefaultValue(name, ctx, p)
-  const { initValue, ..._conf } = init({ formConfig: ctx.formConfig, initValue: _defaultValue })
+  const { initValue, toJson, ..._conf } = init({ formConfig: ctx.formConfig, initValue: _defaultValue })
   const _field: ArrayField = {
     type: "ary",
     name,
@@ -94,6 +95,7 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     setting: false,
     userConfig: _conf,
     parent: ctx.field,
+    toJson,
     __uform_field: true,
     ...useFieldValue([...(initValue ?? _defaultValue ?? [])])
   }
