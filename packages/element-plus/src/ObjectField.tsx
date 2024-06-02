@@ -1,5 +1,5 @@
 import { FormActionCallInfo, ObjectFieldActions, useFormObjectField } from "@usaform/vue"
-import { Ref, SlotsType, defineComponent, h, ref } from "vue"
+import { Ref, SlotsType, computed, defineComponent, h, ref } from "vue"
 import { CFormRuleItem } from "./Form"
 import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
 
@@ -20,14 +20,16 @@ export interface CObjectFieldLayoutInfo {
   fieldValue: Ref<any>
   actions: ObjectFieldActions
   Rules: Record<any, CFormRuleItem>
-  children: (p: Record<any, any>) => any
+  props: Record<any, any>
+  layoutProps: Record<any, any>
+  children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
 }
 
 export const ObjectField = defineComponent({
   name: "ObjectField",
   props: ["name", "initValue", "layout", "layoutProps", "element", "props"],
   slots: Object as SlotsType<{
-    default: { actions: ObjectFieldActions; fieldValue: any; [x: string]: any }
+    default: (props: { actions: ObjectFieldActions; fieldValue: any; [x: string]: any }) => any
   }>,
   setup(props: CObjectFieldProps, { slots }) {
     const { name, layout, element } = props
@@ -71,26 +73,35 @@ export const ObjectField = defineComponent({
       }
     })
 
-    return () => {
-      const render = () => {
-        if (FieldLayout) {
-          const children = (p: any) => {
-            const { bind, ..._p } = p
-            const _props = { ..._p, ...props.props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
-            return FieldElement ? [h(FieldElement, _props)] : FieldSlot?.(_props)
+    const controllerProps = computed(() => {
+      if (!FieldLayout) return null
+      const p: CObjectFieldLayoutInfo = {
+        type: "object",
+        fieldValue,
+        actions,
+        props: props.props ?? {},
+        layoutProps: { ...gLayoutProps, ...props.layoutProps },
+        Rules: gFieldRules,
+        children: ({ bind, props }) => {
+          const _props = { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
+          if (FieldElement) {
+            return [h(FieldElement, _props)]
+          } else {
+            Object.assign(_props, { bind: { ...bind, ref: fieldElementRef } })
+            return FieldSlot?.(_props)
           }
-          const info: CObjectFieldLayoutInfo = { type: "object", fieldValue, actions, Rules: gFieldRules, children }
-          return h(FieldLayout, {
-            ...gLayoutProps,
-            ...props.layoutProps,
-            __fieldInfo: info,
-            ref: fieldLayoutRef
-          })
         }
-        const _props = { ...props.props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
-        return FieldElement ? h(FieldElement, _props) : FieldSlot?.(_props)
       }
-      return <FieldRender render={render}></FieldRender>
+      return p
+    })
+
+    const resolveRenderElement = () => {
+      const _props = { ...props.props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
+      return FieldElement ? h(FieldElement, _props) : FieldSlot?.(_props)
+    }
+
+    return () => {
+      return <FieldRender>{FieldLayout ? h(FieldLayout, { FormControllerProps: controllerProps, ref: fieldLayoutRef }) : resolveRenderElement()}</FieldRender>
     }
   }
 })

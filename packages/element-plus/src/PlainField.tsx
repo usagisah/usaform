@@ -1,7 +1,7 @@
 import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usaform/vue"
-import { Ref, SlotsType, defineComponent, h, ref } from "vue"
+import { Ref, SlotsType, computed, defineComponent, h, ref } from "vue"
 import { CFormRuleItem } from "./Form"
-import { CFormItemExpose } from "./FormItem"
+import { CFormItemExpose } from "./controller/helper"
 import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
 
 export interface CPlainFieldProps {
@@ -21,14 +21,16 @@ export interface CPlainFieldLayoutInfo {
   fieldValue: Ref<any>
   actions: PlainFieldActions
   Rules: Record<any, CFormRuleItem>
-  children: (p: Record<any, any>) => any
+  props: Record<any, any>
+  layoutProps: Record<any, any>
+  children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
 }
 
 export const PlainField = defineComponent({
   name: "PlainField",
   props: ["name", "initValue", "layout", "layoutProps", "element", "props"],
   slots: Object as SlotsType<{
-    default: { bind: { modelValue: any; "onUpdate:modelValue": (e: any) => any } } & Record<any, any>
+    default: (props: { bind?: { modelValue: any; "onUpdate:modelValue": (e: any) => any } } & Record<any, any>) => any
   }>,
   setup(props: CPlainFieldProps, { slots }) {
     const { name, layout, element } = props
@@ -54,7 +56,7 @@ export const PlainField = defineComponent({
       gLayoutProps = layoutProps!
       gFieldRules = Rules!
 
-      const _initValue = ("initValue" in props) ? props.initValue : initValue
+      const _initValue = "initValue" in props ? props.initValue : initValue
       return {
         initValue: _initValue,
         toJson: createFormCFieldToJson(props, layout, element),
@@ -83,26 +85,35 @@ export const PlainField = defineComponent({
       fieldValue.value = v
     }
 
-    const resolveElement = (p: any = {}) => {
-      const { bind, ..._p } = p
-      if (FieldElement) {
-        return [h(FieldElement, { ..._p, ...props.props, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, actions, ref: fieldElementRef })]
-      } else {
-        return FieldSlot?.({ ..._p, ...props.props, ref: fieldElementRef, bind: { ...bind, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, ref: fieldElementRef } })
+    const controllerProps = computed(() => {
+      if (!FieldLayout) return null
+      const p: CPlainFieldLayoutInfo = {
+        type: "plain",
+        fieldValue,
+        actions,
+        props: props.props ?? {},
+        layoutProps: { ...gLayoutProps, ...props.layoutProps },
+        Rules: gFieldRules,
+        children: ({ bind, props }) => {
+          const _props = { ...props, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, actions, ref: fieldElementRef }
+          if (FieldElement) {
+            return [h(FieldElement, _props)]
+          } else {
+            Object.assign(_props, { bind: { ...bind, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, ref: fieldElementRef } })
+            return FieldSlot?.(_props)
+          }
+        }
       }
+      return p
+    })
+
+    const resolveRenderElement = () => {
+      const _props = { ...props.props, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, actions, ref: fieldElementRef }
+      return FieldElement ? h(FieldElement, _props) : FieldSlot?.(_props)
     }
 
     return () => {
-      if (FieldLayout) {
-        const info: CPlainFieldLayoutInfo = { type: "plain", fieldValue, actions, Rules: gFieldRules, children: resolveElement }
-        return h(FieldLayout, {
-          ...gLayoutProps,
-          ...props.layoutProps,
-          __fieldInfo: info,
-          ref: fieldLayoutRef
-        })
-      }
-      return resolveElement()
+      return FieldLayout ? h(FieldLayout, { FormControllerProps: controllerProps, ref: fieldLayoutRef }) : resolveRenderElement()
     }
   }
 })

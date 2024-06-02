@@ -1,5 +1,5 @@
 import { ArrayFieldActions, FormActionCallInfo, useFormArrayField } from "@usaform/vue"
-import { Ref, SlotsType, defineComponent, h, ref } from "vue"
+import { Ref, SlotsType, computed, defineComponent, h, ref } from "vue"
 import { CFormRuleItem } from "./Form"
 import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
 
@@ -17,24 +17,21 @@ export interface CArrayFieldProps {
 
 export interface CArrayFieldActions extends ArrayFieldActions {}
 
-export type CArrayFieldAttrs = {
-  fieldValue: any[]
-  actions: CArrayFieldActions
-} & Record<any, any>
-
 export interface CArrayFieldLayoutInfo {
   type: "array"
   fieldValue: Ref<any[]>
   actions: CArrayFieldActions
   Rules: Record<any, CFormRuleItem>
-  children: (p: Record<any, any>) => any
+  props: Record<any, any>
+  layoutProps: Record<any, any>
+  children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
 }
 
 export const ArrayField = defineComponent({
   name: "ArrayField",
   props: ["name", "initValue", "layout", "layoutProps", "element", "props"],
   slots: Object as SlotsType<{
-    default: CArrayFieldAttrs
+    default: (props: { fieldValue: any[]; actions: CArrayFieldActions } & Record<any, any>) => any
   }>,
   setup(props: CArrayFieldProps, { slots }) {
     const { name, layout, element } = props
@@ -82,25 +79,35 @@ export const ArrayField = defineComponent({
     })
     const cActions: CArrayFieldActions = actions
 
-    const resolveElement = (p: any = {}) => {
-      const { bind, ..._p } = p
-      const _props = { ..._p, ...props.props, fieldValue: fieldValue.value, actions: cActions, ref: fieldElementRef }
-      return FieldElement ? [h(FieldElement, _props)] : FieldSlot?.(_props)
-    }
-    return () => {
-      const render = () => {
-        if (FieldLayout) {
-          const info: CArrayFieldLayoutInfo = { type: "array", fieldValue, actions: cActions, Rules: gFieldRules, children: resolveElement }
-          return h(FieldLayout, {
-            ...gLayoutProps,
-            ...props.layoutProps,
-            __fieldInfo: info,
-            ref: fieldLayoutRef
-          })
+    const controllerProps = computed(() => {
+      if (!FieldLayout) return null
+      const p: CArrayFieldLayoutInfo = {
+        type: "array",
+        fieldValue,
+        actions: cActions,
+        props: props.props ?? {},
+        layoutProps: { ...gLayoutProps, ...props.layoutProps },
+        Rules: gFieldRules,
+        children: ({ bind, props }) => {
+          const _props = { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
+          if (FieldElement) {
+            return [h(FieldElement, _props)]
+          } else {
+            Object.assign(_props, { bind: { ...bind, ref: fieldElementRef } })
+            return FieldSlot?.(_props)
+          }
         }
-        return resolveElement()
       }
-      return <FieldRender render={render}></FieldRender>
+      return p
+    })
+
+    const resolveRenderElement = () => {
+      const _props = { ...props.props, fieldValue: fieldValue.value, actions: cActions, ref: fieldElementRef }
+      return FieldElement ? h(FieldElement, _props) : FieldSlot?.(_props)
+    }
+
+    return () => {
+      return <FieldRender>{FieldLayout ? h(FieldLayout, { FormControllerProps: controllerProps, ref: fieldLayoutRef }) : resolveRenderElement()}</FieldRender>
     }
   }
 })
