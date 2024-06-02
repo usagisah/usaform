@@ -113,7 +113,7 @@ export const PlainField = defineComponent({
     }
 
     return () => {
-      return FieldLayout ? h(FieldLayout, { FormControllerProps: controllerProps, ref: fieldLayoutRef }) : resolveRenderElement()
+      return FieldLayout ? h(FieldLayout, { FormControllerProps: controllerProps.value, ref: fieldLayoutRef }) : resolveRenderElement()
     }
   }
 })

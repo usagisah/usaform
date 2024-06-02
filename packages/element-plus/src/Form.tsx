@@ -1,6 +1,6 @@
 import { FormActions, FormConfig, RootField, useForm as _useForm } from "@usaform/vue"
 import { RuleItem } from "async-validator"
-import { App, defineComponent, h, hasInjectionContext, inject, provide, toRaw } from "vue"
+import { App, PropType, defineComponent, h, hasInjectionContext, inject, provide, toRaw } from "vue"
 import { buildScopeElement } from "./helper"
 
 export interface CFormRuleItem extends RuleItem {
@@ -93,16 +93,6 @@ export const Form = defineComponent({
   }
 })
 
-const FormContextConfigKey = Symbol()
-export function useFormConfigProvide(config: CFormConfig): CFormConfig
-export function useFormConfigProvide(config: CFormConfig, app: App): CFormConfig
-export function useFormConfigProvide(config: CFormConfig, app?: App) {
-  const conf = normalizeFormConfig(toRaw(config))
-  if (app) app.provide(FormContextConfigKey, conf)
-  else if (hasInjectionContext()) provide(FormContextConfigKey, conf)
-  return conf
-}
-
 export function normalizeFormConfig(c: CFormConfig): CFormConfig {
   const config = { ...c }
   config.Elements = { ...(config.Elements ?? {}) }
@@ -124,3 +114,29 @@ export function normalizeFormConfig(c: CFormConfig): CFormConfig {
   }
   return config
 }
+
+const FormContextConfigKey = "u" + Date.now().toString(16)
+export function provideGlobalFormConfig(config: CFormConfig, app?: App) {
+  const conf = normalizeFormConfig(toRaw(config))
+  if (app) app.provide(FormContextConfigKey, conf)
+  else if (hasInjectionContext()) provide(FormContextConfigKey, conf)
+  return conf
+}
+
+export const CFormPlugin = (app: any, config: CFormConfig) => {
+  provideGlobalFormConfig(config ?? {}, app)
+}
+
+export const CFormProvider = defineComponent({
+  name: "FormProvider",
+  props: {
+    config: {
+      type: Object as PropType<CFormConfig>,
+      required: true
+    }
+  },
+  setup(props, { slots }) {
+    provideGlobalFormConfig(props.config)
+    return () => slots.default?.()
+  }
+})

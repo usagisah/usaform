@@ -73,7 +73,7 @@ export const FormItem = defineComponent({
 
     const childrenContent = computed(() => {
       const p = { id, size: size.value, onBlur }
-      return props.FormControllerProps.children({ props: { ...p }, bind: { ...p } }).map((c: any) => cloneVNode(c, { disabled: disabled.value }))
+      return props.FormControllerProps.children({ props: { ...props.FormControllerProps.props, ...p }, bind: { ...props.FormControllerProps.props, ...p } }).map((c: any) => cloneVNode(c, { disabled: disabled.value }))
     })
 
     return () => {

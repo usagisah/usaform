@@ -107,7 +107,7 @@ export const ArrayField = defineComponent({
     }
 
     return () => {
-      return <FieldRender>{FieldLayout ? h(FieldLayout, { FormControllerProps: controllerProps, ref: fieldLayoutRef }) : resolveRenderElement()}</FieldRender>
+      return <FieldRender>{FieldLayout ? h(FieldLayout, { FormControllerProps: controllerProps.value, ref: fieldLayoutRef }) : resolveRenderElement()}</FieldRender>
     }
   }
 })
