@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script lang="tsx" setup>
 import { onMounted, ref } from "vue"
 import { ElSelect, ElOption, ElInput, ElRadio, ElRadioGroup, ElCheckbox, ElCheckboxGroup, ElInputNumber, ElDivider, ElCard, ElButton, ElDatePicker, ElCascader, ElSpace } from "element-plus"
 import { Form, FormItem, PlainField, CFormExpose, exportFormStructJson } from "@usaform/element-plus"
@@ -278,6 +278,8 @@ const callSlot = async (key: string) => {
 }
 const formKey = ref<CFormExpose | null>(null)
 const callKey = async (key: string) => console.log(await formKey.value![key]())
+
+const customLabel = (attrs: any) => <div {...attrs}>时间</div>
 </script>
 
 <template>
@@ -329,7 +331,7 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
             </el-checkbox-group>
           </template>
         </PlainField>
-        <PlainField name="DatePicker" :layout="FormItem" :layout-props="{ label: '时间', labelWith: '60px' }">
+        <PlainField name="DatePicker" :layout="FormItem" :layout-props="{ label: customLabel, labelWith: '60px' }">
           <template #default="{ bind }">
             <ElDatePicker v-bind="bind" type="date" placeholder="Pick a day" />
           </template>
@@ -346,13 +348,13 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
 
     <ElCard>
       <template #header>指定 key</template>
-      <Form ref="formKey">
+      <Form ref="formKey" :config="{ defaultController: 'FormItem' }">
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
-        <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称' }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
-        <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量' }" element="ElInputNumber" :props="{ placeholder: '请输入数量' }" />
-        <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉' }" element="Select" :props="{ placeholder: '请选择' }" />
-        <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }" element="Radio" />
-        <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联' }" element="ElCascader" :props="{ options: CascaderOptions, props: { expandTrigger: 'hover' } }" />
+        <PlainField name="input" :layout-props="{ label: '名称' }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
+        <PlainField name="number" :layout-props="{ label: '数量' }" element="ElInputNumber" :props="{ placeholder: '请输入数量' }" />
+        <PlainField name="select" :layout-props="{ label: '下拉' }" element="Select" :props="{ placeholder: '请选择' }" />
+        <PlainField name="radio" :layout-props="{ label: '按钮' }" element="Radio" />
+        <PlainField name="Cascader" :layout-props="{ label: '级联' }" element="ElCascader" :props="{ options: CascaderOptions, props: { expandTrigger: 'hover' } }" />
         <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选' }" element="Checkbox" />
         <PlainField name="DatePicker" :layout="FormItem" :layout-props="{ label: '时间' }" element="ElDatePicker" :props="{ type: 'date', placeholder: 'Pick a day' }" />
 

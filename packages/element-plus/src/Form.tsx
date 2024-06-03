@@ -116,7 +116,6 @@ export function normalizeFormConfig(c: CFormConfig): CFormConfig {
   config.Elements = { ...(config.Elements ?? {}) }
   config.Rules = { ...(config.Rules ?? {}) }
   config.layoutProps = { ...(config.layoutProps ?? {}) }
-  config.modelValue = config.modelValue ?? "modelValue"
 
   if (hasInjectionContext()) {
     const ctxConfig = inject<CFormConfig | null>(FormContextConfigKey, null)
@@ -132,6 +131,9 @@ export function normalizeFormConfig(c: CFormConfig): CFormConfig {
       }
     }
   }
+
+  config.modelValue = config.modelValue ?? "modelValue"
+
   return config
 }
 
