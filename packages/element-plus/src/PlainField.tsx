@@ -97,7 +97,7 @@ export const PlainField = defineComponent({
         children: ({ bind, props }) => {
           const _props = { ...props, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, actions, ref: fieldElementRef }
           if (FieldElement) {
-            return [h(FieldElement, _props)]
+            return h(FieldElement, _props)
           } else {
             Object.assign(_props, { bind: { ...bind, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, ref: fieldElementRef } })
             return FieldSlot?.(_props)

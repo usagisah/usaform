@@ -19,7 +19,7 @@
 }
 
 .ufi-label {
-  display: inline-flex;
+  display: flex;
   color: #606266;
   align-items: center;
   user-select: none;
@@ -28,7 +28,7 @@
 .ufi-content {
   position: relative;
   display: flex;
-  gap: 18px 24px;
+  gap: 0 24px;
   flex-wrap: wrap;
   flex: 1;
   width: 100%;
@@ -75,24 +75,29 @@
   }
 }
 
-/* -------------- position -------------- */
+/* -------------- mod -------------- */
 
-.ufi-pos-right {
+.ufi-mode-right {
   .ufi-label {
     justify-content: flex-end;
   }
 }
 
-.ufi-pos-left {
+.ufi-mode-left {
   .ufi-label {
     justify-content: flex-start;
   }
 }
 
-.ufi-pos-top {
+.ufi-mode-top {
   flex-direction: column;
   align-items: flex-start;
   gap: 0px;
+
+  .ufi-label {
+    display: block;
+    width: 100%;
+  }
 }
 
 /* -------------- disabled -------------- */
@@ -103,9 +108,9 @@
   }
 }
 
-/* --------------  -------------- */
+/* -------------- error -------------- */
 
-.ufi-error {
+.ufi-status-error {
   .ufi-content-error {
     position: absolute;
     top: 100%;
@@ -120,8 +125,10 @@
   }
 
   .el-input__wrapper,
-  .el-input__wrapper:hover {
+  .el-input__wrapper:hover,
+  .el-input__wrapper.is-focus {
     box-shadow: 0 0 0 1px #f56c6c inset;
+    outline: none;
   }
 
   .el-input__prefix svg,

@@ -1,5 +1,5 @@
 import Schema from "async-validator"
-import { SlotsType, cloneVNode, computed, defineComponent, onUnmounted, reactive, shallowRef, watch, watchEffect } from "vue"
+import { SlotsType, computed, defineComponent, onUnmounted, reactive, shallowRef, watch, watchEffect } from "vue"
 import { CFormRuleItem } from "../Form"
 import { FormControllerProps, FormControllerSetValidate, FormControllerValidateState } from "./helper"
 
@@ -35,58 +35,69 @@ export const FormItem = defineComponent({
   slots: Object as SlotsType<{
     default: (props: { id: string; size: string; disabled: boolean }) => any
   }>,
-  setup(props: { FormControllerProps: FormControllerProps }, { slots, expose }) {
-    if (!props.FormControllerProps) throw "<FormItem/>必须被用于字段组件内"
-
+  setup(props: { FormControllerProps?: FormControllerProps }, { slots, expose }) {
     const validateState: FormControllerValidateState = reactive({ status: "", message: "" })
     const setValidate: FormControllerSetValidate = state => Object.assign(validateState, state)
     const { fieldRequired, onBlur, validate } = useRules(props.FormControllerProps, setValidate)
     expose({ validate, setValidateState: setValidate })
 
     const id = "ufi-id-" + randomIdCount++
-    const size = computed(() => props.FormControllerProps.layoutProps.size ?? "default")
+
+    const size = computed(() => {
+      const { FormControllerProps } = props
+      if (!FormControllerProps) return "default"
+      return FormControllerProps.layoutProps.size ?? "default"
+    })
+
     const disabled = computed(() => {
-      const { disabled } = props.FormControllerProps.layoutProps
+      const { FormControllerProps } = props
+      if (!FormControllerProps) return false
+      const { disabled } = FormControllerProps.layoutProps
       if (typeof disabled === "string") return disabled.length === 0
       return !!disabled
     })
 
     const classNames = computed(() => {
-      const { inline, mode, label } = props.FormControllerProps.layoutProps
+      const { inline = false, mode = "right" } = props.FormControllerProps?.layoutProps ?? {}
       const _inline = `ufi-${inline ? "inline" : "block"}`
       const _mode = `ufi-mode-${mode ?? "right"}`
-      const _required = fieldRequired.value && label?.length !== 0 ? "ufi-required" : ""
+      const _required = fieldRequired.value ? "ufi-required" : ""
       const _disabled = disabled.value ? "ufi-disabled" : ""
       const _size = `ufi-size-${size.value}`
-      const _status = validateState.status.length > 0 ? `ufi-status-${validateState}` : ""
+      const _status = validateState.status.length > 0 ? `ufi-status-${validateState.status}` : ""
       return ["ufi", _size, _inline, _mode, _required, _disabled, _status].join(" ").trim()
     })
 
     const labelStyle = computed(() => {
-      const { labelWith } = props.FormControllerProps.layoutProps
-      const style = { width: "" }
+      const { FormControllerProps } = props
+      const style: Record<string, string> = {}
+      if (!FormControllerProps) return style
+      const { labelWith, mode } = FormControllerProps.layoutProps
       if (typeof labelWith === "string") style.width = labelWith
       else if (typeof labelWith === "number") style.width = labelWith + "px"
-      else style.width = "auto"
+      else if (mode !== "top") style.width = "auto"
       return style
     })
 
-    const childrenContent = computed(() => {
-      const p = { id, size: size.value, onBlur }
-      return props.FormControllerProps.children({ props: { ...props.FormControllerProps.props, ...p }, bind: { ...props.FormControllerProps.props, ...p } }).map((c: any) => cloneVNode(c, { disabled: disabled.value }))
-    })
-
     return () => {
-      const { label } = props.FormControllerProps.layoutProps
+      const { FormControllerProps } = props
+      const _label = FormControllerProps?.layoutProps.label
+      const _props = { id, size: size.value, disabled: disabled.value, onBlur }
+
       return (
         <div class={classNames.value}>
-          {typeof label === "string" && (
+          {typeof _label === "string" && (
             <label class="ufi-label" style={labelStyle.value} for={id}>
-              {label}
+              {_label}
             </label>
           )}
-          <div class={"ufi-content"}>
-            {childrenContent.value}
+          <div class="ufi-content">
+            {FormControllerProps
+              ? FormControllerProps.children({
+                  props: { ...FormControllerProps.props, ..._props },
+                  bind: { ...FormControllerProps.props, ..._props }
+                })
+              : slots.default?.(_props)}
             {validateState.status.length > 0 && <div class={`ufi-content-${validateState.status}`}>{validateState.message}</div>}
           </div>
         </div>
@@ -95,11 +106,15 @@ export const FormItem = defineComponent({
   }
 })
 
-function useRules(props: FormControllerProps, setValidate: FormControllerSetValidate) {
+function useRules(props: FormControllerProps | undefined, setValidate: FormControllerSetValidate) {
   const fieldRequired = shallowRef(false)
   let changeRules: CFormRuleItem[] = []
   let blurRules: CFormRuleItem[] = []
   watchEffect(() => {
+    if (!props) {
+      return
+    }
+
     const { Rules, layoutProps } = props
     const { rules = [] } = layoutProps
     changeRules = []
@@ -119,7 +134,7 @@ function useRules(props: FormControllerProps, setValidate: FormControllerSetVali
 
   const validate = (rules: CFormRuleItem[], name = "", value: any) => {
     if (rules.length === 0) return Promise.resolve()
-    return new Schema({ [name]: rules }).validate({ [name]: value }).then(
+    return new Schema({ [name]: rules }).validate({ [name]: value }, { firstFields: true }).then(
       () => setValidate({ status: "", message: "" }),
       ({ errors }) => {
         setValidate({ status: "error", message: errors[0].message })
@@ -128,12 +143,14 @@ function useRules(props: FormControllerProps, setValidate: FormControllerSetVali
     )
   }
 
-  watch(
-    () => props.fieldValue,
-    v => {
-      validate(changeRules, "", v).catch(() => null)
-    }
-  )
+  if (props) {
+    watch(
+      () => props.fieldValue,
+      v => {
+        validate(changeRules, "", v).catch(() => null)
+      }
+    )
+  }
 
   return {
     fieldRequired,
@@ -141,7 +158,9 @@ function useRules(props: FormControllerProps, setValidate: FormControllerSetVali
       return validate([...blurRules, ...changeRules], n, v)
     },
     onBlur: () => {
-      validate(blurRules, "", props.fieldValue.value).catch(() => null)
+      if (props) {
+        validate(blurRules, "", props.fieldValue.value).catch(() => null)
+      }
     }
   }
 }
