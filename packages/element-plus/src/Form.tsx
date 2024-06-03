@@ -1,5 +1,5 @@
 import { FormActions, FormConfig, RootField, useForm as _useForm } from "@usaform/vue"
-import { RuleItem } from "async-validator"
+import { RuleItem, ValidateOption } from "async-validator"
 import { App, PropType, defineComponent, h, hasInjectionContext, inject, provide, toRaw } from "vue"
 import { buildScopeElement } from "./helper"
 
@@ -8,9 +8,18 @@ export interface CFormRuleItem extends RuleItem {
 }
 
 export interface CFormConfig extends FormConfig {
-  Elements?: Record<any, any>
-  Rules?: Record<any, CFormRuleItem>
+  // 默认使用的控制器
+  defaultController?: string | Record<any, any> | ((...props: any[]) => any)
+  // 全局布局参数
   layoutProps?: Record<any, any>
+  // 双向绑定的 key
+  modelValue?: string
+  // 用于指定 key 的元素
+  Elements?: Record<string, any>
+  // 默认的校验选项
+  defaultValidateOption?: ValidateOption
+  // 用于指定 key 的规则
+  Rules?: Record<any, CFormRuleItem>
 }
 
 export interface CFormProps {
@@ -84,8 +93,17 @@ export function useForm(formConfig?: CFormConfig) {
 
 export const Form = defineComponent({
   name: "Form",
-  props: ["config", "layout"],
-  setup(props: CFormProps, { slots, expose }) {
+  props: {
+    config: {
+      type: Object as PropType<CFormConfig>,
+      required: false
+    },
+    layout: {
+      type: [Object, String],
+      required: false
+    }
+  },
+  setup(props, { slots, expose }) {
     const { createFormRender, actions, createFormExpose } = useForm(props.config)
     actions.provide()
     expose(createFormExpose())
@@ -98,6 +116,8 @@ export function normalizeFormConfig(c: CFormConfig): CFormConfig {
   config.Elements = { ...(config.Elements ?? {}) }
   config.Rules = { ...(config.Rules ?? {}) }
   config.layoutProps = { ...(config.layoutProps ?? {}) }
+  config.modelValue = config.modelValue ?? "modelValue"
+
   if (hasInjectionContext()) {
     const ctxConfig = inject<CFormConfig | null>(FormContextConfigKey, null)
     if (ctxConfig) {

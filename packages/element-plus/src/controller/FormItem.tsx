@@ -1,11 +1,12 @@
 import Schema from "async-validator"
-import { SlotsType, computed, defineComponent, onUnmounted, reactive, shallowRef, watch, watchEffect } from "vue"
+import { SlotsType, computed, defineComponent, h, onUnmounted, reactive, shallowRef, watch, watchEffect } from "vue"
 import { CFormRuleItem } from "../Form"
+import { isPlainObject } from "../helper"
 import { FormControllerProps, FormControllerSetValidate, FormControllerValidateState } from "./helper"
 
 export interface CFormItemProps {
   // 标题
-  label?: string
+  label?: string | Record<any, any>
   // 标题宽度
   labelWith?: string | number
   // 尺寸
@@ -81,16 +82,27 @@ export const FormItem = defineComponent({
 
     return () => {
       const { FormControllerProps } = props
+
       const _label = FormControllerProps?.layoutProps.label
+      const labelProps = { class: "ufi-label", style: labelStyle.value, id }
+      let LabelElem: any = null
+      if (_label) {
+        if (isPlainObject(_label)) LabelElem = h(_label, labelProps)
+        else if (typeof _label === "function") LabelElem = _label(labelProps)
+        else {
+          LabelElem = (
+            <label class="ufi-label" style={labelStyle.value} for={id}>
+              {_label}
+            </label>
+          )
+        }
+      }
+
       const _props = { id, size: size.value, disabled: disabled.value, onBlur }
 
       return (
         <div class={classNames.value}>
-          {typeof _label === "string" && (
-            <label class="ufi-label" style={labelStyle.value} for={id}>
-              {_label}
-            </label>
-          )}
+          {LabelElem}
           <div class="ufi-content">
             {FormControllerProps
               ? FormControllerProps.children({
@@ -134,7 +146,7 @@ function useRules(props: FormControllerProps | undefined, setValidate: FormContr
 
   const validate = (rules: CFormRuleItem[], name = "", value: any) => {
     if (rules.length === 0) return Promise.resolve()
-    return new Schema({ [name]: rules }).validate({ [name]: value }, { firstFields: true }).then(
+    return new Schema({ [name]: rules }).validate({ [name]: value }, { firstFields: true, ...(props?.formConfig.defaultValidateOption ?? {}) }).then(
       () => setValidate({ status: "", message: "" }),
       ({ errors }) => {
         setValidate({ status: "error", message: errors[0].message })

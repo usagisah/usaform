@@ -1,6 +1,6 @@
 import { FormActionCallInfo, ObjectFieldActions, useFormObjectField } from "@usaform/vue"
 import { Ref, SlotsType, computed, defineComponent, h, ref } from "vue"
-import { CFormRuleItem } from "./Form"
+import { CFormConfig, CFormRuleItem } from "./Form"
 import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
 
 export interface CObjectFieldProps {
@@ -22,6 +22,7 @@ export interface CObjectFieldLayoutInfo {
   Rules: Record<any, CFormRuleItem>
   props: Record<any, any>
   layoutProps: Record<any, any>
+  formConfig: CFormConfig
   children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
 }
 
@@ -47,13 +48,17 @@ export const ObjectField = defineComponent({
     let gLayoutProps: any = {}
     let gFieldRules: any = {}
 
+    let formConfig_ = {} as any
+
     const { fieldValue, FieldRender, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
-      const { Elements, layoutProps, Rules } = formConfig
+      const { Elements, layoutProps, Rules, defaultController } = formConfig
       if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements![layout]
+      if (!FieldLayout && defaultController) FieldLayout = isPlainObject(defaultController) ? layout : Elements![defaultController]
       if (element) FieldElement = isPlainObject(element) ? element : Elements![element]
 
       gLayoutProps = layoutProps
       gFieldRules = Rules
+      formConfig_ = formConfig
 
       return {
         initValue: initValue ?? props.initValue,
@@ -82,6 +87,7 @@ export const ObjectField = defineComponent({
         props: props.props ?? {},
         layoutProps: { ...gLayoutProps, ...props.layoutProps },
         Rules: gFieldRules,
+        formConfig: formConfig_,
         children: ({ bind, props }) => {
           const _props = { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
           if (FieldElement) {

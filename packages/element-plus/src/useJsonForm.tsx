@@ -17,6 +17,7 @@ export type JsonFormStructJson = Omit<FormStructJson, "children"> & {
 }
 export type JsonFormConfig = CFormProps & {
   struct: JsonFormStructJson
+  arrayKeys?: string[]
 }
 
 function createArrayItem(children: JsonFormStructJson[], deep: number, ctx: RenderJsonStructContext) {
@@ -28,8 +29,10 @@ function createArrayItem(children: JsonFormStructJson[], deep: number, ctx: Rend
       return () => {
         const { fieldValue } = props
         return fieldValue.map((item: any, index: number) => {
+          const { arrayKeys } = ctx
+          const key = arrayKeys.find(k => item[k] !== undefined)
           return (
-            <div key={item.key}>
+            <div key={key ? item[key] : Math.random()}>
               {children.map(item => {
                 item.name = index
                 return renderFormItem(item, deep + 1, ctx)
@@ -42,7 +45,7 @@ function createArrayItem(children: JsonFormStructJson[], deep: number, ctx: Rend
   })
 }
 
-type RenderJsonStructContext = { memo: Map<string, any>; Elements: Record<string, any> }
+type RenderJsonStructContext = { memo: Map<string, any>; Elements: Record<string, any>; arrayKeys: string[] }
 const renderStrategy = { plain: PlainField, object: ObjectField, ary: ArrayField, void: VoidField }
 function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStructContext): any {
   const { type, children, ...attrs } = struct
@@ -68,7 +71,7 @@ function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStr
   return h(FormFieldComponent, attrs, _children)
 }
 
-export function useJsonForm({ struct, layout, config: formConfig }: JsonFormConfig): CFormExpose & { Form: DefineComponent<{}, {}, any> } {
+export function useJsonForm({ struct, arrayKeys = ["key", "id"], layout, config: formConfig }: JsonFormConfig): CFormExpose & { Form: DefineComponent<{}, {}, any> } {
   const { config, actions, createFormExpose, FieldRender } = useForm(formConfig)
   if (struct.type !== "root") {
     throw "非法的表单根节点"
@@ -80,7 +83,7 @@ export function useJsonForm({ struct, layout, config: formConfig }: JsonFormConf
     Form: defineComponent({
       name: "Form",
       setup(_, { slots }) {
-        const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements! }
+        const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements!, arrayKeys }
         Object.assign(config.Elements!, buildScopeElement(slots))
         return () => {
           const childrenSlots = struct.children ? struct.children.map(item => renderFormItem(item, 0, ctx)) : []

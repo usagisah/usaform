@@ -1,6 +1,6 @@
 import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usaform/vue"
 import { Ref, SlotsType, computed, defineComponent, h, ref } from "vue"
-import { CFormRuleItem } from "./Form"
+import { CFormConfig, CFormRuleItem } from "./Form"
 import { CFormItemExpose } from "./controller/helper"
 import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
 
@@ -24,13 +24,14 @@ export interface CPlainFieldLayoutInfo {
   props: Record<any, any>
   layoutProps: Record<any, any>
   children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
+  formConfig: CFormConfig
 }
 
 export const PlainField = defineComponent({
   name: "PlainField",
   props: ["name", "initValue", "layout", "layoutProps", "element", "props"],
   slots: Object as SlotsType<{
-    default: (props: { bind?: { modelValue: any; "onUpdate:modelValue": (e: any) => any } } & Record<any, any>) => any
+    default: (props: { bind?: Record<any, any> } & Record<any, any>) => any
   }>,
   setup(props: CPlainFieldProps, { slots }) {
     const { name, layout, element } = props
@@ -48,13 +49,21 @@ export const PlainField = defineComponent({
     let gLayoutProps: any = {}
     let gFieldRules: Record<any, CFormRuleItem>
 
+    let vModel = { v: "", e: "" }
+    let formConfig_ = {} as any
+
     const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig }) => {
-      const { Elements, Rules, layoutProps } = formConfig
+      const { Elements, Rules, layoutProps, defaultController, modelValue } = formConfig
       if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements![layout]
+      if (!FieldLayout && defaultController) FieldLayout = isPlainObject(defaultController) ? layout : Elements![defaultController]
       if (element) FieldElement = isPlainObject(element) ? element : Elements![element]
 
       gLayoutProps = layoutProps!
       gFieldRules = Rules!
+
+      vModel.v = modelValue
+      vModel.e = "onUpdate:" + modelValue
+      formConfig_ = formConfig
 
       const _initValue = "initValue" in props ? props.initValue : initValue
       return {
@@ -94,12 +103,13 @@ export const PlainField = defineComponent({
         props: props.props ?? {},
         layoutProps: { ...gLayoutProps, ...props.layoutProps },
         Rules: gFieldRules,
+        formConfig: formConfig_,
         children: ({ bind, props }) => {
-          const _props = { ...props, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, actions, ref: fieldElementRef }
+          const _props = { ...props, [vModel.v]: fieldValue.value, [vModel.e]: setFieldValue, actions, ref: fieldElementRef }
           if (FieldElement) {
             return h(FieldElement, _props)
           } else {
-            Object.assign(_props, { bind: { ...bind, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, ref: fieldElementRef } })
+            Object.assign(_props, { bind: { ...bind, [vModel.v]: fieldValue.value, [vModel.e]: setFieldValue, ref: fieldElementRef } })
             return FieldSlot?.(_props)
           }
         }
@@ -108,7 +118,7 @@ export const PlainField = defineComponent({
     })
 
     const resolveRenderElement = () => {
-      const _props = { ...props.props, modelValue: fieldValue.value, "onUpdate:modelValue": setFieldValue, actions, ref: fieldElementRef }
+      const _props = { ...props.props, [vModel.v]: fieldValue.value, [vModel.e]: setFieldValue, actions, ref: fieldElementRef }
       return FieldElement ? h(FieldElement, _props) : FieldSlot?.(_props)
     }
 
