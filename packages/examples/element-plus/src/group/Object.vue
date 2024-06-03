@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import { ElSelect, ElOption, ElInput, ElRadio, ElRadioGroup, ElCheckbox, ElCheckboxGroup, ElInputNumber, ElDivider, ElCard, ElButton, ElDatePicker, ElCascader, ElSpace } from "element-plus"
-import { Form, FormItem, PlainField, CFormExpose, ObjectField } from "@usaform/element-plus"
+import { Form, FormItem, PlainField, CFormExpose, ObjectField, exportFormStructJson } from "@usaform/element-plus"
 
 const CascaderOptions = [
   {
@@ -276,6 +276,9 @@ const formSlot = ref<CFormExpose | null>(null)
 const callSlot = async (key: string) => console.log(await formSlot.value![key]())
 const formKey = ref<CFormExpose | null>(null)
 const callKey = async (key: string) => console.log(await formKey.value![key]())
+onMounted(() => {
+  console.log("export json", exportFormStructJson(formKey.value!.field))
+})
 </script>
 
 <template>
@@ -285,7 +288,7 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
       <Form ref="formSlot">
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
         <ObjectField name="object">
-          <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', required: true }">
+          <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称' }">
             <template #default="{ bind }">
               <ElInput v-bind="bind" placeholder="请输入名称" />
             </template>
@@ -308,8 +311,8 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
             <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }">
               <template #default="{ bind }">
                 <el-radio-group v-bind="bind">
-                  <el-radio label="1" size="large">Option 1</el-radio>
-                  <el-radio label="2" size="large">Option 2</el-radio>
+                  <el-radio value="1" size="large">Option 1</el-radio>
+                  <el-radio value="2" size="large">Option 2</el-radio>
                 </el-radio-group>
               </template>
             </PlainField>
@@ -322,11 +325,11 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
               <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选' }">
                 <template #default="{ bind }">
                   <el-checkbox-group v-bind="bind">
-                    <el-checkbox label="Option A" />
-                    <el-checkbox label="Option B" />
-                    <el-checkbox label="Option C" />
-                    <el-checkbox label="disabled" disabled />
-                    <el-checkbox label="selected and disabled" disabled />
+                    <el-checkbox label="Option A" value="Option A" />
+                    <el-checkbox label="Option B" value="Option B" />
+                    <el-checkbox label="Option C" value="Option C" />
+                    <el-checkbox label="disabled" value="disabled" disabled />
+                    <el-checkbox label="selected and disabled" value="selected and disabled" disabled />
                   </el-checkbox-group>
                 </template>
               </PlainField>
@@ -353,7 +356,7 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
       <Form ref="formKey">
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
         <ObjectField name="object">
-          <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', required: true }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
+          <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称' }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
           <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量' }" element="ElInputNumber" :props="{ placeholder: '请输入数量' }" />
           <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉' }" element="Select" :props="{ placeholder: '请选择' }" />
           <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }" element="Radio" />

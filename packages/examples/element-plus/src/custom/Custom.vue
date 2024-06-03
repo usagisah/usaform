@@ -26,5 +26,3 @@ const elementIncrease = () => {
     <ElButton @click="elementIncrease">调用自定义字段方法 +1</ElButton>
   </ElSpace>
 </template>
-
-<style lang="scss" scoped></style>

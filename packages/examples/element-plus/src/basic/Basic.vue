@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import { ElSelect, ElOption, ElInput, ElRadio, ElRadioGroup, ElCheckbox, ElCheckboxGroup, ElInputNumber, ElDivider, ElCard, ElButton, ElDatePicker, ElCascader, ElSpace } from "element-plus"
-import { Form, FormItem, PlainField, CFormExpose } from "@usaform/element-plus"
+import { Form, FormItem, PlainField, CFormExpose, exportFormStructJson } from "@usaform/element-plus"
 
 const CascaderOptions = [
   {
@@ -286,17 +286,17 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
       <template #header>插槽</template>
       <Form ref="formSlot">
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
-        <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', required: true }">
+        <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', labelWith: '60px', mode: 'left', rules: [{ trigger: 'blur', required: true, message: '该字段是必填的' }] }">
           <template #default="{ bind }">
             <ElInput v-bind="bind" placeholder="请输入名称" />
           </template>
         </PlainField>
-        <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量' }" :init-value="0">
+        <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量', labelWith: '60px', mode: 'right' }" :init-value="10">
           <template #default="{ bind }">
             <ElInputNumber v-bind="bind" placeholder="请输入数量" />
           </template>
         </PlainField>
-        <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉' }">
+        <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉', mode: 'top', disabled: true }">
           <template #default="{ bind }">
             <ElSelect v-bind="bind" placeholder="请选择">
               <ElOption label="1" value="1" />
@@ -305,31 +305,31 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
             </ElSelect>
           </template>
         </PlainField>
-        <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }">
+        <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮', labelWith: '60px' }">
           <template #default="{ bind }">
             <el-radio-group v-bind="bind">
-              <el-radio label="1" size="large">Option 1</el-radio>
-              <el-radio label="2" size="large">Option 2</el-radio>
+              <el-radio value="1" size="large">Option 1</el-radio>
+              <el-radio value="2" size="large">Option 2</el-radio>
             </el-radio-group>
           </template>
         </PlainField>
-        <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联' }">
+        <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联', labelWith: '60px' }">
           <template #default="{ bind }">
             <ElCascader v-bind="bind" :options="CascaderOptions" :props="{ expandTrigger: 'hover' }" />
           </template>
         </PlainField>
-        <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选' }">
+        <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选', labelWith: '60px' }">
           <template #default="{ bind }">
             <el-checkbox-group v-bind="bind">
-              <el-checkbox label="Option A" />
-              <el-checkbox label="Option B" />
-              <el-checkbox label="Option C" />
-              <el-checkbox label="disabled" disabled />
-              <el-checkbox label="selected and disabled" disabled />
+              <el-checkbox label="Option A" value="Option A" />
+              <el-checkbox label="Option B" value="Option B" />
+              <el-checkbox label="Option C" value="Option C" />
+              <el-checkbox label="disabled" value="disabled" disabled />
+              <el-checkbox label="selected and disabled" value="selected and disabled" disabled />
             </el-checkbox-group>
           </template>
         </PlainField>
-        <PlainField name="DatePicker" :layout="FormItem" :layout-props="{ label: '时间' }">
+        <PlainField name="DatePicker" :layout="FormItem" :layout-props="{ label: '时间', labelWith: '60px' }">
           <template #default="{ bind }">
             <ElDatePicker v-bind="bind" type="date" placeholder="Pick a day" />
           </template>
@@ -348,7 +348,7 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
       <template #header>指定 key</template>
       <Form ref="formKey">
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
-        <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', required: true }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
+        <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称' }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
         <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量' }" element="ElInputNumber" :props="{ placeholder: '请输入数量' }" />
         <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉' }" element="Select" :props="{ placeholder: '请选择' }" />
         <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }" element="Radio" />

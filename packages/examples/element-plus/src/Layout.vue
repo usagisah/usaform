@@ -8,6 +8,7 @@ import Dynamic from "./dynamic/DynamicNest.vue"
 import Custom from "./custom/Custom.vue"
 import Step from "./step/Step.vue"
 import Page from "./page/Page.vue"
+import Json from "./json/Json.vue"
 
 const list = shallowReactive([
   { n: "普通平铺", d: "基本的平铺写法，与直接使用 ElForm 差不多", c: Basic },
@@ -16,7 +17,8 @@ const list = shallowReactive([
   { n: "复杂嵌套", d: "3者混合的动态表单，演示功能：多层嵌套，多字段联动，动态更新，跨字段监听", c: Dynamic },
   { n: "自定义", d: "", c: Custom },
   { n: "分步表单", d: "", c: Step },
-  { n: "系统页面", d: "", c: Page }
+  { n: "系统页面", d: "", c: Page },
+  { n: "json 转表单", d: "", c: Json }
 ])
 const act = ref(0)
 </script>

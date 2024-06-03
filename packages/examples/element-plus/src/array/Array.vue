@@ -1,12 +1,15 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { ElInput, ElDivider, ElCard, ElButton, ElSpace } from "element-plus"
-import { Form, FormItem, PlainField, CFormExpose, ArrayField } from "@usaform/element-plus"
+import { Form, FormItem, PlainField, CFormExpose, ArrayField, exportFormStructJson } from "@usaform/element-plus"
 
 const formSlot = ref<CFormExpose | null>(null)
 const callSlot = async (key: string) => console.log(await formSlot.value![key]())
 const formKey = ref<CFormExpose | null>(null)
 const callKey = async (key: string) => console.log(await formKey.value![key]())
+const printJson = () => {
+  console.log(exportFormStructJson(formKey.value!.field))
+}
 </script>
 
 <template>
@@ -17,7 +20,7 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
         <ArrayField name="array">
           <template #default="{ fieldValue, actions }">
             <div v-for="(item, i) in fieldValue" :key="item.id">
-              <PlainField :name="i" layout="FormItem" :layout-props="{ label: '名称', required: true }">
+              <PlainField :name="i" layout="FormItem" :layout-props="{ label: '名称' }">
                 <template #default="{ bind }">
                   <ElInput v-bind="bind" placeholder="请输入名称" />
                 </template>
@@ -51,6 +54,7 @@ const callKey = async (key: string) => console.log(await formKey.value![key]())
           <ElButton @click="callKey('getFormData')">submit</ElButton>
           <ElButton @click="callKey('validate')">validate</ElButton>
           <ElButton @click="callKey('reset')">reset</ElButton>
+          <ElButton @click="printJson">printJson</ElButton>
         </FormItem>
       </Form>
     </ElCard>

@@ -1,10 +1,10 @@
 <script lang="tsx" setup>
 import { ref } from "vue"
-import { CFieldLayoutInfo } from "@usaform/element-plus"
+import { FormControllerProps } from "@usaform/element-plus"
 import { ElCard, ElDivider } from "element-plus"
 
-const props = defineProps<{ __fieldInfo: any }>()
-const { children }: CFieldLayoutInfo = props.__fieldInfo
+const props = defineProps<{ FormControllerProps: FormControllerProps }>()
+const { children } = props.FormControllerProps
 const count = ref(0)
 defineExpose({
   increase: () => count.value++
@@ -17,8 +17,9 @@ defineExpose({
       <h1>自定义布局</h1>
     </template>
     <ElDivider content-position="center">布局自定义事件调用次数：{{ count }}</ElDivider>
-    <div><children /></div>
+    <div>
+      <component :is="children" :bind="{}" :props="{}" />
+    </div>
   </ElCard>
 </template>
 
-<style lang="scss" scoped></style>
