@@ -76,10 +76,10 @@ export function useForm(formConfig?: CFormConfig) {
     return actions.call(path, "callElement", { params: [{ key, point, params }] })
   }
 
-  const createFormRender = (slots: Record<any, any>, layout?: any) => {
+  const createFormRender = (attrs: Record<any, any>, slots: Record<any, any>, layout?: any) => {
     Object.assign(config.Elements!, buildScopeElement(slots))
     return function FormRender() {
-      return <FieldRender>{layout ? h(layout, {}, slots.default?.()) : <div class="u-form">{slots.default?.()}</div>}</FieldRender>
+      return <FieldRender>{layout ? h(layout, attrs, () => slots.default?.()) : <div class="u-form">{slots.default?.()}</div>}</FieldRender>
     }
   }
 
@@ -103,11 +103,11 @@ export const Form = defineComponent({
       required: false
     }
   },
-  setup(props, { slots, expose }) {
+  setup(props, { attrs, slots, expose }) {
     const { createFormRender, actions, createFormExpose } = useForm(props.config)
     actions.provide()
     expose(createFormExpose())
-    return createFormRender(slots, props.layout)
+    return createFormRender(attrs, slots, props.layout)
   }
 })
 

@@ -82,12 +82,12 @@ export function useJsonForm({ struct, arrayKeys = ["key", "id"], layout, config:
     ...createFormExpose(),
     Form: defineComponent({
       name: "Form",
-      setup(_, { slots }) {
+      setup(_, { attrs, slots }) {
         const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements!, arrayKeys }
         Object.assign(config.Elements!, buildScopeElement(slots))
         return () => {
           const childrenSlots = struct.children ? struct.children.map(item => renderFormItem(item, 0, ctx)) : []
-          return <FieldRender>{layout ? h(layout, {}, childrenSlots) : <div class="u-form">{childrenSlots}</div>}</FieldRender>
+          return <FieldRender>{layout ? h(layout, attrs, { default: childrenSlots }) : <div class="u-form">{childrenSlots}</div>}</FieldRender>
         }
       }
     })

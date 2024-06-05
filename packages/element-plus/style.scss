@@ -52,8 +52,8 @@
 .ufi-size-default {
   font-size: 14px;
   .ufi-label {
-    height: 32px;
-    line-height: 32px;
+    height: 20px;
+    line-height: 20px;
   }
 }
 
@@ -118,7 +118,6 @@
     font-size: 12px;
     line-height: 1;
     left: 0;
-    padding-top: 4px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
