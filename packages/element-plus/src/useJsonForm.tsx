@@ -8,7 +8,7 @@ import { VoidField } from "./VoidField"
 import { buildScopeElement } from "./helper"
 
 export type JsonFormStructJson = Omit<FormStructJson, "children"> & {
-  type: "root" | "plain" | "object" | "ary" | "void"
+  type: "plain" | "object" | "ary" | "void"
   layout?: string
   layoutProps?: Record<any, any>
   element?: string
@@ -16,7 +16,7 @@ export type JsonFormStructJson = Omit<FormStructJson, "children"> & {
   children?: JsonFormStructJson[]
 }
 export type JsonFormConfig = CFormProps & {
-  struct: JsonFormStructJson
+  struct: JsonFormStructJson[]
   arrayKeys?: string[]
 }
 
@@ -76,9 +76,6 @@ export function createJsonForm({ struct, arrayKeys = ["key", "id"], layout, conf
     name: "Form",
     setup(_, { attrs, slots, expose }) {
       const { config, actions, createFormExpose, FieldRender } = useForm(formConfig)
-      if (struct.type !== "root") {
-        throw "非法的表单根节点"
-      }
 
       actions.provide()
       expose(createFormExpose())
@@ -87,7 +84,7 @@ export function createJsonForm({ struct, arrayKeys = ["key", "id"], layout, conf
       Object.assign(config.Elements!, buildScopeElement(slots))
 
       return () => {
-        const childrenSlots = struct.children ? struct.children.map(item => renderFormItem(item, 0, ctx)) : []
+        const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
         return <FieldRender>{layout ? h(layout, attrs, { default: childrenSlots }) : <div class="u-form">{childrenSlots}</div>}</FieldRender>
       }
     }

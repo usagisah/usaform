@@ -3,10 +3,7 @@ import { CFormExpose, JsonFormStructJson, createJsonForm } from "@usaform/elemen
 import { ElButton } from "element-plus"
 import { shallowRef } from "vue";
 
-const struct: JsonFormStructJson = {
-  name: "root",
-  type: "root",
-  children: [
+const struct: JsonFormStructJson[] = [
     { type: "void", name: "title", element: "ElDividerLine", props: { contentPosition: "center", content: "基本表单元素" } },
     { type: "plain", name: "input", layout: "FormItem", layoutProps: { label: "名称" }, element: "ElInput", props: { placeholder: "请输入名称" } },
     { type: "plain", name: "number", layout: "FormItem", layoutProps: { label: "数量" }, element: "ElInputNumber", props: { placeholder: "请输入数量" } },
@@ -17,7 +14,6 @@ const struct: JsonFormStructJson = {
     { type: "void", name: "title", element: "ElDividerLine", props: { contentPosition: "center", content: "(布局样式) 提交" } },
     { type: "void", name: "actions", element: "submit" }
   ]
-}
 const Form = createJsonForm({ struct })
 const FormRef = shallowRef<CFormExpose>()
 const _getFormData = () => console.log(FormRef.value!.getFormData())

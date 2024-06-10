@@ -57,7 +57,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
     let formConfig_ = {} as any
 
     const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig }) => {
-      const { Elements, Rules, layoutProps, plainFieldController, modelValue } = formConfig
+      let { Elements, Rules, layoutProps, plainFieldController, modelValue } = formConfig
       if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements![layout]
       if (!FieldLayout && plainFieldController) FieldLayout = isPlainObject(plainFieldController) ? layout : Elements![plainFieldController]
       if (element) FieldElement = isPlainObject(element) ? element : Elements![element]
@@ -65,14 +65,9 @@ export const PlainField = defineComponent<CPlainFieldProps>({
       gLayoutProps = layoutProps!
       gFieldRules = Rules!
 
-      if (typeof props.modelValue === "string") {
-        const { modelValue } = props
-        vModel.v = modelValue
-        vModel.e = "onUpdate:" + modelValue
-      } else {
-        vModel.v = modelValue
-        vModel.e = "onUpdate:" + modelValue
-      }
+      if (typeof props.modelValue === "string") modelValue = props.modelValue
+      vModel.v = modelValue
+      vModel.e = "onUpdate:" + modelValue
 
       formConfig_ = formConfig
 

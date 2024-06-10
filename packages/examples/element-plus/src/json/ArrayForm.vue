@@ -3,10 +3,7 @@ import { CFormExpose, JsonFormStructJson, createJsonForm } from "@usaform/elemen
 import { ElButton } from "element-plus"
 import { shallowRef } from "vue"
 
-const struct: JsonFormStructJson = {
-  name: "root",
-  type: "root",
-  children: [
+const struct: JsonFormStructJson[] = [
     { type: "void", name: "title", element: "ElDividerLine", props: { contentPosition: "center", content: "基本表单元素" } },
     {
       type: "plain",
@@ -38,7 +35,6 @@ const struct: JsonFormStructJson = {
     },
     { type: "void", name: "actions", element: "submit" }
   ]
-}
 
 const FormRef = shallowRef<CFormExpose>()
 const Form = createJsonForm({
