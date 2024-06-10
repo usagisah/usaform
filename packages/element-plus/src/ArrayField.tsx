@@ -53,9 +53,9 @@ export const ArrayField = defineComponent({
     let formConfig_ = {} as any
 
     const { fieldValue, actions, FieldRender } = useFormArrayField(name, ({ initValue, formConfig }) => {
-      const { Elements, layoutProps, Rules, defaultController } = formConfig
+      const { Elements, layoutProps, Rules, arrayFieldController } = formConfig
       if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements![layout]
-      if (!FieldLayout && defaultController) FieldLayout = isPlainObject(defaultController) ? layout : Elements![defaultController]
+      if (!FieldLayout && arrayFieldController) FieldLayout = isPlainObject(arrayFieldController) ? layout : Elements![arrayFieldController]
       if (element) FieldElement = isPlainObject(element) ? element : Elements![element]
 
       gLayoutProps = layoutProps!

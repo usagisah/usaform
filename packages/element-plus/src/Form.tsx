@@ -9,7 +9,9 @@ export interface CFormRuleItem extends RuleItem {
 
 export interface CFormConfig extends FormConfig {
   // 默认使用的控制器
-  defaultController?: string | Record<any, any> | ((...props: any[]) => any)
+  plainFieldController?: string | Record<any, any> 
+  objectFieldController?: string | Record<any, any>
+  arrayFieldController?: string | Record<any, any> 
   // 全局布局参数
   layoutProps?: Record<any, any>
   // 双向绑定的 key

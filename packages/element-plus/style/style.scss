@@ -124,16 +124,4 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-
-  .el-input__wrapper,
-  .el-input__wrapper:hover,
-  .el-input__wrapper.is-focus {
-    box-shadow: 0 0 0 1px #f56c6c inset;
-    outline: none;
-  }
-
-  .el-input__prefix svg,
-  .el-input__suffix svg {
-    color: #f56c6c;
-  }
 }

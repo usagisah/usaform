@@ -348,7 +348,7 @@ const customLabel = (attrs: any) => <div {...attrs}>时间</div>
 
     <ElCard>
       <template #header>指定 key</template>
-      <Form ref="formKey" :config="{ defaultController: 'FormItem' }">
+      <Form ref="formKey" :config="{ plainFieldController: 'FormItem' }">
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
         <PlainField name="input" :layout-props="{ label: '名称' }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
         <PlainField name="number" :layout-props="{ label: '数量' }" element="ElInputNumber" :props="{ placeholder: '请输入数量' }" />
