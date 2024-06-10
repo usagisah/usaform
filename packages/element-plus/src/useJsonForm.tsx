@@ -1,7 +1,7 @@
 import { FormStructJson } from "@usaform/vue"
-import { DefineComponent, defineComponent, h } from "vue"
+import { defineComponent, h } from "vue"
 import { ArrayField } from "./ArrayField"
-import { CFormExpose, CFormProps, useForm } from "./Form"
+import { CFormProps, useForm } from "./Form"
 import { ObjectField } from "./ObjectField"
 import { PlainField } from "./PlainField"
 import { VoidField } from "./VoidField"
@@ -71,25 +71,25 @@ function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStr
   return h(FormFieldComponent, attrs, _children)
 }
 
-export function useJsonForm({ struct, arrayKeys = ["key", "id"], layout, config: formConfig }: JsonFormConfig): CFormExpose & { Form: DefineComponent<{}, {}, any> } {
-  const { config, actions, createFormExpose, FieldRender } = useForm(formConfig)
-  if (struct.type !== "root") {
-    throw "非法的表单根节点"
-  }
-
-  actions.provide()
-  return {
-    ...createFormExpose(),
-    Form: defineComponent({
-      name: "Form",
-      setup(_, { attrs, slots }) {
-        const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements!, arrayKeys }
-        Object.assign(config.Elements!, buildScopeElement(slots))
-        return () => {
-          const childrenSlots = struct.children ? struct.children.map(item => renderFormItem(item, 0, ctx)) : []
-          return <FieldRender>{layout ? h(layout, attrs, { default: childrenSlots }) : <div class="u-form">{childrenSlots}</div>}</FieldRender>
-        }
+export function createJsonForm({ struct, arrayKeys = ["key", "id"], layout, config: formConfig }: JsonFormConfig) {
+  return defineComponent({
+    name: "Form",
+    setup(_, { attrs, slots, expose }) {
+      const { config, actions, createFormExpose, FieldRender } = useForm(formConfig)
+      if (struct.type !== "root") {
+        throw "非法的表单根节点"
       }
-    })
-  }
+
+      actions.provide()
+      expose(createFormExpose())
+
+      const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements!, arrayKeys }
+      Object.assign(config.Elements!, buildScopeElement(slots))
+
+      return () => {
+        const childrenSlots = struct.children ? struct.children.map(item => renderFormItem(item, 0, ctx)) : []
+        return <FieldRender>{layout ? h(layout, attrs, { default: childrenSlots }) : <div class="u-form">{childrenSlots}</div>}</FieldRender>
+      }
+    }
+  })
 }

@@ -8,7 +8,7 @@ export { PlainField } from "./PlainField.jsx"
 export type { CPlainFieldLayoutInfo, CPlainFieldProps } from "./PlainField.jsx"
 export { VoidField } from "./VoidField.jsx"
 export type { CVoidFieldProps } from "./VoidField.jsx"
-export { useJsonForm } from "./useJsonForm.jsx"
+export { createJsonForm } from "./useJsonForm.jsx"
 export type { JsonFormConfig, JsonFormStructJson } from "./useJsonForm.jsx"
 
 export { FormItem } from "./controller/FormItem.jsx"
