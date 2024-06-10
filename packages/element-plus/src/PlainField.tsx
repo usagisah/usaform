@@ -65,7 +65,7 @@ export const PlainField = defineComponent({
       vModel.e = "onUpdate:" + modelValue
       formConfig_ = formConfig
 
-      const _initValue = "initValue" in props ? props.initValue : initValue
+      const _initValue = "initValue" === undefined ? props.initValue : initValue
       return {
         initValue: _initValue,
         toJson: createFormCFieldToJson(props, layout, element),
