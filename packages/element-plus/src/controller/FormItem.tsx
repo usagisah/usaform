@@ -34,9 +34,15 @@ export const FormItem = defineComponent({
   props: ["FormControllerProps"],
   inheritAttrs: true,
   slots: Object as SlotsType<{
-    default: (props: { id: string; size: string; disabled: boolean }) => any
+    default: (props?: { id: string; size: string; disabled: boolean }) => any
   }>,
   setup(props: { FormControllerProps?: FormControllerProps }, { slots, expose }) {
+    if (!props.FormControllerProps) {
+      return () => {
+        return slots.default?.()
+      }
+    }
+
     const validateState: FormControllerValidateState = reactive({ status: "", message: "" })
     const setValidate: FormControllerSetValidate = state => Object.assign(validateState, state)
     const { fieldRequired, onBlur, validate } = useRules(props.FormControllerProps, setValidate)
@@ -45,21 +51,17 @@ export const FormItem = defineComponent({
     const id = "ufi-id-" + randomIdCount++
 
     const size = computed(() => {
-      const { FormControllerProps } = props
-      if (!FormControllerProps) return "default"
-      return FormControllerProps.layoutProps.size ?? "default"
+      return props.FormControllerProps!.layoutProps.size ?? "default"
     })
 
     const disabled = computed(() => {
-      const { FormControllerProps } = props
-      if (!FormControllerProps) return false
-      const { disabled } = FormControllerProps.layoutProps
+      const { disabled } = props.FormControllerProps!.layoutProps
       if (typeof disabled === "string") return disabled.length === 0
       return !!disabled
     })
 
     const classNames = computed(() => {
-      const { inline = false, mode = "right" } = props.FormControllerProps?.layoutProps ?? {}
+      const { inline = false, mode = "right" } = props.FormControllerProps!.layoutProps ?? {}
       const _inline = `ufi-${inline ? "inline" : "block"}`
       const _mode = `ufi-mode-${mode ?? "right"}`
       const _required = fieldRequired.value ? "ufi-required" : ""
@@ -70,10 +72,8 @@ export const FormItem = defineComponent({
     })
 
     const labelStyle = computed(() => {
-      const { FormControllerProps } = props
       const style: Record<string, string> = {}
-      if (!FormControllerProps) return style
-      const { labelWith, mode } = FormControllerProps.layoutProps
+      const { labelWith, mode } = props.FormControllerProps!.layoutProps
       if (typeof labelWith === "string") style.width = labelWith
       else if (typeof labelWith === "number") style.width = labelWith + "px"
       else if (mode !== "top") style.width = "auto"
@@ -81,9 +81,9 @@ export const FormItem = defineComponent({
     })
 
     return () => {
-      const { FormControllerProps } = props
+      const { props: elemProps, layoutProps, children } = props.FormControllerProps!
+      const { label: _label } = layoutProps
 
-      const _label = FormControllerProps?.layoutProps.label
       const labelProps = { class: "ufi-label", style: labelStyle.value, id }
       let LabelElem: any = null
       if (_label) {
@@ -104,12 +104,7 @@ export const FormItem = defineComponent({
         <div class={classNames.value}>
           {LabelElem}
           <div class="ufi-content">
-            {FormControllerProps
-              ? FormControllerProps.children({
-                  props: { ...FormControllerProps.props, ..._props },
-                  bind: { ...FormControllerProps.props, ..._props }
-                })
-              : slots.default?.(_props)}
+            {children({ props: { ...elemProps, ..._props }, bind: { ...elemProps, ..._props } })}
             {validateState.status.length > 0 && <div class={`ufi-content-${validateState.status}`}>{validateState.message}</div>}
           </div>
         </div>
@@ -118,15 +113,11 @@ export const FormItem = defineComponent({
   }
 })
 
-function useRules(props: FormControllerProps | undefined, setValidate: FormControllerSetValidate) {
+function useRules(props: FormControllerProps, setValidate: FormControllerSetValidate) {
   const fieldRequired = shallowRef(false)
   let changeRules: CFormRuleItem[] = []
   let blurRules: CFormRuleItem[] = []
   watchEffect(() => {
-    if (!props) {
-      return
-    }
-
     const { Rules, layoutProps } = props
     const { rules = [] } = layoutProps
     changeRules = []
@@ -146,7 +137,7 @@ function useRules(props: FormControllerProps | undefined, setValidate: FormContr
 
   const validate = (rules: CFormRuleItem[], name = "", value: any) => {
     if (rules.length === 0) return Promise.resolve()
-    return new Schema({ [name]: rules }).validate({ [name]: value }, { firstFields: true, ...(props?.formConfig.defaultValidateOption ?? {}) }).then(
+    return new Schema({ [name]: rules }).validate({ [name]: value }, { firstFields: true, ...(props.formConfig.defaultValidateOption ?? {}) }).then(
       () => setValidate({ status: "", message: "" }),
       ({ errors }) => {
         setValidate({ status: "error", message: errors[0].message })

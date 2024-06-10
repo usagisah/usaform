@@ -13,7 +13,7 @@ export const VoidField = defineComponent({
   name: "VoidField",
   props: ["name", "element", "props"],
   slots: Object as SlotsType<{
-    default: { actions: ObjectFieldActions; fieldValue: any; [x: string]: any }
+    default: () => any
   }>,
   setup(props: CVoidFieldProps, { slots }) {
     let { name, element, props: elementProps } = props
@@ -31,7 +31,7 @@ export const VoidField = defineComponent({
     })
 
     return () => {
-      return h(element, elementProps)
+      return element ? h(element, elementProps) : slots.default?.()
     }
   }
 })
