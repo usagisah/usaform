@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { JsonFormStructJson, useJsonForm } from "@usaform/element-plus"
+import { CFormExpose, JsonFormStructJson, createJsonForm } from "@usaform/element-plus"
 import { ElButton } from "element-plus"
+import { shallowRef } from "vue"
 
 const struct: JsonFormStructJson = {
   name: "root",
@@ -29,16 +30,17 @@ const struct: JsonFormStructJson = {
     { type: "void", name: "actions", element: "submit" }
   ]
 }
-const { Form, validate, reset, getFormData } = useJsonForm({ struct })
-const _getFormData = () => console.log(getFormData())
+const Form = createJsonForm({ struct })
+const FomrRef = shallowRef<CFormExpose>()
+const _getFormData = () => console.log(FomrRef.value!.getFormData())
 </script>
 
 <template>
-  <Form>
+  <Form ref="FomrRef">
     <template #submit>
       <ElButton type="primary" @click="_getFormData">submit</ElButton>
-      <ElButton @click="validate">validate</ElButton>
-      <ElButton @click="reset">reset</ElButton>
+      <ElButton @click="() => FomrRef!.validate()">validate</ElButton>
+      <ElButton @click="() => FomrRef!.reset()">reset</ElButton>
     </template>
   </Form>
 </template>

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { JsonFormStructJson, useJsonForm } from "@usaform/element-plus"
+import { CFormExpose, JsonFormStructJson, createJsonForm } from "@usaform/element-plus"
 import { ElButton } from "element-plus"
+import { shallowRef } from "vue"
 
 const struct: JsonFormStructJson = {
   name: "root",
@@ -39,7 +40,8 @@ const struct: JsonFormStructJson = {
   ]
 }
 
-const { Form, validate, reset, getFormData, set } = useJsonForm({
+const FormRef = shallowRef<CFormExpose>()
+const Form = createJsonForm({
   struct,
   config: {
     defaultFormData: {
@@ -51,18 +53,18 @@ const { Form, validate, reset, getFormData, set } = useJsonForm({
     }
   }
 })
-const _getFormData = () => console.log(getFormData())
+const _getFormData = () => console.log(FormRef.value!.getFormData())
 const push = () => {
-  set("ary", { key: Math.random(), input: Math.random() }, "push")
+  FormRef.value!.set("ary", { key: Math.random(), input: Math.random() }, "push")
 }
 </script>
 
 <template>
-  <Form>
+  <Form ref="FormRef">
     <template #submit>
       <ElButton type="primary" @click="_getFormData">submit</ElButton>
-      <ElButton @click="validate">validate</ElButton>
-      <ElButton @click="reset">reset</ElButton>
+      <ElButton @click="() => FormRef!.validate()">validate</ElButton>
+      <ElButton @click="() => FormRef!.reset()">reset</ElButton>
       <ElButton @click="push">尾部添加</ElButton>
     </template>
   </Form>

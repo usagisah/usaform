@@ -12,7 +12,7 @@
       "types": "./dist/validator.d.ts",
       "default": "./dist/validator.js"
     },
-    "./style.scss": "./style.scss"
+    "./style/*": "./style/*"
   },
   "scripts": {
     "dev": "tsc -w",
