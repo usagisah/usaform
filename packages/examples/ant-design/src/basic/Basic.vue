@@ -1,6 +1,6 @@
 <script lang="tsx" setup>
 import { ref } from "vue"
-import { Space, Card, Input, InputNumber, Button, Select, CheckboxGroup, DatePicker, Divider, RadioGroup } from "ant-design-vue"
+import { Space, Card, Input, InputNumber, Button, Select, CheckboxGroup, DatePicker, Divider, RadioGroup, Checkbox } from "ant-design-vue"
 import { Form, FormItem, PlainField, CFormExpose } from "@usaform/element-plus"
 
 const formSlot = ref<CFormExpose | null>(null)
@@ -10,7 +10,7 @@ const callSlot = async (key: string) => {
 const formKey = ref<CFormExpose | null>(null)
 const callKey = async (key: string) => console.log(await formKey.value![key]())
 
-const customLabel = (attrs: any) => <div {...attrs}>时间</div>
+const customLabel = (attrs: any) => <div {...attrs}>自定义标题:时间</div>
 </script>
 
 <template>
@@ -18,16 +18,19 @@ const customLabel = (attrs: any) => <div {...attrs}>时间</div>
     <Card title="插槽" style="width: 600px;">
       <Form ref="formSlot">
         <Divider content-position="center">(布局样式) 基本表单元素</Divider>
+
         <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', labelWith: '60px', mode: 'left', rules: [{ trigger: 'blur', required: true, message: '该字段是必填的' }] }">
           <template #default="{ bind }">
             <Input v-bind="bind" placeholder="请输入名称" />
           </template>
         </PlainField>
+
         <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量', labelWith: '60px', mode: 'right' }" :init-value="10">
           <template #default="{ bind }">
             <InputNumber v-bind="bind" placeholder="请输入数量" />
           </template>
         </PlainField>
+
         <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉', mode: 'top' }">
           <template #default="{ bind }">
             <Select
@@ -43,18 +46,28 @@ const customLabel = (attrs: any) => <div {...attrs}>时间</div>
             </Select>
           </template>
         </PlainField>
+
         <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮', labelWith: '60px' }">
           <template #default="{ bind }">
             <RadioGroup v-bind="bind" :options="[{ label: 'o1', value: '1' }, { label: 'o2', value: '2' }]">
             </RadioGroup>
           </template>
         </PlainField>
+
         <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选', labelWith: '60px' }">
           <template #default="{ bind }">
             <CheckboxGroup v-bind="bind" :options="['A', 'B', 'C']"
             </CheckboxGroup>
           </template>
         </PlainField>
+
+        <PlainField name="singleCheckbox" layout="FormItem" :layout-props="{ label: '不同的VModal', labelWith: '60px' }" modelValue="checked">
+          <template #default="{ bind }">
+            <Checkbox v-bind="bind"></Checkbox>
+          </template>
+        </PlainField>
+        
+
         <PlainField name="DatePicker" :layout="FormItem" :layout-props="{ label: customLabel, labelWith: '60px' }">
           <template #default="{ bind }">
             <DatePicker v-bind="bind" type="date" placeholder="Pick a day" />

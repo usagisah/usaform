@@ -7,7 +7,11 @@ import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./help
 export interface CPlainFieldProps {
   name: string | number
 
+  // 初始值
   initValue?: any
+
+  // 双向绑定的 key
+  modelValue?: string
 
   layout?: string | Record<any, any>
   layoutProps?: Record<any, any>
@@ -27,13 +31,13 @@ export interface CPlainFieldLayoutInfo {
   formConfig: CFormConfig
 }
 
-export const PlainField = defineComponent({
+export const PlainField = defineComponent<CPlainFieldProps>({
   name: "PlainField",
-  props: ["name", "initValue", "layout", "layoutProps", "element", "props"],
+  props: ["name", "initValue", "layout", "layoutProps", "element", "props", "modelValue"] as any as undefined,
   slots: Object as SlotsType<{
     default: (props: { bind?: Record<any, any> } & Record<any, any>) => any
   }>,
-  setup(props: CPlainFieldProps, { slots }) {
+  setup(props, { slots }) {
     const { name, layout, element } = props
     if (name !== 0 && !name) {
       throw "非法的使用方式，请正确使用 PlainField 组件"
@@ -61,8 +65,15 @@ export const PlainField = defineComponent({
       gLayoutProps = layoutProps!
       gFieldRules = Rules!
 
-      vModel.v = modelValue
-      vModel.e = "onUpdate:" + modelValue
+      if (typeof props.modelValue === "string") {
+        const { modelValue } = props
+        vModel.v = modelValue
+        vModel.e = "onUpdate:" + modelValue
+      } else {
+        vModel.v = modelValue
+        vModel.e = "onUpdate:" + modelValue
+      }
+
       formConfig_ = formConfig
 
       const _initValue = "initValue" === undefined ? props.initValue : initValue
