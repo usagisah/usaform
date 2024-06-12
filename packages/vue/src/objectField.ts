@@ -83,7 +83,7 @@ export function createObjectField(name: FieldName, ctx: FormContext, init: Objec
     parent: ctx.field,
     toJson,
     __uform_field: true,
-    ...useFieldValue(initValue ?? _defaultValue)
+    ...useFieldValue(initValue ?? _defaultValue, {}, () => name)
   }
   return { _field }
 }

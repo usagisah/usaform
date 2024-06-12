@@ -70,7 +70,7 @@ export function createPlainField(name: FieldName, ctx: FormContext, init: PlainF
     toJson,
     __uform_field: true,
     parent: ctx.field,
-    ...useFieldValue(initValue ?? _defaultValue)
+    ...useFieldValue(initValue ?? _defaultValue, {}, () => name)
   }
   return { _field }
 }

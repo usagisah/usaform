@@ -147,7 +147,7 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     parent: ctx.field,
     toJson,
     __uform_field: true,
-    ...useFieldValue([...(initValue ?? _defaultValue ?? [])], _actions)
+    ...useFieldValue([...(initValue ?? _defaultValue ?? [])], _actions, () => name)
   }
 
   return { _field, _actions }

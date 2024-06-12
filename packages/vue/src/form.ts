@@ -27,7 +27,7 @@ export function useForm(formConfig: FormConfig = {}) {
     userConfig: {},
     toJson,
     __uform_field: true,
-    ...useFieldValue({ ...defaultFormData })
+    ...useFieldValue({ ...defaultFormData }, {}, () => "root")
   }
 
   const context: FormContext = {

@@ -288,12 +288,12 @@ const customLabel = (attrs: any) => <div {...attrs}>时间</div>
       <template #header>插槽</template>
       <Form ref="formSlot">
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
-        <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', labelWidth: '60px', mode: 'left', rules: [{ trigger: 'blur', required: true, message: '该字段是必填的' }] }">
+        <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', labelWith: '60px', mode: 'left', rules: [{ trigger: 'blur', required: true, message: '该字段是必填的' }] }">
           <template #default="{ bind }">
             <ElInput v-bind="bind" placeholder="请输入名称" />
           </template>
         </PlainField>
-        <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量', labelWidth: '60px', mode: 'right' }" :init-value="10">
+        <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量', labelWith: '60px', mode: 'right' }" :init-value="10">
           <template #default="{ bind }">
             <ElInputNumber v-bind="bind" placeholder="请输入数量" />
           </template>
@@ -307,7 +307,7 @@ const customLabel = (attrs: any) => <div {...attrs}>时间</div>
             </ElSelect>
           </template>
         </PlainField>
-        <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮', labelWidth: '60px' }">
+        <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮', labelWith: '60px' }">
           <template #default="{ bind }">
             <el-radio-group v-bind="bind">
               <el-radio value="1" size="large">Option 1</el-radio>
@@ -315,12 +315,12 @@ const customLabel = (attrs: any) => <div {...attrs}>时间</div>
             </el-radio-group>
           </template>
         </PlainField>
-        <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联', labelWidth: '60px' }">
+        <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联', labelWith: '60px' }">
           <template #default="{ bind }">
             <ElCascader v-bind="bind" :options="CascaderOptions" :props="{ expandTrigger: 'hover' }" />
           </template>
         </PlainField>
-        <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选', labelWidth: '60px' }">
+        <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选', labelWith: '60px' }">
           <template #default="{ bind }">
             <el-checkbox-group v-bind="bind">
               <el-checkbox label="Option A" value="Option A" />
@@ -331,7 +331,7 @@ const customLabel = (attrs: any) => <div {...attrs}>时间</div>
             </el-checkbox-group>
           </template>
         </PlainField>
-        <PlainField name="DatePicker" :layout="FormItem" :layout-props="{ label: customLabel, labelWidth: '60px' }">
+        <PlainField name="DatePicker" :layout="FormItem" :layout-props="{ label: customLabel, labelWith: '60px' }">
           <template #default="{ bind }">
             <ElDatePicker v-bind="bind" type="date" placeholder="Pick a day" />
           </template>

@@ -1,9 +1,10 @@
 import { Ref, ShallowRef, nextTick, shallowRef, unref, watch } from "vue"
+import { FieldName } from "./form.helper"
 
 export type FieldGetter = () => any
 export type FieldSetter = (value: any, method?: string) => any
 
-export type FieldSubscribeHandle = (newValue: any, oldValue: any) => any
+export type FieldSubscribeHandle = (newValue: any, oldValue: any, info: { name: FieldName }) => any
 export type FieldSubscribeConfig = { immediate?: boolean }
 export type FieldUnSubscribe = () => void
 export type FieldSubscribe = (handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) => FieldUnSubscribe
@@ -18,13 +19,13 @@ export type FieldValue = {
   clearSubscribers: FieldClearSubscribes
 }
 
-export function useFieldValue(value: any, actions: Record<any, any> = {}): FieldValue {
+export function useFieldValue(value: any, actions: Record<any, any>, getFieldName: () => FieldName): FieldValue {
   const subscribers: FieldSubscribeHandle[] = []
   const fieldValue = shallowRef(value)
   watch(fieldValue, (newValue, oldValue) => {
     for (const fn of subscribers) {
       try {
-        fn(newValue, oldValue)
+        fn(newValue, oldValue, { name: getFieldName() })
       } catch (e) {
         console.error(e)
       }
@@ -48,7 +49,7 @@ export function useFieldValue(value: any, actions: Record<any, any> = {}): Field
     const { immediate } = config
     if (immediate) {
       try {
-        handle(unref(fieldValue), undefined)
+        handle(unref(fieldValue), undefined, { name: getFieldName() })
       } catch (e) {
         console.error(e)
       }

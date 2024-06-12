@@ -1,5 +1,5 @@
 import { CFormPlugin, FormItem } from "@usaform/element-plus"
-import "@usaform/element-plus/style.scss"
+import "@usaform/element-plus/style/element-plus.scss"
 import { ElCascader, ElDatePicker, ElInput, ElInputNumber, ElSelect } from "element-plus"
 import "element-plus/dist/index.css"
 import { createApp } from "vue"
