@@ -1,6 +1,6 @@
 {
   "name": "@usaform/vue",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "用于创建表单类别结构的 hooks 库",
   "type": "module",
   "exports": {
