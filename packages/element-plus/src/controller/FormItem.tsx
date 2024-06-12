@@ -8,7 +8,7 @@ export interface CFormItemProps {
   // 标题
   label?: string | Record<any, any>
   // 标题宽度
-  labelWith?: string | number
+  labelWidth?: string | number
   // 尺寸
   size?: "small" | "large" | "default"
   // 禁用
@@ -73,9 +73,9 @@ export const FormItem = defineComponent({
 
     const labelStyle = computed(() => {
       const style: Record<string, string> = {}
-      const { labelWith, mode } = props.FormControllerProps!.layoutProps
-      if (typeof labelWith === "string") style.width = labelWith
-      else if (typeof labelWith === "number") style.width = labelWith + "px"
+      const { labelWidth, mode } = props.FormControllerProps!.layoutProps
+      if (typeof labelWidth === "string") style.width = labelWidth
+      else if (typeof labelWidth === "number") style.width = labelWidth + "px"
       else if (mode !== "top") style.width = "auto"
       return style
     })

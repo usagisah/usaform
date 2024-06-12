@@ -80,12 +80,16 @@ export function createJsonForm({ struct, arrayKeys = ["key", "id"], layout, conf
       actions.provide()
       expose(createFormExpose())
 
+      if (typeof layout === "string") {
+        layout = config.Elements![layout]
+      }
+
       const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements!, arrayKeys }
       Object.assign(config.Elements!, buildScopeElement(slots))
 
       return () => {
         const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
-        return <FieldRender>{layout ? h(layout, attrs, { default: childrenSlots }) : <div class="u-form">{childrenSlots}</div>}</FieldRender>
+        return <FieldRender>{layout ? h(layout, attrs, { default: () => childrenSlots }) : <div class="u-form">{childrenSlots}</div>}</FieldRender>
       }
     }
   })

@@ -80,6 +80,11 @@ export function useForm(formConfig?: CFormConfig) {
 
   const createFormRender = (attrs: Record<any, any>, slots: Record<any, any>, layout?: any) => {
     Object.assign(config.Elements!, buildScopeElement(slots))
+
+    if (typeof layout === "string") {
+      layout = config.Elements![layout]
+    }
+
     return function FormRender() {
       return <FieldRender>{layout ? h(layout, attrs, () => slots.default?.()) : <div class="u-form">{slots.default?.()}</div>}</FieldRender>
     }
