@@ -31,7 +31,7 @@ const customLabel = (attrs: any) => <div {...attrs}>自定义标题:时间</div>
           </template>
         </PlainField>
 
-        <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉', mode: 'top', rules: [{ trigger: 'blur', required: true, message: '该字段是必填的' }] }">
+        <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉', mode: 'top', rules: [{ trigger: 'blur', required: true, type: 'number', message: '该字段是必填的' }] }">
           <template #default="{ bind }">
             <Select
               v-bind="bind"

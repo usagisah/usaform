@@ -98,13 +98,13 @@ export const FormItem = defineComponent({
         }
       }
 
-      const _props = { id, size: size.value, disabled: disabled.value, onBlur }
+      const _props = { status: validateState.status, ...elemProps, id, size: size.value, disabled: disabled.value, onBlur }
 
       return (
         <div class={classNames.value}>
           {LabelElem}
           <div class="ufi-content">
-            {children({ props: { ...elemProps, ..._props }, bind: { ...elemProps, ..._props } })}
+            {children({ props: _props, bind: _props })}
             {validateState.status.length > 0 && <div class={`ufi-content-${validateState.status}`}>{validateState.message}</div>}
           </div>
         </div>
@@ -118,6 +118,8 @@ function useRules(props: FormControllerProps, setValidate: FormControllerSetVali
   let changeRules: CFormRuleItem[] = []
   let blurRules: CFormRuleItem[] = []
   watchEffect(() => {
+    setValidate({ status: "", message: "" })
+
     const { Rules, layoutProps } = props
     const { rules = [] } = layoutProps
     changeRules = []
@@ -125,7 +127,7 @@ function useRules(props: FormControllerProps, setValidate: FormControllerSetVali
     ;(rules as (string | CFormRuleItem)[]).forEach(r => {
       const _rule = typeof r === "string" ? Rules[r] : r
       if (!_rule) return
-      if (!_rule.trigger) _rule.trigger = "change"
+      if (!_rule.trigger) _rule.trigger = "blur"
       if (_rule.required) fieldRequired.value = true
       _rule.trigger === "change" ? changeRules.push(_rule) : blurRules.push(_rule)
     })
@@ -146,14 +148,12 @@ function useRules(props: FormControllerProps, setValidate: FormControllerSetVali
     )
   }
 
-  if (props) {
-    watch(
-      () => props.fieldValue,
-      v => {
-        validate(changeRules, "", v).catch(() => null)
-      }
-    )
-  }
+  watch(
+    () => props.fieldValue,
+    v => {
+      validate(changeRules, "", v).catch(() => null)
+    }
+  )
 
   return {
     fieldRequired,
@@ -161,9 +161,7 @@ function useRules(props: FormControllerProps, setValidate: FormControllerSetVali
       return validate([...blurRules, ...changeRules], n, v)
     },
     onBlur: () => {
-      if (props) {
-        validate(blurRules, "", props.fieldValue.value).catch(() => null)
-      }
+      validate(blurRules, "", props.fieldValue.value).catch(() => null)
     }
   }
 }
