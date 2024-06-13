@@ -34,14 +34,4 @@ const act = ref(0)
   gap: 12px;
   width: 100vw;
 }
-
-.ufi-status-error {
-  .ant-input,
-  .ant-input:hover,
-  .ant-input.is-focus {
-    border-color: transparent;
-    box-shadow: 0 0 0 1px #f56c6c inset;
-    outline: none;
-  }
-}
 </style>

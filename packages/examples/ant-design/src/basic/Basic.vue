@@ -15,7 +15,7 @@ const customLabel = (attrs: any) => <div {...attrs}>自定义标题:时间</div>
 
 <template>
   <Space>
-    <Card title="插槽" style="width: 600px;">
+    <Card title="插槽" style="width: 600px">
       <Form ref="formSlot">
         <Divider content-position="center">(布局样式) 基本表单元素</Divider>
 
@@ -31,12 +31,12 @@ const customLabel = (attrs: any) => <div {...attrs}>自定义标题:时间</div>
           </template>
         </PlainField>
 
-        <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉', mode: 'top' }">
+        <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉', mode: 'top', rules: [{ trigger: 'blur', required: true, message: '该字段是必填的' }] }">
           <template #default="{ bind }">
             <Select
               v-bind="bind"
               placeholder="请选择"
-              style="width: 100%;"
+              style="width: 100%"
               :options="[
                 { label: 1, value: 1 },
                 { label: 2, value: 2 },
@@ -49,15 +49,20 @@ const customLabel = (attrs: any) => <div {...attrs}>自定义标题:时间</div>
 
         <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮', labelWidth: '60px' }">
           <template #default="{ bind }">
-            <RadioGroup v-bind="bind" :options="[{ label: 'o1', value: '1' }, { label: 'o2', value: '2' }]">
+            <RadioGroup
+              v-bind="bind"
+              :options="[
+                { label: 'o1', value: '1' },
+                { label: 'o2', value: '2' }
+              ]"
+            >
             </RadioGroup>
           </template>
         </PlainField>
 
         <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选', labelWidth: '60px' }">
           <template #default="{ bind }">
-            <CheckboxGroup v-bind="bind" :options="['A', 'B', 'C']"
-            </CheckboxGroup>
+            <CheckboxGroup v-bind="bind" :options="['A', 'B', 'C']"> </CheckboxGroup>
           </template>
         </PlainField>
 
@@ -66,7 +71,6 @@ const customLabel = (attrs: any) => <div {...attrs}>自定义标题:时间</div>
             <Checkbox v-bind="bind"></Checkbox>
           </template>
         </PlainField>
-        
 
         <PlainField name="DatePicker" :layout="FormItem" :layout-props="{ label: customLabel, labelWidth: '60px' }">
           <template #default="{ bind }">

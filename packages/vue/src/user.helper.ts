@@ -18,25 +18,25 @@ function fieldToJson(field: Field, realName?: FieldName): FormStructJson {
     case "object": {
       const { type, name, struct, toJson } = field
       return {
-        ...toJson?.(),
         type,
         name: realName ?? name,
         children: Array.from(struct.entries())
           .sort((a, b) => a[1].order - b[1].order)
-          .map(item => fieldToJson(item[1]))
+          .map(item => fieldToJson(item[1])),
+        ...toJson?.()
       }
     }
     case "plain": {
       const { type, name, toJson } = field
-      return { ...toJson?.(), type, name: realName ?? name }
+      return { type, name: realName ?? name, ...toJson?.() }
     }
     case "ary": {
       const { type, name, toJson } = field
-      return { ...toJson?.(), type, name: realName ?? name }
+      return { type, name: realName ?? name, ...toJson?.() }
     }
     case "void": {
       const { type, name, userConfig, toJson } = field
-      return { ...toJson?.(), type, name: realName ?? name, config: userConfig }
+      return { type, name: realName ?? name, config: userConfig, ...toJson?.() }
     }
     default: {
       throw "非法的表单节点"

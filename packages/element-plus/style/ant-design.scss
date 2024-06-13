@@ -1,11 +1,1 @@
 @import "./style.scss";
-
-.ufi-status-error {
-  .ant-input,
-  .ant-input:hover,
-  .ant-input.is-focus {
-    border-color: transparent;
-    box-shadow: 0 0 0 1px #f56c6c inset;
-    outline: none;
-  }
-}

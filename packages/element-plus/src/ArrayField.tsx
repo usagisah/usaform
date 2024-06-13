@@ -25,6 +25,7 @@ export interface CArrayFieldLayoutInfo {
   props: Record<any, any>
   layoutProps: Record<any, any>
   formConfig: CFormConfig
+  fieldProps: Record<any, any>
   children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
 }
 
@@ -34,7 +35,7 @@ export const ArrayField = defineComponent({
   slots: Object as SlotsType<{
     default: (props: { fieldValue: any[]; actions: CArrayFieldActions } & Record<any, any>) => any
   }>,
-  setup(props: CArrayFieldProps, { slots }) {
+  setup(props: CArrayFieldProps, { slots, attrs }) {
     const { name, layout, element } = props
     if (name !== 0 && !name) {
       throw "非法的使用方式，请正确使用 ArrayField 组件"
@@ -94,6 +95,7 @@ export const ArrayField = defineComponent({
         layoutProps: { ...gLayoutProps, ...props.layoutProps },
         Rules: gFieldRules,
         formConfig: formConfig_,
+        fieldProps: attrs,
         children: ({ bind, props }) => {
           const _props = { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
           if (FieldElement) {

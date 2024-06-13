@@ -1,4 +1,4 @@
-import { ObjectFieldActions, useFormVoidField } from "@usaform/vue"
+import { useFormVoidField } from "@usaform/vue"
 import { SlotsType, defineComponent, h } from "vue"
 import { createFormCFieldToJson, resolveScopeElement } from "./helper"
 

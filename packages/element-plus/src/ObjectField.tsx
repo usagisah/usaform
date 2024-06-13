@@ -23,6 +23,7 @@ export interface CObjectFieldLayoutInfo {
   props: Record<any, any>
   layoutProps: Record<any, any>
   formConfig: CFormConfig
+  fieldProps: Record<any, any>
   children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
 }
 
@@ -32,7 +33,7 @@ export const ObjectField = defineComponent({
   slots: Object as SlotsType<{
     default: (props: { actions: ObjectFieldActions; fieldValue: any; [x: string]: any }) => any
   }>,
-  setup(props: CObjectFieldProps, { slots }) {
+  setup(props: CObjectFieldProps, { slots, attrs }) {
     const { name, layout, element } = props
     if (name !== 0 && !name) {
       throw "非法的使用方式，请正确使用 ObjectField 组件"
@@ -88,6 +89,7 @@ export const ObjectField = defineComponent({
         layoutProps: { ...gLayoutProps, ...props.layoutProps },
         Rules: gFieldRules,
         formConfig: formConfig_,
+        fieldProps: attrs,
         children: ({ bind, props }) => {
           const _props = { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
           if (FieldElement) {

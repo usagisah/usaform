@@ -28,6 +28,7 @@ export interface CPlainFieldLayoutInfo {
   props: Record<any, any>
   layoutProps: Record<any, any>
   children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
+  fieldProps: Record<any, any>
   formConfig: CFormConfig
 }
 
@@ -37,7 +38,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
   slots: Object as SlotsType<{
     default: (props: { bind?: Record<any, any> } & Record<any, any>) => any
   }>,
-  setup(props, { slots }) {
+  setup(props, { slots, attrs }) {
     const { name, layout, element } = props
     if (name !== 0 && !name) {
       throw "非法的使用方式，请正确使用 PlainField 组件"
@@ -110,6 +111,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
         layoutProps: { ...gLayoutProps, ...props.layoutProps },
         Rules: gFieldRules,
         formConfig: formConfig_,
+        fieldProps: attrs,
         children: ({ bind, props }) => {
           const _props = { ...props, [vModel.v]: fieldValue.value, [vModel.e]: setFieldValue, actions, ref: fieldElementRef }
           if (FieldElement) {
