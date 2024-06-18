@@ -72,7 +72,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
 
       formConfig_ = formConfig
 
-      const _initValue = "initValue" === undefined ? props.initValue : initValue
+      const _initValue = initValue === undefined ? props.initValue : initValue
       return {
         initValue: _initValue,
         toJson: createFormCFieldToJson(props, layout, element),

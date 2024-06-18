@@ -64,7 +64,7 @@ export const ArrayField = defineComponent({
       formConfig_ = formConfig
 
       return {
-        initValue: props.initValue === undefined ? props.initValue : initValue,
+        initValue: initValue === undefined ? initValue : props.initValue,
         toJson: createFormCFieldToJson(props, layout, element),
         reset() {
           actions.set("", [])

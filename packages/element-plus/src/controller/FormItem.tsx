@@ -3,6 +3,7 @@ import { SlotsType, computed, defineComponent, h, onUnmounted, reactive, shallow
 import { CFormRuleItem } from "../Form"
 import { isPlainObject } from "../helper"
 import { FormControllerProps, FormControllerSetValidate, FormControllerValidateState } from "./helper"
+import { PlainFieldActions, ObjectFieldActions, ArrayFieldActions } from "@usaform/vue"
 
 export interface CFormItemProps {
   // 标题
@@ -21,11 +22,13 @@ export interface CFormItemProps {
   rules?: (CFormRuleItem | string)[]
 }
 
-export interface CFormItemAttrs {
+export interface CFormSlotAttrs {
   id: string
-  disabled: boolean
   size: "small" | "large" | "default"
+  status: string
+  disabled: boolean
   onBlur: (e: any) => void
+  actions?: PlainFieldActions & ObjectFieldActions & ArrayFieldActions
 }
 
 let randomIdCount = 0
@@ -34,7 +37,7 @@ export const FormItem = defineComponent({
   props: ["FormControllerProps"],
   inheritAttrs: true,
   slots: Object as SlotsType<{
-    default: (props?: { id: string; size: string; disabled: boolean }) => any
+    default: (props?: CFormSlotAttrs) => any
   }>,
   setup(props: { FormControllerProps?: FormControllerProps }, { slots, expose }) {
     if (!props.FormControllerProps) {
@@ -98,7 +101,7 @@ export const FormItem = defineComponent({
         }
       }
 
-      const _props = { status: validateState.status, ...elemProps, id, size: size.value, disabled: disabled.value, onBlur }
+      const _props: CFormSlotAttrs = { ...elemProps, id, size: size.value, status: validateState.status, disabled: disabled.value, onBlur }
 
       return (
         <div class={classNames.value}>
