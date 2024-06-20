@@ -1,13 +1,13 @@
+import { ArrayFieldActions, ObjectFieldActions, PlainFieldActions } from "@usaform/vue"
 import Schema from "async-validator"
 import { SlotsType, computed, defineComponent, h, onUnmounted, reactive, shallowRef, watch, watchEffect } from "vue"
 import { CFormRuleItem } from "../Form"
 import { isPlainObject } from "../helper"
 import { FormControllerProps, FormControllerSetValidate, FormControllerValidateState } from "./helper"
-import { PlainFieldActions, ObjectFieldActions, ArrayFieldActions } from "@usaform/vue"
 
 export interface CFormItemProps {
   // 标题
-  label?: string | Record<any, any>
+  label?: string | Record<any, any> | ((...props: any[]) => any)
   // 标题宽度
   labelWidth?: string | number
   // 尺寸
@@ -20,6 +20,10 @@ export interface CFormItemProps {
   inline?: boolean
   // 当前字段的校验规则
   rules?: (CFormRuleItem | string)[]
+  // 自定义布局 class
+  classNames?: string[]
+
+  [x: string]: any
 }
 
 export interface CFormSlotAttrs {
@@ -58,20 +62,18 @@ export const FormItem = defineComponent({
     })
 
     const disabled = computed(() => {
-      const { disabled } = props.FormControllerProps!.layoutProps
-      if (typeof disabled === "string") return disabled.length === 0
-      return !!disabled
+      return !!props.FormControllerProps!.layoutProps.disabled
     })
 
     const classNames = computed(() => {
-      const { inline = false, mode = "right" } = props.FormControllerProps!.layoutProps ?? {}
+      const { inline = false, mode = "right", classNames = [] } = props.FormControllerProps!.layoutProps ?? {}
       const _inline = `ufi-${inline ? "inline" : "block"}`
       const _mode = `ufi-mode-${mode ?? "right"}`
       const _required = fieldRequired.value ? "ufi-required" : ""
       const _disabled = disabled.value ? "ufi-disabled" : ""
       const _size = `ufi-size-${size.value}`
       const _status = validateState.status.length > 0 ? `ufi-status-${validateState.status}` : ""
-      return ["ufi", _size, _inline, _mode, _required, _disabled, _status].join(" ").trim()
+      return ["ufi", _size, _inline, _mode, _required, _disabled, _status, ...classNames].join(" ").trim()
     })
 
     const labelStyle = computed(() => {
@@ -91,7 +93,7 @@ export const FormItem = defineComponent({
       let LabelElem: any = null
       if (_label) {
         if (isPlainObject(_label)) LabelElem = h(_label, labelProps)
-        else if (typeof _label === "function") LabelElem = _label(labelProps)
+        else if (typeof _label === "function") LabelElem = (_label as any)(labelProps)
         else {
           LabelElem = (
             <label class="ufi-label" style={labelStyle.value} for={id}>

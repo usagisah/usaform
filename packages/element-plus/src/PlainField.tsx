@@ -1,6 +1,7 @@
 import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usaform/vue"
 import { Ref, SlotsType, computed, defineComponent, h, ref } from "vue"
 import { CFormConfig, CFormRuleItem } from "./Form"
+import { CFormItemProps } from "./controller/FormItem"
 import { CFormItemExpose } from "./controller/helper"
 import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
 
@@ -14,7 +15,7 @@ export interface CPlainFieldProps {
   modelValue?: string
 
   layout?: string | Record<any, any>
-  layoutProps?: Record<any, any>
+  layoutProps?: CFormItemProps
 
   element?: string | Record<any, any>
   props?: Record<any, any>
@@ -26,7 +27,7 @@ export interface CPlainFieldLayoutInfo {
   actions: PlainFieldActions
   Rules: Record<any, CFormRuleItem>
   props: Record<any, any>
-  layoutProps: Record<any, any>
+  layoutProps: CFormItemProps
   children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
   fieldProps: Record<any, any>
   formConfig: CFormConfig

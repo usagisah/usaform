@@ -5,12 +5,13 @@ import { CFormProps, useForm } from "./Form"
 import { ObjectField } from "./ObjectField"
 import { PlainField } from "./PlainField"
 import { VoidField } from "./VoidField"
+import { CFormItemProps } from "./controller/FormItem"
 import { buildScopeElement } from "./helper"
 
 export type JsonFormStructJson = Omit<FormStructJson, "children"> & {
   type: "plain" | "object" | "ary" | "void"
   layout?: string
-  layoutProps?: Record<any, any>
+  layoutProps?: CFormItemProps
   element?: string
   props?: Record<any, any>
   children?: JsonFormStructJson[]

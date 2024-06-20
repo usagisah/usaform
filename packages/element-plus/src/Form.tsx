@@ -1,6 +1,7 @@
 import { FormActions, FormConfig, RootField, useForm as _useForm } from "@usaform/vue"
 import { RuleItem, ValidateOption } from "async-validator"
 import { App, PropType, defineComponent, h, hasInjectionContext, inject, provide, toRaw } from "vue"
+import { CFormItemProps } from "./controller/FormItem"
 import { buildScopeElement } from "./helper"
 
 export interface CFormRuleItem extends RuleItem {
@@ -9,11 +10,11 @@ export interface CFormRuleItem extends RuleItem {
 
 export interface CFormConfig extends FormConfig {
   // 默认使用的控制器
-  plainFieldController?: string | Record<any, any> 
+  plainFieldController?: string | Record<any, any>
   objectFieldController?: string | Record<any, any>
-  arrayFieldController?: string | Record<any, any> 
+  arrayFieldController?: string | Record<any, any>
   // 全局布局参数
-  layoutProps?: Record<any, any>
+  layoutProps?: CFormItemProps
   // 双向绑定的 key
   modelValue?: string
   // 用于指定 key 的元素

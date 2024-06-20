@@ -1,6 +1,7 @@
 import { FormActionCallInfo, ObjectFieldActions, useFormObjectField } from "@usaform/vue"
 import { Ref, SlotsType, computed, defineComponent, h, ref } from "vue"
 import { CFormConfig, CFormRuleItem } from "./Form"
+import { CFormItemProps } from "./controller/FormItem"
 import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
 
 export interface CObjectFieldProps {
@@ -9,7 +10,7 @@ export interface CObjectFieldProps {
   initValue?: any
 
   layout?: string | Record<any, any>
-  layoutProps?: Record<any, any>
+  layoutProps?: CFormItemProps
 
   element?: string | Record<any, any>
   props?: Record<any, any>
@@ -21,7 +22,7 @@ export interface CObjectFieldLayoutInfo {
   actions: ObjectFieldActions
   Rules: Record<any, CFormRuleItem>
   props: Record<any, any>
-  layoutProps: Record<any, any>
+  layoutProps: CFormItemProps
   formConfig: CFormConfig
   fieldProps: Record<any, any>
   children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
