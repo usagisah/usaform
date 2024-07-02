@@ -1,6 +1,6 @@
 import { ArrayFieldActions, ObjectFieldActions, PlainFieldActions } from "@usaform/vue"
 import Schema from "async-validator"
-import { SlotsType, computed, defineComponent, h, onUnmounted, reactive, shallowRef, watch, watchEffect } from "vue"
+import { MaybeRef, SlotsType, computed, defineComponent, h, onUnmounted, reactive, shallowRef, unref, watch, watchEffect } from "vue"
 import { CFormRuleItem } from "../Form"
 import { isPlainObject } from "../helper"
 import { FormControllerProps, FormControllerSetValidate, FormControllerValidateState } from "./helper"
@@ -9,11 +9,11 @@ export interface CFormItemProps {
   // 标题
   label?: string | Record<any, any> | ((...props: any[]) => any)
   // 标题宽度
-  labelWidth?: string | number
+  labelWidth?: MaybeRef<string | number>
   // 尺寸
-  size?: "small" | "large" | "default"
+  size?: MaybeRef<"small" | "large" | "default">
   // 禁用
-  disabled?: boolean
+  disabled?: MaybeRef<boolean>
   // 布局模式
   mode?: "left" | "right" | "top"
   // 设置容器为行内
@@ -21,7 +21,7 @@ export interface CFormItemProps {
   // 当前字段的校验规则
   rules?: (CFormRuleItem | string)[]
   // 自定义布局 class
-  classNames?: string[]
+  classNames?: MaybeRef<string[]>
 
   [x: string]: any
 }
@@ -58,11 +58,11 @@ export const FormItem = defineComponent({
     const id = "ufi-id-" + randomIdCount++
 
     const size = computed(() => {
-      return props.FormControllerProps!.layoutProps.size ?? "default"
+      return unref(props.FormControllerProps!.layoutProps.size) ?? "default"
     })
 
     const disabled = computed(() => {
-      return !!props.FormControllerProps!.layoutProps.disabled
+      return !!unref(props.FormControllerProps!.layoutProps.disabled)
     })
 
     const classNames = computed(() => {
@@ -73,12 +73,14 @@ export const FormItem = defineComponent({
       const _disabled = disabled.value ? "ufi-disabled" : ""
       const _size = `ufi-size-${size.value}`
       const _status = validateState.status.length > 0 ? `ufi-status-${validateState.status}` : ""
-      return ["ufi", _size, _inline, _mode, _required, _disabled, _status, ...classNames].join(" ").trim()
+      return ["ufi", _size, _inline, _mode, _required, _disabled, _status, ...unref(classNames)].join(" ").trim()
     })
 
     const labelStyle = computed(() => {
       const style: Record<string, string> = {}
-      const { labelWidth, mode } = props.FormControllerProps!.layoutProps
+      let { labelWidth, mode } = props.FormControllerProps!.layoutProps
+      labelWidth = unref(labelWidth)
+
       if (typeof labelWidth === "string") style.width = labelWidth
       else if (typeof labelWidth === "number") style.width = labelWidth + "px"
       else if (mode !== "top") style.width = "auto"

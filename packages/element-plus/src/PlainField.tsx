@@ -73,12 +73,12 @@ export const PlainField = defineComponent<CPlainFieldProps>({
 
       formConfig_ = formConfig
 
-      const _initValue = initValue === undefined ? props.initValue : initValue
       return {
-        initValue: _initValue,
+        initValue: initValue === undefined ? props.initValue : initValue,
         toJson: createFormCFieldToJson(props, layout, element),
         reset: () => {
-          fieldValue.value = _initValue
+          // 确保初始值在没有可用的情况下，永远是外部传进来最新的
+          fieldValue.value = initValue === undefined ? props.initValue : initValue
           fieldLayoutRef.value?.setValidateState({ error: false, message: "" })
         },
         validate({ path }: FormActionCallInfo) {

@@ -63,7 +63,7 @@ export const ObjectField = defineComponent({
       formConfig_ = formConfig
 
       return {
-        initValue: initValue === undefined ? initValue : props.initValue,
+        initValue: initValue === undefined ? props.initValue : initValue,
         toJson: createFormCFieldToJson(props, layout, element),
         callLayout(_: any, { key, point, params }: FormActionCallInfo) {
           return callFuncWithError(() => {
