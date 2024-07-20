@@ -72,7 +72,7 @@ function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStr
   return h(FormFieldComponent, attrs, _children)
 }
 
-export function createJsonForm({ struct, arrayKeys = ["key", "id"], layout, config: formConfig }: JsonFormConfig) {
+export function createJsonForm({ struct, arrayKeys = ["key", "id"], layout, layoutProps, config: formConfig }: JsonFormConfig) {
   return defineComponent({
     name: "Form",
     setup(_, { attrs, slots, expose }) {
@@ -90,7 +90,17 @@ export function createJsonForm({ struct, arrayKeys = ["key", "id"], layout, conf
 
       return () => {
         const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
-        return <FieldRender>{layout ? h(layout, attrs, { default: () => childrenSlots }) : <div class="u-form">{childrenSlots}</div>}</FieldRender>
+        return (
+          <FieldRender>
+            {layout ? (
+              h(layout, { ...layoutProps, ...attrs }, { default: () => childrenSlots })
+            ) : (
+              <div class="u-form" {...attrs}>
+                {childrenSlots}
+              </div>
+            )}
+          </FieldRender>
+        )
       }
     }
   })

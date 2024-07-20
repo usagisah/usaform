@@ -28,6 +28,7 @@ export interface CFormConfig extends FormConfig {
 export interface CFormProps {
   config?: CFormConfig
   layout?: any
+  layoutProps?: Record<any, any>
 }
 
 export interface CFormValidateError {
@@ -79,7 +80,9 @@ export function useForm(formConfig?: CFormConfig) {
     return actions.call(path, "callElement", { params: [{ key, point, params }] })
   }
 
-  const createFormRender = (attrs: Record<any, any>, slots: Record<any, any>, layout?: any) => {
+  const createFormRender = (attrs: Record<any, any>, slots: Record<any, any>, props: CFormProps) => {
+    let { layout, layoutProps } = props
+
     Object.assign(config.Elements!, buildScopeElement(slots))
 
     if (typeof layout === "string") {
@@ -87,7 +90,17 @@ export function useForm(formConfig?: CFormConfig) {
     }
 
     return function FormRender() {
-      return <FieldRender>{layout ? h(layout, attrs, () => slots.default?.()) : <div class="u-form">{slots.default?.()}</div>}</FieldRender>
+      return (
+        <FieldRender>
+          {layout ? (
+            h(layout, { ...layoutProps, ...attrs }, () => slots.default?.())
+          ) : (
+            <div class="u-form" {...attrs}>
+              {slots.default?.()}
+            </div>
+          )}
+        </FieldRender>
+      )
     }
   }
 
@@ -99,18 +112,22 @@ export function useForm(formConfig?: CFormConfig) {
   return { actions, config, field, FieldRender, validate, reset, callLayout, callElement, createFormRender, createFormExpose }
 }
 
-export const Form = defineComponent({
+export const Form = defineComponent<CFormProps>({
   name: "Form",
   props: {
     config: {
-      type: Object as PropType<CFormConfig>,
+      type: Object,
       required: false
     },
     layout: {
       type: [Object, String],
       required: false
+    },
+    layoutProps: {
+      type: Object,
+      required: false
     }
-  },
+  } as any as undefined,
   setup(props, { attrs, slots, expose }) {
     const { createFormRender, actions, createFormExpose } = useForm(props.config)
     actions.provide()
