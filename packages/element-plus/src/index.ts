@@ -1,6 +1,6 @@
 export { ArrayField } from "./ArrayField.jsx"
 export type { CArrayFieldActions, CArrayFieldLayoutInfo, CArrayFieldProps } from "./ArrayField.jsx"
-export { CFormPlugin, CFormProvider, Form } from "./Form.jsx"
+export { CFormPlugin, CFormProvider, createForm } from "./Form.jsx"
 export type { CFormConfig, CFormExpose, CFormProps, CFormRuleItem, CFormValidateError } from "./Form.jsx"
 export { createJsonForm } from "./JsonForm.jsx"
 export type { JsonFormConfig, JsonFormStructJson } from "./JsonForm.jsx"

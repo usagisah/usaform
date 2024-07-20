@@ -1,7 +1,7 @@
 import { FormStructJson } from "@usaform/vue"
-import { defineComponent, h } from "vue"
+import { defineComponent, h, shallowRef } from "vue"
 import { ArrayField } from "./ArrayField"
-import { CFormProps, useForm } from "./Form"
+import { CFormExpose, CFormProps, useForm } from "./Form"
 import { ObjectField } from "./ObjectField"
 import { PlainField } from "./PlainField"
 import { VoidField } from "./VoidField"
@@ -73,13 +73,21 @@ function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStr
 }
 
 export function createJsonForm({ struct, arrayKeys = ["key", "id"], layout, layoutProps, config: formConfig }: JsonFormConfig) {
-  return defineComponent({
+  const formActions = shallowRef<CFormExpose | null>(null)
+  const flushKey = shallowRef(0)
+  const forceRender = () => {
+    formActions.value = null
+    flushKey.value++
+  }
+  const Form = defineComponent({
     name: "Form",
     setup(_, { attrs, slots, expose }) {
       const { config, actions, createFormExpose, FieldRender } = useForm(formConfig)
-
       actions.provide()
-      expose(createFormExpose())
+
+      const formExpose = createFormExpose()
+      formActions.value = formExpose
+      expose(formExpose)
 
       if (typeof layout === "string") {
         layout = config.Elements![layout]
@@ -91,7 +99,7 @@ export function createJsonForm({ struct, arrayKeys = ["key", "id"], layout, layo
       return () => {
         const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
         return (
-          <FieldRender>
+          <FieldRender key={flushKey.value}>
             {layout ? (
               h(layout, { ...layoutProps, ...attrs }, { default: () => childrenSlots })
             ) : (
@@ -104,4 +112,5 @@ export function createJsonForm({ struct, arrayKeys = ["key", "id"], layout, layo
       }
     }
   })
+  return [Form, formActions, forceRender] as const
 }

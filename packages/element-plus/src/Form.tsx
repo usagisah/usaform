@@ -1,6 +1,6 @@
 import { FormActions, FormConfig, RootField, useForm as _useForm } from "@usaform/vue"
 import { RuleItem, ValidateOption } from "async-validator"
-import { App, PropType, defineComponent, h, hasInjectionContext, inject, provide, toRaw } from "vue"
+import { App, PropType, Ref, defineComponent, h, hasInjectionContext, inject, provide, shallowRef, toRaw } from "vue"
 import { CFormItemProps } from "./controller/FormItem"
 import { buildScopeElement } from "./helper"
 
@@ -80,7 +80,7 @@ export function useForm(formConfig?: CFormConfig) {
     return actions.call(path, "callElement", { params: [{ key, point, params }] })
   }
 
-  const createFormRender = (attrs: Record<any, any>, slots: Record<any, any>, props: CFormProps) => {
+  const createFormRender = (attrs: Record<any, any>, slots: Record<any, any>, props: CFormProps, flushKey: Ref<number>) => {
     let { layout, layoutProps } = props
 
     Object.assign(config.Elements!, buildScopeElement(slots))
@@ -91,7 +91,7 @@ export function useForm(formConfig?: CFormConfig) {
 
     return function FormRender() {
       return (
-        <FieldRender>
+        <FieldRender key={flushKey.value}>
           {layout ? (
             h(layout, { ...layoutProps, ...attrs }, () => slots.default?.())
           ) : (
@@ -112,29 +112,42 @@ export function useForm(formConfig?: CFormConfig) {
   return { actions, config, field, FieldRender, validate, reset, callLayout, callElement, createFormRender, createFormExpose }
 }
 
-export const Form = defineComponent<CFormProps>({
-  name: "Form",
-  props: {
-    config: {
-      type: Object,
-      required: false
-    },
-    layout: {
-      type: [Object, String],
-      required: false
-    },
-    layoutProps: {
-      type: Object,
-      required: false
-    }
-  } as any as undefined,
-  setup(props, { attrs, slots, expose }) {
-    const { createFormRender, actions, createFormExpose } = useForm(props.config)
-    actions.provide()
-    expose(createFormExpose())
-    return createFormRender(attrs, slots, props.layout)
+export function createForm() {
+  const formActions = shallowRef<CFormExpose | null>(null)
+  const flushKey = shallowRef(0)
+  const forceRender = () => {
+    formActions.value = null
+    flushKey.value++
   }
-})
+  const Form = defineComponent<CFormProps>({
+    name: "Form",
+    props: {
+      config: {
+        type: Object,
+        required: false
+      },
+      layout: {
+        type: [Object, String],
+        required: false
+      },
+      layoutProps: {
+        type: Object,
+        required: false
+      }
+    } as any as undefined,
+    setup(props, { attrs, slots, expose }) {
+      const { createFormRender, actions, createFormExpose } = useForm(props.config)
+      actions.provide()
+
+      const formExpose = createFormExpose()
+      formActions.value = formExpose
+      expose(formExpose)
+
+      return createFormRender(attrs, slots, props.layout, flushKey)
+    }
+  })
+  return [Form, formActions, forceRender] as const
+}
 
 export function normalizeFormConfig(c: CFormConfig): CFormConfig {
   const config = { ...c }
