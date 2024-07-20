@@ -1,6 +1,6 @@
 import { FormActions, FormConfig, RootField, useForm as _useForm } from "@usaform/vue"
 import { RuleItem, ValidateOption } from "async-validator"
-import { App, PropType, Ref, defineComponent, h, hasInjectionContext, inject, provide, shallowRef, toRaw } from "vue"
+import { App, PropType, computed, defineComponent, h, hasInjectionContext, inject, provide, shallowRef, toRaw } from "vue"
 import { CFormItemProps } from "./controller/FormItem"
 import { buildScopeElement } from "./helper"
 
@@ -29,6 +29,7 @@ export interface CFormProps {
   config?: CFormConfig
   layout?: any
   layoutProps?: Record<any, any>
+  dynamic?: boolean
 }
 
 export interface CFormValidateError {
@@ -80,36 +81,12 @@ export function useForm(formConfig?: CFormConfig) {
     return actions.call(path, "callElement", { params: [{ key, point, params }] })
   }
 
-  const createFormRender = (attrs: Record<any, any>, slots: Record<any, any>, props: CFormProps, flushKey: Ref<number>) => {
-    let { layout, layoutProps } = props
-
-    Object.assign(config.Elements!, buildScopeElement(slots))
-
-    if (typeof layout === "string") {
-      layout = config.Elements![layout]
-    }
-
-    return function FormRender() {
-      return (
-        <FieldRender key={flushKey.value}>
-          {layout ? (
-            h(layout, { ...layoutProps, ...attrs }, () => slots.default?.())
-          ) : (
-            <div class="u-form" {...attrs}>
-              {slots.default?.()}
-            </div>
-          )}
-        </FieldRender>
-      )
-    }
-  }
-
   const createFormExpose = (): CFormExpose => {
     const { provide, ..._actions } = actions
     return { ..._actions, validate, reset, callLayout, callElement, field }
   }
 
-  return { actions, config, field, FieldRender, validate, reset, callLayout, callElement, createFormRender, createFormExpose }
+  return { actions, config, field, FieldRender, validate, reset, callLayout, callElement, createFormExpose }
 }
 
 export function createForm(props: CFormProps = {}) {
@@ -119,20 +96,48 @@ export function createForm(props: CFormProps = {}) {
     formActions.value = null
     flushKey.value++
   }
-  const Form = defineComponent({
-    name: "Form",
-    setup(_, { attrs, slots, expose }) {
-      const { createFormRender, actions, createFormExpose } = useForm(props.config)
-      actions.provide()
 
-      const formExpose = createFormExpose()
-      formActions.value = formExpose
-      expose(formExpose)
+  const createFormRender = () => {
+    return defineComponent({
+      name: "Form",
+      setup(_, { attrs, slots, expose }) {
+        const { FieldRender, config, actions, createFormExpose } = useForm(props.config)
+        Object.assign(config.Elements!, buildScopeElement(slots))
 
-      return createFormRender(attrs, slots, props, flushKey)
+        actions.provide()
+
+        const formExpose = createFormExpose()
+        formActions.value = formExpose
+        expose(formExpose)
+
+        return () => {
+          const { layout, layoutProps } = props
+          const Layout = typeof layout === "string" ? config.Elements![layout] : layout
+          return (
+            <FieldRender>
+              {Layout ? (
+                h(Layout, { ...layoutProps, ...attrs }, () => slots.default?.())
+              ) : (
+                <div class="u-form" {...attrs}>
+                  {slots.default?.()}
+                </div>
+              )}
+            </FieldRender>
+          )
+        }
+      }
+    })
+  }
+  const ProxyForm = defineComponent({
+    name: "ProxyForm",
+    setup(_, { attrs, slots }) {
+      const Form = computed<any>(() => {
+        return flushKey.value > -1 && createFormRender()
+      })
+      return () => h(Form.value, attrs, slots)
     }
   })
-  return [Form, formActions, forceRender] as const
+  return [props.dynamic ?? true ? ProxyForm : createFormRender(), formActions, forceRender] as const
 }
 
 export function normalizeFormConfig(c: CFormConfig): CFormConfig {

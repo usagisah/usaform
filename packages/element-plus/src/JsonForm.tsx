@@ -1,5 +1,5 @@
 import { FormStructJson } from "@usaform/vue"
-import { defineComponent, h, shallowRef } from "vue"
+import { computed, defineComponent, h, shallowRef } from "vue"
 import { ArrayField } from "./ArrayField"
 import { CFormExpose, CFormProps, useForm } from "./Form"
 import { ObjectField } from "./ObjectField"
@@ -72,45 +72,56 @@ function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStr
   return h(FormFieldComponent, attrs, _children)
 }
 
-export function createJsonForm({ struct, arrayKeys = ["key", "id"], layout, layoutProps, config: formConfig }: JsonFormConfig) {
+export function createJsonForm(jsonFormConfig: JsonFormConfig) {
+  const { dynamic = true, struct, arrayKeys = ["key", "id"], layout, layoutProps, config: formConfig } = jsonFormConfig
   const formActions = shallowRef<CFormExpose | null>(null)
   const flushKey = shallowRef(0)
   const forceRender = () => {
     formActions.value = null
     flushKey.value++
   }
-  const Form = defineComponent({
-    name: "Form",
-    setup(_, { attrs, slots, expose }) {
-      const { config, actions, createFormExpose, FieldRender } = useForm(formConfig)
-      actions.provide()
 
-      const formExpose = createFormExpose()
-      formActions.value = formExpose
-      expose(formExpose)
+  const createFormRender = () => {
+    return defineComponent({
+      name: "Form",
+      setup(_, { attrs, slots, expose }) {
+        const { config, actions, createFormExpose, FieldRender } = useForm(formConfig)
+        actions.provide()
 
-      if (typeof layout === "string") {
-        layout = config.Elements![layout]
+        const formExpose = createFormExpose()
+        formActions.value = formExpose
+        expose(formExpose)
+
+        const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements!, arrayKeys }
+        Object.assign(config.Elements!, buildScopeElement(slots))
+
+        return () => {
+          const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
+          const Layout = typeof layout === "string" ? config.Elements![layout] : layout
+          return (
+            <FieldRender>
+              {Layout ? (
+                h(Layout, { ...layoutProps, ...attrs }, { default: () => childrenSlots })
+              ) : (
+                <div class="u-form" {...attrs}>
+                  {childrenSlots}
+                </div>
+              )}
+            </FieldRender>
+          )
+        }
       }
-
-      const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements!, arrayKeys }
-      Object.assign(config.Elements!, buildScopeElement(slots))
-
-      return () => {
-        const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
-        return (
-          <FieldRender key={flushKey.value}>
-            {layout ? (
-              h(layout, { ...layoutProps, ...attrs }, { default: () => childrenSlots })
-            ) : (
-              <div class="u-form" {...attrs}>
-                {childrenSlots}
-              </div>
-            )}
-          </FieldRender>
-        )
-      }
+    })
+  }
+  const ProxyForm = defineComponent({
+    name: "ProxyForm",
+    setup(_, { attrs, slots }) {
+      const Form = computed<any>(() => {
+        return flushKey.value > -1 && createFormRender()
+      })
+      return () => h(Form.value, attrs, slots)
     }
   })
-  return [Form, formActions, forceRender] as const
+
+  return [dynamic ? ProxyForm : createFormRender(), formActions, forceRender] as const
 }
