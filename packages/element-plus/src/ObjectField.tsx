@@ -1,5 +1,5 @@
 import { FormActionCallInfo, ObjectFieldActions, useFormObjectField } from "@usaform/vue"
-import { Ref, SlotsType, computed, defineComponent, h, ref } from "vue"
+import { ComputedRef, Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref } from "vue"
 import { CFormConfig, CFormRuleItem } from "./Form"
 import { CFormItemProps } from "./controller/FormItem"
 import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
@@ -54,9 +54,9 @@ export const ObjectField = defineComponent({
 
     const { fieldValue, FieldRender, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
       const { Elements, layoutProps, Rules, objectFieldController } = formConfig
-      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements![layout]
-      if (!FieldLayout && objectFieldController) FieldLayout = isPlainObject(objectFieldController) ? layout : Elements![objectFieldController]
-      if (element) FieldElement = isPlainObject(element) ? element : Elements![element]
+      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements!.value[layout]
+      if (!FieldLayout && objectFieldController) FieldLayout = isPlainObject(objectFieldController) ? layout : Elements!.value[objectFieldController]
+      if (element) FieldElement = isPlainObject(element) ? element : Elements!.value[element]
 
       gLayoutProps = layoutProps
       gFieldRules = Rules
@@ -87,8 +87,8 @@ export const ObjectField = defineComponent({
         fieldValue,
         actions,
         props: props.props ?? {},
-        layoutProps: { ...gLayoutProps, ...props.layoutProps },
-        Rules: gFieldRules,
+        layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}) },
+        Rules: unref(gFieldRules),
         formConfig: formConfig_,
         fieldProps: attrs,
         children: ({ bind, props }) => {

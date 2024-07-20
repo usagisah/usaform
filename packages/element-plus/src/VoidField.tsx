@@ -23,7 +23,7 @@ export const VoidField = defineComponent({
 
     useFormVoidField(name, ({ formConfig }) => {
       if (typeof element === "string") {
-        element = resolveScopeElement(element, formConfig.Elements)
+        element = resolveScopeElement(element, formConfig.Elements.value)
       }
       return {
         toJson: createFormCFieldToJson(props, null, element)

@@ -1,5 +1,5 @@
 import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usaform/vue"
-import { Ref, SlotsType, computed, defineComponent, h, ref } from "vue"
+import { ComputedRef, Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref } from "vue"
 import { CFormConfig, CFormRuleItem } from "./Form"
 import { CFormItemProps } from "./controller/FormItem"
 import { CFormItemExpose } from "./controller/helper"
@@ -53,16 +53,16 @@ export const PlainField = defineComponent<CPlainFieldProps>({
     let FieldSlot = slots.default
 
     let gLayoutProps: any = {}
-    let gFieldRules: Record<any, CFormRuleItem>
+    let gFieldRules: any
 
     let vModel = { v: "", e: "" }
     let formConfig_ = {} as any
 
     const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig }) => {
       let { Elements, Rules, layoutProps, plainFieldController, modelValue } = formConfig
-      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements![layout]
-      if (!FieldLayout && plainFieldController) FieldLayout = isPlainObject(plainFieldController) ? layout : Elements![plainFieldController]
-      if (element) FieldElement = isPlainObject(element) ? element : Elements![element]
+      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements!.value[layout]
+      if (!FieldLayout && plainFieldController) FieldLayout = isPlainObject(plainFieldController) ? layout : Elements!.value[plainFieldController]
+      if (element) FieldElement = isPlainObject(element) ? element : Elements!.value[element]
 
       gLayoutProps = layoutProps!
       gFieldRules = Rules!
@@ -79,7 +79,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
         reset: () => {
           // 确保初始值在没有可用的情况下，永远是外部传进来最新的
           fieldValue.value = initValue === undefined ? props.initValue : initValue
-          fieldLayoutRef.value?.setValidateState({ error: false, message: "" })
+          fieldLayoutRef.value?.setValidateState({ status: "", message: "" })
         },
         validate({ path }: FormActionCallInfo) {
           return fieldLayoutRef.value?.validate(path, fieldValue.value)
@@ -109,8 +109,8 @@ export const PlainField = defineComponent<CPlainFieldProps>({
         fieldValue,
         actions,
         props: props.props ?? {},
-        layoutProps: { ...gLayoutProps, ...props.layoutProps },
-        Rules: gFieldRules,
+        layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}) },
+        Rules: unref(gFieldRules),
         formConfig: formConfig_,
         fieldProps: attrs,
         children: ({ bind, props }) => {

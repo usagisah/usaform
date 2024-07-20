@@ -1,5 +1,5 @@
 import { ArrayFieldActions, FormActionCallInfo, useFormArrayField } from "@usaform/vue"
-import { Ref, SlotsType, computed, defineComponent, h, ref } from "vue"
+import { Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref } from "vue"
 import { CFormConfig, CFormRuleItem } from "./Form"
 import { CFormItemProps } from "./controller/FormItem"
 import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
@@ -93,8 +93,8 @@ export const ArrayField = defineComponent({
         fieldValue,
         actions: cActions,
         props: props.props ?? {},
-        layoutProps: { ...gLayoutProps, ...props.layoutProps },
-        Rules: gFieldRules,
+        layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}) },
+        Rules: unref(gFieldRules),
         formConfig: formConfig_,
         fieldProps: attrs,
         children: ({ bind, props }) => {

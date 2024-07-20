@@ -92,12 +92,12 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
         formActions.value = formExpose
         expose(formExpose)
 
-        const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements!, arrayKeys }
-        Object.assign(config.Elements!, buildScopeElement(slots))
+        const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements!.value, arrayKeys }
+        Object.assign(config.Elements!.value, buildScopeElement(slots))
 
         return () => {
           const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
-          const Layout = typeof layout === "string" ? config.Elements![layout] : layout
+          const Layout = typeof layout === "string" ? config.Elements!.value[layout] : layout
           return (
             <FieldRender>
               {Layout ? (
