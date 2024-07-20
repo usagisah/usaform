@@ -1,7 +1,6 @@
 <script lang="tsx" setup>
-import { onMounted, ref } from "vue"
 import { ElSelect, ElOption, ElInput, ElRadio, ElRadioGroup, ElCheckbox, ElCheckboxGroup, ElInputNumber, ElDivider, ElCard, ElButton, ElDatePicker, ElCascader, ElSpace } from "element-plus"
-import { Form, FormItem, PlainField, CFormExpose, exportFormStructJson } from "@usaform/element-plus"
+import { createForm, FormItem, PlainField } from "@usaform/element-plus"
 
 const CascaderOptions = [
   {
@@ -272,12 +271,13 @@ const CascaderOptions = [
   }
 ]
 
-const formSlot = ref<CFormExpose | null>(null)
+const [FormSlot, formSlotRef] = createForm()
 const callSlot = async (key: string) => {
-  console.log(await formSlot.value![key]())
+  console.log(await formSlotRef.value![key]())
 }
-const formKey = ref<CFormExpose | null>(null)
-const callKey = async (key: string) => console.log(await formKey.value![key]())
+
+const [FormKey, formKeyRef] = createForm({ config: { plainFieldController: "FormItem" } })
+const callKey = async (key: string) => console.log(await formKeyRef.value![key]())
 
 const customLabel = (attrs: any) => <div {...attrs}>时间</div>
 </script>
@@ -286,7 +286,7 @@ const customLabel = (attrs: any) => <div {...attrs}>时间</div>
   <ElSpace>
     <ElCard>
       <template #header>插槽</template>
-      <Form ref="formSlot">
+      <FormSlot>
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
         <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', labelWidth: '60px', mode: 'left', rules: [{ trigger: 'blur', required: true, message: '该字段是必填的' }] }">
           <template #default="{ bind }">
@@ -343,12 +343,12 @@ const customLabel = (attrs: any) => <div {...attrs}>时间</div>
           <ElButton @click="callSlot('validate')">validate</ElButton>
           <ElButton @click="callSlot('reset')">reset</ElButton>
         </FormItem>
-      </Form>
+      </FormSlot>
     </ElCard>
 
     <ElCard>
       <template #header>指定 key</template>
-      <Form ref="formKey" :config="{ plainFieldController: 'FormItem' }">
+      <FormKey>
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
         <PlainField name="input" :layout-props="{ label: '名称' }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
         <PlainField name="number" :layout-props="{ label: '数量' }" element="ElInputNumber" :props="{ placeholder: '请输入数量' }" />
@@ -364,7 +364,7 @@ const customLabel = (attrs: any) => <div {...attrs}>时间</div>
           <ElButton @click="callKey('validate')">validate</ElButton>
           <ElButton @click="callKey('reset')">reset</ElButton>
         </FormItem>
-      </Form>
+      </FormKey>
     </ElCard>
   </ElSpace>
 </template>

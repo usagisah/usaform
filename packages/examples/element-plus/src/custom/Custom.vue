@@ -1,14 +1,10 @@
 <script lang="ts" setup>
-import { CFormConfig, CFormExpose, Form, PlainField } from "@usaform/element-plus"
-import { ref } from "vue"
+import { createForm, PlainField } from "@usaform/element-plus"
 import CustomElement from "./CustomElement.vue"
 import CustomLayout from "./CustomLayout.vue"
 import { ElButton, ElSpace } from "element-plus"
 
-const config: CFormConfig = {
-  Elements: { CustomElement, CustomLayout }
-}
-const form = ref<CFormExpose>()
+const [Form, form] = createForm({ config: { Elements: { CustomElement, CustomLayout } } })
 const layoutIncrease = () => {
   form.value!.callLayout("all", "increase")
 }
@@ -18,7 +14,7 @@ const elementIncrease = () => {
 </script>
 
 <template>
-  <Form ref="form" :config="config">
+  <Form>
     <PlainField name="input" layout="CustomLayout" element="CustomElement"></PlainField>
   </Form>
   <ElSpace>

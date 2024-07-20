@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { ElSelect, ElOption, ElInput, ElRadio, ElRadioGroup, ElCheckbox, ElCheckboxGroup, ElInputNumber, ElDivider, ElCard, ElButton, ElDatePicker, ElCascader, ElSpace } from "element-plus"
-import { Form, FormItem, PlainField, CFormExpose, ObjectField, exportFormStructJson } from "@usaform/element-plus"
+import { createForm, FormItem, PlainField, CFormExpose, ObjectField, exportFormStructJson } from "@usaform/element-plus"
 
 const CascaderOptions = [
   {
@@ -272,10 +272,12 @@ const CascaderOptions = [
   }
 ]
 
-const formSlot = ref<CFormExpose | null>(null)
+const [FormSlot, formSlot] = createForm()
 const callSlot = async (key: string) => console.log(await formSlot.value![key]())
-const formKey = ref<CFormExpose | null>(null)
+
+const [FormKey, formKey] = createForm()
 const callKey = async (key: string) => console.log(await formKey.value![key]())
+
 onMounted(() => {
   console.log("export json", exportFormStructJson(formKey.value!.field))
 })
@@ -285,7 +287,7 @@ onMounted(() => {
   <ElSpace>
     <ElCard>
       <template #header>插槽</template>
-      <Form ref="formSlot">
+      <FormSlot>
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
         <ObjectField name="object">
           <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称' }">
@@ -348,12 +350,12 @@ onMounted(() => {
           <ElButton @click="callSlot('validate')">validate</ElButton>
           <ElButton @click="callSlot('reset')">reset</ElButton>
         </FormItem>
-      </Form>
+      </FormSlot>
     </ElCard>
 
     <ElCard>
       <template #header>指定 key</template>
-      <Form ref="formKey">
+      <FormKey>
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
         <ObjectField name="object">
           <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称' }" element="ElInput" :props="{ placeholder: '请输入名称' }" />
@@ -373,7 +375,7 @@ onMounted(() => {
           <ElButton @click="callKey('validate')">validate</ElButton>
           <ElButton @click="callKey('reset')">reset</ElButton>
         </FormItem>
-      </Form>
+      </FormKey>
     </ElCard>
   </ElSpace>
 </template>

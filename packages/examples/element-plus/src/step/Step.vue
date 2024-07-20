@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { ElButton, ElCard, ElDivider, ElInput, ElSpace, ElStep, ElSteps } from "element-plus"
-import { CFormExpose, Form, PlainField } from "@usaform/element-plus"
+import { createForm, PlainField } from "@usaform/element-plus"
 
 const active = ref(1)
 const next = () => active.value++
 
-const form = ref<CFormExpose>()
-const submit = () => console.log( form.value?.getFormData() )
+const [Form, form] = createForm()
+const submit = () => console.log(form.value?.getFormData())
 </script>
 
 <template>

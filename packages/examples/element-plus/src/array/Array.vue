@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { ElInput, ElDivider, ElCard, ElButton, ElSpace } from "element-plus"
-import { Form, FormItem, PlainField, CFormExpose, ArrayField, exportFormStructJson } from "@usaform/element-plus"
+import { createForm, FormItem, PlainField, CFormExpose, ArrayField, exportFormStructJson } from "@usaform/element-plus"
 
-const formSlot = ref<CFormExpose | null>(null)
+const [FormSlot, formSlot] = createForm()
 const callSlot = async (key: string) => console.log(await formSlot.value![key]())
-const formKey = ref<CFormExpose | null>(null)
+
+const [FormKey, formKey] = createForm()
 const callKey = async (key: string) => console.log(await formKey.value![key]())
+
 const printJson = () => {
   console.log(exportFormStructJson(formKey.value!.field))
 }
@@ -16,7 +18,7 @@ const printJson = () => {
   <ElSpace>
     <ElCard>
       <template #header>插槽</template>
-      <Form ref="formSlot">
+      <FormSlot>
         <ArrayField name="array">
           <template #default="{ fieldValue, actions }">
             <div v-for="(item, i) in fieldValue" :key="item.id">
@@ -42,12 +44,12 @@ const printJson = () => {
           <ElButton @click="callSlot('validate')">validate</ElButton>
           <ElButton @click="callSlot('reset')">reset</ElButton>
         </FormItem>
-      </Form>
+      </FormSlot>
     </ElCard>
 
     <ElCard>
       <template #header>指定 key</template>
-      <Form ref="formKey">
+      <FormKey>
         <ArrayField name="array" element="ArraySlot" />
         <ElDivider content-position="center">(布局样式) 提交</ElDivider>
         <FormItem>
@@ -56,7 +58,7 @@ const printJson = () => {
           <ElButton @click="callKey('reset')">reset</ElButton>
           <ElButton @click="printJson">printJson</ElButton>
         </FormItem>
-      </Form>
+      </FormKey>
     </ElCard>
   </ElSpace>
 </template>

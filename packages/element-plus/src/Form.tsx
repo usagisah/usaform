@@ -112,30 +112,16 @@ export function useForm(formConfig?: CFormConfig) {
   return { actions, config, field, FieldRender, validate, reset, callLayout, callElement, createFormRender, createFormExpose }
 }
 
-export function createForm() {
+export function createForm(props: CFormProps = {}) {
   const formActions = shallowRef<CFormExpose | null>(null)
   const flushKey = shallowRef(0)
   const forceRender = () => {
     formActions.value = null
     flushKey.value++
   }
-  const Form = defineComponent<CFormProps>({
+  const Form = defineComponent({
     name: "Form",
-    props: {
-      config: {
-        type: Object,
-        required: false
-      },
-      layout: {
-        type: [Object, String],
-        required: false
-      },
-      layoutProps: {
-        type: Object,
-        required: false
-      }
-    } as any as undefined,
-    setup(props, { attrs, slots, expose }) {
+    setup(_, { attrs, slots, expose }) {
       const { createFormRender, actions, createFormExpose } = useForm(props.config)
       actions.provide()
 
@@ -143,7 +129,7 @@ export function createForm() {
       formActions.value = formExpose
       expose(formExpose)
 
-      return createFormRender(attrs, slots, props.layout, flushKey)
+      return createFormRender(attrs, slots, props, flushKey)
     }
   })
   return [Form, formActions, forceRender] as const

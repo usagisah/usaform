@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onUnmounted, provide, reactive, ref } from "vue"
 import { ElDivider, ElCard, ElButton } from "element-plus"
-import { Form, FormConfig, FormItem, CFormExpose, ArrayField } from "@usaform/element-plus"
+import { FormConfig, FormItem, CFormExpose, ArrayField, createForm } from "@usaform/element-plus"
 
 /* -------------- 模拟三级表单中的内容，这里为了方便，写死并用 provide 共享 -------------- */
 const fetchData = reactive({
@@ -34,10 +34,9 @@ const fidFirstData = {
     }
   ]
 }
-const formConfig: FormConfig = { defaultFormData: fidFirstData }
 
 /* -------------- 基础操作 -------------- */
-const form = ref<CFormExpose | null>(null)
+const [Form, form] = createForm({ config: { defaultFormData: fidFirstData } })
 const submit = () => {
   console.log(form.value!.getFormData())
 }
@@ -81,7 +80,7 @@ onUnmounted(() => {
   <ElDivider content-position="center">首屏 {{ t }} 秒后，模拟接口动态更新表单，注意第一条的内容变化</ElDivider>
   <ElCard style="width: 1000px">
     <template #header>指定 key</template>
-    <Form :config="formConfig" ref="form">
+    <Form>
       <ArrayField name="dynamic" element="DynamicGroup" />
       <ElDivider content-position="center">(布局样式) 提交</ElDivider>
       <FormItem>

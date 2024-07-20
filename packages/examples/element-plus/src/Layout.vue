@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ElAlert, ElButton, ElDivider, ElLink, ElSpace } from "element-plus"
+import { ElAlert, ElButton, ElDivider, ElSpace } from "element-plus"
 import { ref, shallowReactive } from "vue"
 import Basic from "./basic/Basic.vue"
 import Obj from "./group/Object.vue"
@@ -7,7 +7,6 @@ import Arr from "./array/Array.vue"
 import Dynamic from "./dynamic/DynamicNest.vue"
 import Custom from "./custom/Custom.vue"
 import Step from "./step/Step.vue"
-import Page from "./page/Page.vue"
 import Json from "./json/Json.vue"
 
 const list = shallowReactive([
@@ -17,7 +16,6 @@ const list = shallowReactive([
   { n: "复杂嵌套", d: "3者混合的动态表单，演示功能：多层嵌套，多字段联动，动态更新，跨字段监听", c: Dynamic },
   { n: "自定义", d: "", c: Custom },
   { n: "分步表单", d: "", c: Step },
-  { n: "系统页面", d: "", c: Page },
   { n: "json 转表单", d: "", c: Json }
 ])
 const act = ref(0)

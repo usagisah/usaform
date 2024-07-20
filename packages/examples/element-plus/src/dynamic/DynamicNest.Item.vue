@@ -30,5 +30,3 @@ const remove = (i: number) => {
     <ElButton type="primary" @click="add">添加条目</ElButton>
   </ElSpace>
 </template>
-
-<style lang="scss" scoped></style>

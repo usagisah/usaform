@@ -10,5 +10,3 @@ const props = defineProps<{ fieldValue: any; actions: any }>()
     <ArrayField :name="index" element="DynamicItem" />
   </div>
 </template>
-
-<style lang="scss" scoped></style>
