@@ -3,7 +3,7 @@
   "description": "表单",
   "type": "module",
   "scripts": {
-    "test-vue": "vitest dev -c vitest.vue.config.ts"
+    "test-vue": "vitest dev -c  vitest.vue.config.ts"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
