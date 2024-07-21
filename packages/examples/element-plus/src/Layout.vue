@@ -9,6 +9,7 @@ import Custom from "./custom/Custom.vue"
 import Step from "./step/Step.vue"
 import Json from "./json/Json.vue"
 import ForceRender from "./forceRender/ForceRender.vue"
+import dynamicStruct from "./dynamicStruct/dynamicStruct.vue"
 
 const list = shallowReactive([
   { n: "普通平铺", d: "基本的平铺写法，与直接使用 ElForm 差不多", c: Basic },
@@ -18,7 +19,8 @@ const list = shallowReactive([
   { n: "自定义", d: "", c: Custom },
   { n: "分步表单", d: "", c: Step },
   { n: "json 转表单", d: "", c: Json },
-  { n: "强制刷新", d: "", c: ForceRender }
+  { n: "强制刷新", d: "", c: ForceRender },
+  { n: "模拟if动态结构", d: "", c: dynamicStruct },
 ])
 const act = ref(0)
 </script>

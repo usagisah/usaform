@@ -1,33 +1,33 @@
 <script lang="ts" setup>
-import { shallowRef, reactive } from "vue"
+import { shallowRef } from "vue"
 import { createForm, PlainField } from "@usaform/element-plus"
 import { ElButton, ElInput, ElSpace } from "element-plus"
 
-const disabled = shallowRef(false)
-const [Form, _, forceRender] = createForm({
+const count = shallowRef(0)
+const [Form, form] = createForm({
   dynamic: true,
   config: {
-    plainFieldController: "FormItem",
-    layoutProps: reactive({ disabled })
+    plainFieldController: "FormItem"
   }
 })
+const submit = () => console.log(form.value?.getFormData())
 </script>
 
 <template>
   <Form>
-    <PlainField name="a" :layoutProps="{ label: '跟随全局禁用', disabled }">
+    <PlainField v-if="count % 2 == 0" name="a" :layoutProps="{ label: '单数' }">
       <template #default="{ bind, ...p }">
         <ElInput v-bind="bind" />
       </template>
     </PlainField>
 
-    <PlainField name="b" :layout-props="{ label: '跟随全局禁用' }">
+    <PlainField v-if="count % 2 !== 0" name="b" :layout-props="{ label: '双数' }">
       <template #default="{ bind }">
         <ElInput v-bind="bind" />
       </template>
     </PlainField>
 
-    <PlainField name="c" :layout-props="{ label: '跟随全局禁用' }">
+    <PlainField v-if="count % 2 == 0" name="c" :layout-props="{ label: '单数' }">
       <template #default="{ bind }">
         <ElInput v-bind="bind" />
       </template>
@@ -35,7 +35,7 @@ const [Form, _, forceRender] = createForm({
   </Form>
 
   <ElSpace>
-    <ElButton @click="disabled = !disabled">toggle-{{ disabled }}</ElButton>
-    <ElButton @click="forceRender">强制刷新</ElButton>
+    <ElButton @click="count++">递增 count -- {{ count }}</ElButton>
+    <ElButton @click="submit"></ElButton>
   </ElSpace>
 </template>

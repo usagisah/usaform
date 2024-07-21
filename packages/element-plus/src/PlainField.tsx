@@ -1,5 +1,5 @@
 import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usaform/vue"
-import { ComputedRef, Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref } from "vue"
+import { Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref } from "vue"
 import { CFormConfig, CFormRuleItem } from "./Form"
 import { CFormItemProps } from "./controller/FormItem"
 import { CFormItemExpose } from "./controller/helper"

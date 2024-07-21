@@ -1,3 +1,9 @@
+:root {
+  --usaform-error: #f56c6c;
+  --usaform-label: #606266;
+  --usaform-label-disabled: #a8abb2;
+}
+
 .ufi {
   gap: 12px;
   justify-content: center;
@@ -22,7 +28,7 @@
 
 .ufi-label {
   display: flex;
-  color: #606266;
+  color: var(--usaform-label, #606266);
   align-items: center;
   user-select: none;
 }
@@ -72,7 +78,7 @@
 .ufi-required {
   .ufi-label::before {
     content: "*";
-    color: #f56c6c;
+    color: var(--usaform-error, #f56c6c);
     margin-right: 4px;
   }
 }
@@ -106,7 +112,7 @@
 
 .ufi-disabled {
   .ufi-label {
-    color: #a8abb2;
+    color: var(--usaform-label-disabled, #a8abb2);
   }
 }
 
@@ -116,7 +122,7 @@
   .ufi-content-error {
     position: absolute;
     top: 100%;
-    color: #f56c6c;
+    color: var(--usaform-error, #f56c6c);
     font-size: 12px;
     line-height: 1;
     left: 0;

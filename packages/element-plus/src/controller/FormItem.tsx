@@ -19,7 +19,7 @@ export interface CFormItemProps {
   // 设置容器为行内
   inline?: boolean
   // 当前字段的校验规则
-  rules?: (CFormRuleItem | string)
+  rules?: (CFormRuleItem | [string] | [string, any])[]
   // 自定义布局 class
   classNames?: string[]
 
@@ -132,15 +132,30 @@ function useRules(props: FormControllerProps, setValidate: FormControllerSetVali
       setValidate({ status: "", message: "" })
     }
 
-    const { Rules, layoutProps } = props
+    const { Rules, layoutProps, actions } = props
     const { rules = [] } = layoutProps
     changeRules = []
     blurRules = []
-    ;(rules as (string | CFormRuleItem)[]).forEach(r => {
-      const _rule = typeof r === "string" ? Rules[r] : r
+    ;(rules as ([string, any] | CFormRuleItem)[]).forEach(r => {
+      let _rule: CFormRuleItem
+      let _value: any
+      if (Array.isArray(r)) {
+        _rule = Rules[r[0]]
+        _value = r[1]
+      } else {
+        _rule = r
+        _value = r.value
+      }
       if (!_rule) return
       if (!_rule.trigger) _rule.trigger = "blur"
       if (_rule.required) fieldRequired.value = true
+      if (_rule.validator) {
+        const r = _rule as any
+        const f = _rule.validator
+        r.validator = (rule: any, value: any) => {
+          return f(value, { ...rule, value: _value, actions })
+        }
+      }
       _rule.trigger === "change" ? changeRules.push(_rule) : blurRules.push(_rule)
     })
   })

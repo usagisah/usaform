@@ -1,12 +1,14 @@
-import { FormActions, FormConfig, RootField, useForm as _useForm } from "@usaform/vue"
-import { RuleItem, ValidateOption } from "async-validator"
+import { FormActions, FormConfig, PlainFieldActions, RootField, useForm as _useForm } from "@usaform/vue"
+import { InternalRuleItem, RuleItem, SyncValidateResult, ValidateOption } from "async-validator"
 import { MaybeRef, computed, defineComponent, h, shallowRef } from "vue"
 import { normalizeFormConfig } from "./Provider"
 import { CFormItemProps } from "./controller/FormItem"
 import { buildScopeElement } from "./helper"
 
-export interface CFormRuleItem extends RuleItem {
+export interface CFormRuleItem extends Omit<RuleItem, "validator" | "asyncValidator"> {
   trigger?: "change" | "blur"
+  value?: any
+  validator?: (value: any, options: InternalRuleItem & { value: any; actions: PlainFieldActions }) => SyncValidateResult | void
 }
 
 export interface CFormConfig extends FormConfig {
