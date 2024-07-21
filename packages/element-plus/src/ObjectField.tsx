@@ -55,7 +55,7 @@ export const ObjectField = defineComponent({
     const { fieldValue, FieldRender, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
       const { Elements, layoutProps, Rules, objectFieldController } = formConfig
       if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements!.value[layout]
-      if (!FieldLayout && objectFieldController) FieldLayout = isPlainObject(objectFieldController) ? layout : Elements!.value[objectFieldController]
+      if (!FieldLayout && objectFieldController) FieldLayout = isPlainObject(objectFieldController) ? objectFieldController : Elements!.value[objectFieldController]
       if (element) FieldElement = isPlainObject(element) ? element : Elements!.value[element]
 
       gLayoutProps = layoutProps

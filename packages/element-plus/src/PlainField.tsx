@@ -1,9 +1,9 @@
 import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usaform/vue"
-import { Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref } from "vue"
+import { Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref, useAttrs } from "vue"
 import { CFormConfig, CFormRuleItem } from "./Form"
 import { CFormItemProps } from "./controller/FormItem"
 import { CFormItemExpose } from "./controller/helper"
-import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
+import { callFuncWithError, createFormCFieldToJson, isPlainObject, resolveScopeElement } from "./helper"
 
 export interface CPlainFieldProps {
   name: string | number
@@ -19,6 +19,8 @@ export interface CPlainFieldProps {
 
   element?: string | Record<any, any>
   props?: Record<any, any>
+
+  slots?: Record<any, any>
 }
 
 export interface CPlainFieldLayoutInfo {
@@ -35,7 +37,7 @@ export interface CPlainFieldLayoutInfo {
 
 export const PlainField = defineComponent<CPlainFieldProps>({
   name: "PlainField",
-  props: ["name", "initValue", "layout", "layoutProps", "element", "props", "modelValue"] as any as undefined,
+  props: ["name", "initValue", "layout", "layoutProps", "element", "props", "modelValue", "slots"] as any as undefined,
   slots: Object as SlotsType<{
     default: (props: { bind?: Record<any, any> } & Record<any, any>) => any
   }>,
@@ -50,7 +52,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
 
     let FieldLayout: any = null
     let FieldElement: any = null
-    let FieldSlot = slots.default
+    let FieldSlots: Record<string, any> = slots
 
     let gLayoutProps: any = {}
     let gFieldRules: any
@@ -60,9 +62,17 @@ export const PlainField = defineComponent<CPlainFieldProps>({
 
     const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig }) => {
       let { Elements, Rules, layoutProps, plainFieldController, modelValue } = formConfig
+
+      for (const k in props.slots) {
+        const v = props.slots[k]
+        if (typeof v === "string") FieldSlots[k] = resolveScopeElement(v, Elements.value)
+        else if (isPlainObject(v) && "setup" in v) FieldSlots[k] = () => [h(v, useAttrs())]
+        else FieldSlots[k] = v
+      }
+
       if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements!.value[layout]
-      if (!FieldLayout && plainFieldController) FieldLayout = isPlainObject(plainFieldController) ? layout : Elements!.value[plainFieldController]
-      if (element) FieldElement = isPlainObject(element) ? element : Elements!.value[element]
+      if (!FieldLayout && plainFieldController) FieldLayout = isPlainObject(plainFieldController) ? plainFieldController : Elements!.value[plainFieldController]
+      if (element) FieldElement = isPlainObject(element) ? element : resolveScopeElement(element, Elements.value)
 
       gLayoutProps = layoutProps!
       gFieldRules = Rules!
@@ -116,10 +126,10 @@ export const PlainField = defineComponent<CPlainFieldProps>({
         children: ({ bind, props }) => {
           const _props = { ...props, [vModel.v]: fieldValue.value, [vModel.e]: setFieldValue, actions, ref: fieldElementRef }
           if (FieldElement) {
-            return h(FieldElement, _props)
+            return h(FieldElement, _props, FieldSlots)
           } else {
             Object.assign(_props, { bind: { ...bind, [vModel.v]: fieldValue.value, [vModel.e]: setFieldValue, ref: fieldElementRef } })
-            return FieldSlot?.(_props)
+            return FieldSlots.default?.(_props)
           }
         }
       }
@@ -128,7 +138,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
 
     const resolveRenderElement = () => {
       const _props = { ...props.props, [vModel.v]: fieldValue.value, [vModel.e]: setFieldValue, actions, ref: fieldElementRef }
-      return FieldElement ? h(FieldElement, _props) : FieldSlot?.(_props)
+      return FieldElement ? h(FieldElement, _props, FieldSlots) : FieldSlots.default?.(_props)
     }
 
     return () => {

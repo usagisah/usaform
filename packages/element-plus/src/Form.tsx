@@ -105,7 +105,7 @@ export function createForm(props: CFormProps = {}) {
       name: "Form",
       setup(_, { attrs, slots, expose }) {
         const { FieldRender, config, actions, createFormExpose } = useForm(props.config)
-        Object.assign(config.Elements!, buildScopeElement(slots))
+        Object.assign(config.Elements!.value, buildScopeElement(slots))
 
         actions.provide()
 
