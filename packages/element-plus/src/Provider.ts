@@ -1,12 +1,13 @@
 import { App, computed, defineComponent, hasInjectionContext, inject, provide, toRaw, unref } from "vue"
 import { CFormConfig } from "./Form"
+import { FormItem } from "./controller/FormItem"
 
 export function normalizeFormConfig(currentConfig: CFormConfig): CFormConfig {
   const { Elements, Rules, layoutProps, ...c } = currentConfig
   const parentConfig = (hasInjectionContext() ? inject(FormContextConfigKey) : {}) as CFormConfig
   const config = { ...parentConfig, ...c }
 
-  config.Elements = computed(() => ({ ...unref(parentConfig.Elements), ...unref(Elements) }))
+  config.Elements = computed(() => ({ FormItem, ...unref(parentConfig.Elements), ...unref(Elements) }))
   config.Rules = computed(() => ({ ...unref(parentConfig.Rules), ...unref(Rules) }))
   config.layoutProps = computed(() => ({ ...unref(parentConfig.layoutProps), ...unref(layoutProps) }))
   if (!config.modelValue) config.modelValue = config.modelValue ?? "modelValue"

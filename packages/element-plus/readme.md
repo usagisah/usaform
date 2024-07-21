@@ -31,6 +31,6 @@
 
 文档请以 github 最新的为准
 
-[国外 github](https://github.com/usagisah/usaform/docs)
+[国外 github](https://github.com/usagisah/usaform/tree/main/docs)
 
-[国内 gitee](https://gitee.com/gxs114/usaform/docs)
+[国内 gitee](https://gitee.com/gxs114/usaform/tree/main/docs)

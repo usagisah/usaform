@@ -2,9 +2,6 @@
 import { CArrayFieldActions, PlainField } from "@usaform/element-plus"
 import { ElButton, ElSpace } from "element-plus"
 
-defineOptions({
-  inheritAttrs: false
-})
 const props = defineProps<{ fieldValue: any[]; actions: CArrayFieldActions }>()
 </script>
 
