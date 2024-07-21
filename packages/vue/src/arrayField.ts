@@ -37,6 +37,7 @@ export interface ArrayFieldActions extends FormBaseActions {
   shift: () => void
   push: (e: any) => void
   unshift: (e: any) => void
+  clear: () => void
 }
 
 type ArrayFieldInit<T> = (info: ArrayFieldInitInfo) => ArrayFieldConfig<T>
@@ -119,6 +120,11 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     else struct.splice(index, 1)
     _setStruct()
   }
+  const clear = () => {
+    const { struct } = _field
+    struct.length = 0
+    _setStruct()
+  }
   const swap: Swap = (i1, i2) => {
     const { struct } = _field
     if (i1 < 0 || i2 >= struct.length) {
@@ -135,7 +141,7 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     setValue(_field.fieldValue.value.length, e)
   }
   const unshift = (e: any) => setValue(-1, e)
-  const _actions = { setValue, delValue, swap, pop, shift, push, unshift }
+  const _actions = { setValue, delValue, swap, pop, shift, push, unshift, clear }
 
   const _field: ArrayField = {
     type: "ary",

@@ -73,7 +73,7 @@ export function useForm(formConfig?: CFormConfig) {
   }
 
   const reset = () => {
-    actions.call("all", "reset", { fieldTypes: ["plain"] })
+    actions.call("all", "reset", { fieldTypes: ["ary", "plain"] })
   }
 
   const callLayout: CFormExpose["callLayout"] = (path, key, point, ...params) => {

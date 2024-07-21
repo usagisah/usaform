@@ -68,7 +68,7 @@ export const ArrayField = defineComponent({
         initValue: initValue === undefined ? props.initValue : initValue,
         toJson: createFormCFieldToJson(props, layout, element),
         reset() {
-          actions.set("", [])
+          actions.clear()
         },
         callLayout(_: any, { key, point, params }: FormActionCallInfo) {
           return callFuncWithError(() => {
