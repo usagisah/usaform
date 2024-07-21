@@ -2,7 +2,7 @@ import { FormActionCallInfo, ObjectFieldActions, useFormObjectField } from "@usa
 import { Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref } from "vue"
 import { CFormConfig, CFormRuleItem } from "./Form"
 import { CFormItemProps } from "./controller/FormItem"
-import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
+import { callFuncWithError, createFormCFieldToJson, isPlainObject, resolveScopeElement } from "./helper"
 
 export interface CObjectFieldProps {
   name: string | number
@@ -54,9 +54,9 @@ export const ObjectField = defineComponent({
 
     const { fieldValue, FieldRender, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
       const { Elements, layoutProps, Rules, objectFieldController } = formConfig
-      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements!.value[layout]
-      if (!FieldLayout && objectFieldController) FieldLayout = isPlainObject(objectFieldController) ? objectFieldController : Elements!.value[objectFieldController]
-      if (element) FieldElement = isPlainObject(element) ? element : Elements!.value[element]
+      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements.value[layout]
+      if (!FieldLayout && objectFieldController) FieldLayout = isPlainObject(objectFieldController) ? objectFieldController : Elements.value[objectFieldController]
+      if (element) FieldElement = isPlainObject(element) ? element : resolveScopeElement(element, Elements.value)
 
       gLayoutProps = layoutProps
       gFieldRules = Rules

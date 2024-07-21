@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { ref } from "vue"
 import { ElInput, ElDivider, ElCard, ElButton, ElSpace } from "element-plus"
 import { createForm, FormItem, PlainField, CFormExpose, ArrayField, exportFormStructJson } from "@usaform/element-plus"
+import ArrayKey from "./Array.slot.vue"
 
 const [FormSlot, formSlot] = createForm()
 const callSlot = async (key: string) => console.log(await formSlot.value![key]())
 
-const [FormKey, formKey] = createForm()
+const [FormKey, formKey] = createForm({ config: { Elements: { ArrayKey } } })
 const callKey = async (key: string) => console.log(await formKey.value![key]())
 
 const printJson = () => {
@@ -50,7 +50,7 @@ const printJson = () => {
     <ElCard>
       <template #header>指定 key</template>
       <FormKey>
-        <ArrayField name="array" element="ArraySlot" />
+        <ArrayField name="array" element="ArrayKey" />
         <ElDivider content-position="center">(布局样式) 提交</ElDivider>
         <FormItem>
           <ElButton @click="callKey('getFormData')">submit</ElButton>

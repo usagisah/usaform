@@ -70,8 +70,8 @@ export const PlainField = defineComponent<CPlainFieldProps>({
         else FieldSlots[k] = v
       }
 
-      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements!.value[layout]
-      if (!FieldLayout && plainFieldController) FieldLayout = isPlainObject(plainFieldController) ? plainFieldController : Elements!.value[plainFieldController]
+      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements.value[layout]
+      if (!FieldLayout && plainFieldController) FieldLayout = isPlainObject(plainFieldController) ? plainFieldController : Elements.value[plainFieldController]
       if (element) FieldElement = isPlainObject(element) ? element : resolveScopeElement(element, Elements.value)
 
       gLayoutProps = layoutProps!

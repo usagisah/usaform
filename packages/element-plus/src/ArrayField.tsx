@@ -2,7 +2,7 @@ import { ArrayFieldActions, FormActionCallInfo, useFormArrayField } from "@usafo
 import { Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref } from "vue"
 import { CFormConfig, CFormRuleItem } from "./Form"
 import { CFormItemProps } from "./controller/FormItem"
-import { callFuncWithError, createFormCFieldToJson, isPlainObject } from "./helper"
+import { callFuncWithError, createFormCFieldToJson, isPlainObject, resolveScopeElement } from "./helper"
 
 export interface CArrayFieldProps {
   name: string | number
@@ -56,9 +56,9 @@ export const ArrayField = defineComponent({
 
     const { fieldValue, actions, FieldRender } = useFormArrayField(name, ({ initValue, formConfig }) => {
       const { Elements, layoutProps, Rules, arrayFieldController } = formConfig
-      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements![layout]
-      if (!FieldLayout && arrayFieldController) FieldLayout = isPlainObject(arrayFieldController) ? arrayFieldController : Elements![arrayFieldController]
-      if (element) FieldElement = isPlainObject(element) ? element : Elements![element]
+      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements.value[layout]
+      if (!FieldLayout && arrayFieldController) FieldLayout = isPlainObject(arrayFieldController) ? arrayFieldController : Elements.value[arrayFieldController]
+      if (element) FieldElement = isPlainObject(element) ? element : resolveScopeElement(element, Elements.value)
 
       gLayoutProps = layoutProps!
       gFieldRules = Rules!

@@ -3,7 +3,7 @@
   "description": "表单",
   "type": "module",
   "scripts": {
-    "format": "prettier --w packages/{examples,vue,element-plus}/src/*{.ts,.tsx,.vue}",
+    "format": "prettier --w packages/{examples,vue,element-plus}/*/*{.ts,.tsx,.vue}",
     "test-vue": "vitest dev -c vitest.vue.config.ts",
     "build:vue": "cd packages/vue && npm run build",
     "build:form": "cd packages/element-plus && npm run build",
@@ -13,6 +13,7 @@
     "@types/node": "^20.14.11",
     "@vitejs/plugin-vue": "^5.0.5",
     "@vitejs/plugin-vue-jsx": "^3.1.0",
+    "@volar/vue-typescript": "^1.6.5",
     "execa": "^8.0.1",
     "jsdom": "^23.2.0",
     "prettier": "^3.3.3",
