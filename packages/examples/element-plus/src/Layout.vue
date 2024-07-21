@@ -10,6 +10,7 @@ import Step from "./step/Step.vue"
 import Json from "./json/Json.vue"
 import ForceRender from "./forceRender/ForceRender.vue"
 import dynamicStruct from "./dynamicStruct/dynamicStruct.vue"
+import InnerSlots from "./InnerSlots/InnerSlots.vue"
 
 const list = shallowReactive([
   { n: "普通平铺", d: "基本的平铺写法，与直接使用 ElForm 差不多", c: Basic },
@@ -21,6 +22,7 @@ const list = shallowReactive([
   { n: "json 转表单", d: "", c: Json },
   { n: "强制刷新", d: "", c: ForceRender },
   { n: "模拟if动态结构", d: "", c: dynamicStruct },
+  { n: "内联渲染", d: "", c: InnerSlots },
 ])
 const act = ref(0)
 </script>
@@ -43,7 +45,7 @@ const act = ref(0)
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .layout {
   display: flex;
   flex-direction: column;
@@ -51,5 +53,12 @@ const act = ref(0)
   align-items: center;
   gap: 12px;
   width: 100vw;
+}
+.form {
+  width: 100%;
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
