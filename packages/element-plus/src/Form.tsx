@@ -140,5 +140,5 @@ export function createForm(props: CFormProps = {}) {
       return () => h(Form.value, attrs, slots)
     }
   })
-  return [props.dynamic ?? true ? ProxyForm : createFormRender(), formActions, forceRender] as const
+  return [(props.dynamic ?? true) ? ProxyForm : createFormRender(), formActions, forceRender] as const
 }

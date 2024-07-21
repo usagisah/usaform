@@ -3,26 +3,30 @@
   "description": "表单",
   "type": "module",
   "scripts": {
-    "test-vue": "vitest dev -c vitest.vue.config.ts"
+    "format": "prettier --w packages/{examples,vue,element-plus}/src/*{.ts,.tsx,.vue}",
+    "test-vue": "vitest dev -c vitest.vue.config.ts",
+    "build:vue": "cd packages/vue && npm run build",
+    "build:form": "cd packages/element-plus && npm run build",
+    "prebuild": "npm run build:vue && npm run build:form"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0",
-    "@vitejs/plugin-vue": "^5.0.3",
+    "@types/node": "^20.14.11",
+    "@vitejs/plugin-vue": "^5.0.5",
     "@vitejs/plugin-vue-jsx": "^3.1.0",
     "execa": "^8.0.1",
     "jsdom": "^23.2.0",
-    "prettier": "^3.2.2",
+    "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^3.2.4",
-    "prettier-plugin-packagejson": "^2.4.9",
-    "sass": "^1.69.7",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.11",
-    "vitest": "^1.2.0",
-    "vue": "^3.4.13"
+    "prettier-plugin-packagejson": "^2.5.1",
+    "sass": "^1.77.8",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.4",
+    "vitest": "^1.6.0",
+    "vue": "^3.4.33"
   },
   "private": true,
   "dependencies": {
-    "@vue/test-utils": "^2.4.3",
-    "puppeteer": "^21.7.0"
+    "@vue/test-utils": "^2.4.6",
+    "puppeteer": "^21.11.0"
   }
 }

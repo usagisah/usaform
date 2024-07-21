@@ -1,5 +1,5 @@
 {
-  "printWidth": 99999,
+  "printWidth": 180,
   "tabWidth": 2,
   "useTabs": false,
   "semi": false,
@@ -13,5 +13,5 @@
   "vueIndentScriptAndStyle": false,
   "endOfLine": "lf",
   "singleAttributePerLine": false,
-  "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-organize-imports"]
+  "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-packagejson"]
 }
