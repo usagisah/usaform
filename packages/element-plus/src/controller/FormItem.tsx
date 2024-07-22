@@ -140,7 +140,7 @@ function useRules(props: FormControllerProps, setValidate: FormControllerSetVali
       let _rule: CFormRuleItem
       let _value: any
       if (Array.isArray(r)) {
-        _rule = Rules[r[0]]
+        _rule = Rules[r[0]](r[1])
         _value = r[1]
       } else {
         _rule = r

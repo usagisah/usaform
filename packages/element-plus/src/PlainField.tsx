@@ -27,7 +27,7 @@ export interface CPlainFieldLayoutInfo {
   type: "plain"
   fieldValue: Ref<any>
   actions: PlainFieldActions
-  Rules: Record<any, CFormRuleItem>
+  Rules: Record<any, (value: any) => CFormRuleItem>
   props: Record<any, any>
   layoutProps: CFormItemProps
   children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any

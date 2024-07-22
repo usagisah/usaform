@@ -20,7 +20,7 @@ export interface CObjectFieldLayoutInfo {
   type: "object"
   fieldValue: Ref<any>
   actions: ObjectFieldActions
-  Rules: Record<any, CFormRuleItem>
+  Rules: Record<any, (value: any) => CFormRuleItem>
   props: Record<any, any>
   layoutProps: CFormItemProps
   formConfig: CFormConfig

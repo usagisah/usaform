@@ -22,7 +22,7 @@ export interface CArrayFieldLayoutInfo {
   type: "array"
   fieldValue: Ref<any[]>
   actions: CArrayFieldActions
-  Rules: Record<any, CFormRuleItem>
+  Rules: Record<any, (value: any) => CFormRuleItem>
   props: Record<any, any>
   layoutProps: CFormItemProps
   formConfig: CFormConfig
