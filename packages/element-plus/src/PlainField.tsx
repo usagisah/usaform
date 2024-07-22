@@ -88,7 +88,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
         toJson: createFormCFieldToJson(props, layout, element),
         reset: () => {
           // 确保初始值在没有可用的情况下，永远是外部传进来最新的
-          fieldValue.value = initValue === undefined ? props.initValue : initValue
+          fieldValue.value = props.initValue
           fieldLayoutRef.value?.setValidateState({ status: "", message: "" })
         },
         validate({ path }: FormActionCallInfo) {

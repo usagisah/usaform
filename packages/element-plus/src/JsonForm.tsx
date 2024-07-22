@@ -73,7 +73,6 @@ function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStr
 }
 
 export function createJsonForm(jsonFormConfig: JsonFormConfig) {
-  const { dynamic = true, struct, arrayKeys = ["key", "id"], layout, layoutProps, config: formConfig } = jsonFormConfig
   const formActions = shallowRef<CFormExpose | null>(null)
   const flushKey = shallowRef(0)
   const forceRender = () => {
@@ -85,7 +84,12 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
     return defineComponent({
       name: "Form",
       setup(_, { attrs, slots, expose }) {
+        const { struct, arrayKeys = ["key", "id"], layout, layoutProps, config: formConfig } = jsonFormConfig
         const { config, actions, createFormExpose, FieldRender } = useForm(formConfig)
+
+        const { defaultFormLayout } = config
+        const gFormLayout = typeof defaultFormLayout === "string" ? config.Elements!.value[defaultFormLayout] : defaultFormLayout
+
         actions.provide()
 
         const formExpose = createFormExpose()
@@ -97,7 +101,7 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
 
         return () => {
           const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
-          const Layout = typeof layout === "string" ? config.Elements!.value[layout] : layout
+          const Layout = typeof layout === "string" ? config.Elements!.value[layout] : (layout ?? gFormLayout)
           return (
             <FieldRender>
               {Layout ? (
@@ -123,5 +127,5 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
     }
   })
 
-  return [dynamic ? ProxyForm : createFormRender(), formActions, forceRender] as const
+  return [(jsonFormConfig.dynamic ?? true) ? ProxyForm : createFormRender(), formActions, forceRender] as const
 }

@@ -12,6 +12,8 @@ export interface CFormRuleItem extends Omit<RuleItem, "validator" | "asyncValida
 }
 
 export interface CFormConfig extends FormConfig {
+  // 默认使用的表单布局组件
+  defaultFormLayout?: string | Record<any, any>
   // 默认使用的控制器
   plainFieldController?: string | Record<any, any>
   objectFieldController?: string | Record<any, any>
@@ -107,6 +109,9 @@ export function createForm(props: CFormProps = {}) {
         const { FieldRender, config, actions, createFormExpose } = useForm(props.config)
         Object.assign(config.Elements!.value, buildScopeElement(slots))
 
+        const { defaultFormLayout } = config
+        const gFormLayout = typeof defaultFormLayout === "string" ? config.Elements!.value[defaultFormLayout] : defaultFormLayout
+
         actions.provide()
 
         const formExpose = createFormExpose()
@@ -115,7 +120,7 @@ export function createForm(props: CFormProps = {}) {
 
         return () => {
           const { layout, layoutProps } = props
-          const Layout = typeof layout === "string" ? config.Elements!.value[layout] : layout
+          const Layout = typeof layout === "string" ? config.Elements!.value[layout] : (layout ?? gFormLayout)
           return (
             <FieldRender>
               {Layout ? (
