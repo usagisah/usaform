@@ -6,14 +6,22 @@
 
 ```ts
 interface CFormExpose {
+  //获取表单数据
   getFormData: () => Record<string, any>;
+  //订阅路径下字段的更改
   subscribe: (path: string, handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) => () => void;
+  //获取指定路径下的值
   get: (path: string, config?: FormActionGetConfig) => Record<string, any>[];
+  //设置路径下字段的值
   set: (path: string, value: any, method?: string) => void;
+  //调用匹配路径下暴漏的方法
   call: (path: string, key: string, config?: FormActionCallConfig) => Record<string, any>;
   validate: () => Promise<CFormValidateError[]>
+  //重置所有字段的值
   reset: () => void
+  //调用指定路径下布局组件的方法
   callLayout: (path: string, key: string, ...params: any[]) => Record<string, any>
+  //调用指定路径下字段组件的方法
   callElement: (path: string, key: string, ...params: any[]) => Record<string, any>
 }
 ```

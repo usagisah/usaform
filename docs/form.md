@@ -44,7 +44,7 @@ interface CFormConfig extends FormConfig {
   // 默认的校验选项
   defaultValidateOption?: ValidateOption
   // 用于指定 key 的规则
-  Rules?: MaybeRef<Record<any, CFormRuleItem>>
+  Rules?: MaybeRef<Record<any, (value: any) => CFormRuleItem>>
 }
 ```
 
