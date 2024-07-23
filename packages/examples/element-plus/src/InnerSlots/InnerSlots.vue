@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { h } from "vue"
-import { createForm, FormItem, PlainField } from "@usaform/element-plus"
+import { createForm, FormItem, PlainField, exportFormStructJson } from "@usaform/element-plus"
 import { ElButton, ElCard, ElOption, ElSelect, ElSpace } from "element-plus"
 import Append from "./Append.vue"
 
 const [Form, form] = createForm({ config: { plainFieldController: FormItem } })
 const onSubmit = () => console.log(form.value?.getFormData())
+const printJson = () => console.log(exportFormStructJson(form.value!.field))
 
 const PrependComp = () => [h("div", "prepend")]
 </script>
@@ -32,6 +33,7 @@ const PrependComp = () => [h("div", "prepend")]
 
     <ElSpace>
       <ElButton type="primary" @click="onSubmit">submit</ElButton>
+      <ElButton type="primary" @click="printJson">json</ElButton>
     </ElSpace>
   </ElCard>
 </template>

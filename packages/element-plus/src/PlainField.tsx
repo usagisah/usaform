@@ -1,5 +1,5 @@
 import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usaform/vue"
-import { Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref, useAttrs } from "vue"
+import { Component, Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref, useAttrs } from "vue"
 import { CFormConfig, CFormRuleItem } from "./Form"
 import { CFormItemProps } from "./controller/FormItem"
 import { CFormItemExpose } from "./controller/helper"
@@ -20,7 +20,7 @@ export interface CPlainFieldProps {
   element?: string | Record<any, any>
   props?: Record<any, any>
 
-  slots?: Record<any, any>
+  slots?: Record<string, Component | string>
 }
 
 export interface CPlainFieldLayoutInfo {
@@ -53,6 +53,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
     let FieldLayout: any = null
     let FieldElement: any = null
     let FieldSlots: Record<string, any> = slots
+    let slotsMap: Record<string, string> = {}
 
     let gLayoutProps: any = {}
     let gFieldRules: any
@@ -60,13 +61,15 @@ export const PlainField = defineComponent<CPlainFieldProps>({
     let vModel = { v: "", e: "" }
     let formConfig_ = {} as any
 
-    const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig }) => {
+    const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig, ...p }) => {
       let { Elements, Rules, layoutProps, plainFieldController, modelValue } = formConfig
 
       for (const k in props.slots) {
         const v = props.slots[k]
-        if (typeof v === "string") FieldSlots[k] = resolveScopeElement(v, Elements.value)
-        else if (isPlainObject(v) && "setup" in v) FieldSlots[k] = () => [h(v, useAttrs())]
+        if (typeof v === "string") {
+          FieldSlots[k] = resolveScopeElement(v, Elements.value)
+          slotsMap[k] = v
+        } else if (isPlainObject(v) && "setup" in v) FieldSlots[k] = () => [h(v, useAttrs())]
         else FieldSlots[k] = v
       }
 
@@ -85,9 +88,8 @@ export const PlainField = defineComponent<CPlainFieldProps>({
 
       return {
         initValue: initValue === undefined ? props.initValue : initValue,
-        toJson: createFormCFieldToJson(props, layout, element),
+        toJson: createFormCFieldToJson(props, layout, element, slotsMap),
         reset: () => {
-          // 确保初始值在没有可用的情况下，永远是外部传进来最新的
           fieldValue.value = props.initValue
           fieldLayoutRef.value?.setValidateState({ status: "", message: "" })
         },

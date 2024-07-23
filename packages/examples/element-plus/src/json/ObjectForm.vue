@@ -33,8 +33,8 @@ const _getFormData = () => console.log(FormRef.value!.getFormData())
   <Form ref="FomrRef">
     <template #submit>
       <ElButton type="primary" @click="_getFormData">submit</ElButton>
-      <ElButton @click="() => FormRef.value?.validate()">validate</ElButton>
-      <ElButton @click="() => FormRef.value?.reset()">reset</ElButton>
+      <ElButton @click="() => FormRef?.validate()">validate</ElButton>
+      <ElButton @click="() => FormRef?.reset()">reset</ElButton>
     </template>
   </Form>
 </template>

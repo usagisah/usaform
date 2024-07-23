@@ -10,7 +10,7 @@ export function isPlainObject(target: any): target is Record<string, any> {
   return Object.prototype.toString.call(target) === "[object Object]"
 }
 
-export function createFormCFieldToJson(props: Record<any, any>, layout: any, element: any) {
+export function createFormCFieldToJson(props: Record<any, any>, layout: any, element: any, slots?: Record<string, any>) {
   return function toJson() {
     const json: Record<any, any> = {}
     if (typeof layout === "string") json.layout = layout
@@ -20,7 +20,7 @@ export function createFormCFieldToJson(props: Record<any, any>, layout: any, ele
     if (initValue !== undefined) json.initValue = initValue
     if (isPlainObject(elemProps)) json.props = elemProps
     if (isPlainObject(layoutProps)) json.layoutProps = layoutProps
-
+    if (slots) json.slots = slots
     return json
   }
 }

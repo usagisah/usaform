@@ -58,8 +58,8 @@ const push = () => {
   <Form>
     <template #submit>
       <ElButton type="primary" @click="_getFormData">submit</ElButton>
-      <ElButton @click="() => FormRef.value?.validate()">validate</ElButton>
-      <ElButton @click="() => FormRef.value?.reset()">reset</ElButton>
+      <ElButton @click="() => FormRef?.validate()">validate</ElButton>
+      <ElButton @click="() => FormRef?.reset()">reset</ElButton>
       <ElButton @click="push">尾部添加</ElButton>
     </template>
   </Form>

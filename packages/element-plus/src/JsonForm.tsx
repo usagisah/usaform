@@ -1,5 +1,5 @@
 import { FormStructJson } from "@usaform/vue"
-import { computed, defineComponent, h, shallowRef } from "vue"
+import { Component, computed, defineComponent, h, shallowRef } from "vue"
 import { ArrayField } from "./ArrayField"
 import { CFormExpose, CFormProps, useForm } from "./Form"
 import { ObjectField } from "./ObjectField"
@@ -14,6 +14,7 @@ export type JsonFormStructJson = Omit<FormStructJson, "children"> & {
   layoutProps?: CFormItemProps
   element?: string
   props?: Record<any, any>
+  slots?: Record<string, string | Component>
   children?: JsonFormStructJson[]
 }
 export type JsonFormConfig = CFormProps & {
@@ -84,7 +85,7 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
     return defineComponent({
       name: "Form",
       setup(_, { attrs, slots, expose }) {
-        const { struct, arrayKeys = ["key", "id"], layout, layoutProps, config: formConfig } = jsonFormConfig
+        const { arrayKeys = ["key", "id"], config: formConfig } = jsonFormConfig
         const { config, actions, createFormExpose, FieldRender } = useForm(formConfig)
 
         const { defaultFormLayout } = config
@@ -100,6 +101,7 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
         Object.assign(config.Elements!.value, buildScopeElement(slots))
 
         return () => {
+          const { struct, layout, layoutProps } = jsonFormConfig
           const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
           const Layout = typeof layout === "string" ? config.Elements!.value[layout] : (layout ?? gFormLayout)
           return (
