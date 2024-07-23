@@ -43,7 +43,7 @@ interface ArrayFieldActions extends FormBaseActions {
 
 所有方法，只要重名，效果就是一样的
 
-互操作对象依赖内置的[路径系统](./path)，查找要操作的对象字段
+互操作对象依赖内置的[路径系统](./path.md)，查找要操作的对象字段
 
 
 

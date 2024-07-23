@@ -74,11 +74,11 @@ interface CPlainFieldProps {
 
 `modelValue` 规定双向绑定的 `key`，对于 `element-plus` 几乎都是 `modelValue` 绑定，但 `ant-design-vue` 却有很多不同的绑定
 
-`layout/element` 分别决定了布局和填充使用什么，可以传递组件，也可以是个引用字符串。`layout` 通常会被指定为 `FormItem`，它是内置的控制器和布局组件，详细内容请看 [控制器](./layout)
+`layout/element` 分别决定了布局和填充使用什么，可以传递组件，也可以是个引用字符串。`layout` 通常会被指定为 `FormItem`，它是内置的控制器和布局组件，详细内容请看 [控制器](./layout.md)
 
-`layoutProps/props` 分别是传递给各自组件的参数，布局参数详细内容请看 [控制器](./layout)
+`layoutProps/props` 分别是传递给各自组件的参数，布局参数详细内容请看 [控制器](./layout.md)
 
-`slots` 用于传递插槽，详细用法请看 [slots](./slots)
+`slots` 用于传递插槽，详细用法请看 [slots](./slots.md)
 
 ### 提取插槽到单个文件被引用
 
@@ -101,7 +101,7 @@ const props = defineProps<{ actions: ... }>()
 
 因为 `Vue` 的属性可以被自动继承，所以不需要显示的接收 `props` 就可以直接传递给例子中的 `ElSelect`，感兴趣有什么可以打印下 `attrs`  查看
 
-`actions` 是与表单交互的操作对象，不同的字段组件会有不同的操作对象，详细用法看 [操作对象](./action)
+`actions` 是与表单交互的操作对象，不同的字段组件会有不同的操作对象，详细用法看 [操作对象](./action.md)
 
 定义完成后在表单配置里进行注册就可以正常使用了
 
