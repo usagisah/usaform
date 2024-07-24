@@ -1,4 +1,4 @@
-import { Field, FormField } from "../form.helper"
+import { Field, FormField } from "../form/field.type"
 import { MatchPath, parsePath } from "./path"
 
 export interface ResolveConfig {

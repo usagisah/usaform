@@ -1,4 +1,5 @@
-import { FormField, resolveArrayItem, safeGetProperty } from "../form.helper"
+import { FormField } from "../form/field.type"
+import { resolveArrayItem, safeGetProperty } from "../shared/resolve"
 
 export function mapFieldToRecord(field: FormField, arrayUnwrapKey: string[]): Record<string, any> {
   if (field.type === "plain") return field.getter()

@@ -1,49 +1,30 @@
 import { inject, onBeforeUnmount, provide } from "vue"
-import { FormBaseActions, useFormActions } from "./actions/hooks"
-import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
-import { FormContext, GlobalInfo, formContext } from "./context"
-import { createFieldRender } from "./fieldRender"
-import { BaseFiled, Field, FieldName, FieldToJson, FieldWrapper, FormConfig, getFieldStructSize, resolveFieldDefaultValue, setProperty } from "./form.helper"
-import { FieldValue, useFieldValue } from "./useFieldValue"
-
-export interface ObjectField extends BaseFiled, FieldValue {
-  type: "object"
-  struct: Map<FieldName, Field>
-  userConfig: Record<any, any>
-}
-
-export interface ObjectFieldInitInfo {
-  initValue: any
-  formConfig: FormConfig
-}
-
-export interface ObjectFieldConfig<T = any> {
-  initValue?: T
-  toJson?: FieldToJson
-  [x: string]: any
-}
-
-export interface ObjectFieldActions extends FormBaseActions {}
-
-type ObjectFieldInit<T> = (info: ObjectFieldInitInfo) => ObjectFieldConfig<T>
+import { useFormActions } from "../actions/hooks"
+import { ArrayItemInitParams } from "../arrayField/arrayField.type"
+import { useFormArrayItem } from "../arrayField/arrayItem"
+import { formContext, FormContext } from "../form/context"
+import { FieldName, FieldWrapper } from "../form/field.type"
+import { createFieldRender } from "../shared/fieldRender"
+import { getFieldStructSize, resolveFieldDefaultValue, setProperty } from "../shared/resolve"
+import { useFieldValue } from "../shared/useFieldValue"
+import { ObjectField, ObjectFieldActions, ObjectFieldInit } from "./objectField.type"
 
 export function useFormObjectField<T = any>(name: FieldName, init: ObjectFieldInit<T>): FieldWrapper<T, ObjectFieldActions, false> {
-  const ctx = inject<FormContext>(formContext)
-  if (!ctx) throw GlobalInfo.invalidField
+  const ctx = inject(formContext) as FormContext
 
   const { field, root, arrayUnwrapKey } = ctx
   if (field.type === "ary") {
     return useFormArrayItem({
       ctx,
       init: p => createObjectField(name, ctx, init, p),
-      afterInit: updateField,
+      afterInit: handleFieldUpdate,
       index: name as number
     })
   }
 
   const { _field } = createObjectField(name, ctx, init)
   field.struct.set(name, _field)
-  updateField(_field, ctx, () => {
+  handleFieldUpdate(_field, ctx, () => {
     field.struct.delete(name)
   })
 
@@ -54,7 +35,7 @@ export function useFormObjectField<T = any>(name: FieldName, init: ObjectFieldIn
   }
 }
 
-function updateField(_field: ObjectField, ctx: FormContext, clean: Function) {
+function handleFieldUpdate(_field: ObjectField, ctx: FormContext, clean: Function) {
   const { name } = _field
   const provideContext: FormContext = { ...ctx, field: _field, currentInitValue: { ..._field.getter() } }
   provide(formContext, provideContext)
@@ -66,7 +47,7 @@ function updateField(_field: ObjectField, ctx: FormContext, clean: Function) {
   onBeforeUnmount(() => {
     _field.struct.clear()
     _field.clearSubscribers()
-    setProperty(ctx.currentInitValue, name, null)
+    setProperty(ctx.currentInitValue, name, undefined)
     clean()
   })
 }
@@ -78,12 +59,12 @@ export function createObjectField(name: FieldName, ctx: FormContext, init: Objec
     type: "object",
     name,
     order: getFieldStructSize(ctx.field),
+    ...useFieldValue(initValue ?? _defaultValue, {}, () => name),
     struct: new Map(),
-    userConfig: _conf,
     parent: ctx.field,
     toJson,
-    __uform_field: true,
-    ...useFieldValue(initValue ?? _defaultValue, {}, () => name)
+    userConfig: _conf,
+    __uform_field: true
   }
   return { _field }
 }

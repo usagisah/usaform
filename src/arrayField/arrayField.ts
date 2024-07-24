@@ -1,64 +1,43 @@
 import { inject, onBeforeUnmount, provide, toRaw } from "vue"
-import { FormBaseActions, useFormActions } from "./actions/hooks"
-import { ArrayItemInitParams, useFormArrayItem } from "./arrayItem"
-import { FormContext, GlobalInfo, formContext } from "./context"
-import { createFieldRender } from "./fieldRender"
-import { BaseFiled, Field, FieldName, FieldToJson, FieldWrapper, FormConfig, getFieldStructSize, resolveFieldDefaultValue, safeGetProperty, setProperty } from "./form.helper"
-import { FieldValue, useFieldValue } from "./useFieldValue"
+import { useFormActions } from "../actions/hooks"
+import { formContext, FormContext } from "../form/context"
+import { Field, FieldName, FieldWrapper } from "../form/field.type"
+import { createFieldRender } from "../shared/fieldRender"
+import { getFieldStructSize, resolveFieldDefaultValue, safeGetProperty, setProperty } from "../shared/resolve"
+import { useFieldValue } from "../shared/useFieldValue"
+import {
+  ArrayActionDelValue,
+  ArrayActionPop,
+  ArrayActionPush,
+  ArrayActionSetValue,
+  ArrayActionShift,
+  ArrayActionSwap,
+  ArrayActionUnshift,
+  ArrayField,
+  ArrayFieldActions,
+  ArrayFieldInit,
+  ArrayItemInitParams
+} from "./arrayField.type"
+import { useFormArrayItem } from "./arrayItem"
 
-export interface ArrayField extends BaseFiled, FieldValue {
-  type: "ary"
-  struct: Field[]
-  setting: boolean
-  userConfig: Record<any, any>
-}
-
-type SetValue = (index: number, e: any) => void
-type DelValue = (index: number) => void
-type Swap = (i1: number, i2: number) => void
 export const ArrayEmptyItem = Symbol()
 
-export interface ArrayFieldInitInfo {
-  initValue: any[]
-  formConfig: FormConfig
-}
-
-export interface ArrayFieldConfig<T = any> {
-  initValue?: T[]
-  toJson?: FieldToJson
-  [x: string]: any
-}
-
-export interface ArrayFieldActions extends FormBaseActions {
-  setValue: SetValue
-  delValue: DelValue
-  swap: Swap
-  pop: () => void
-  shift: () => void
-  push: (e: any) => void
-  unshift: (e: any) => void
-  clear: () => void
-}
-
-type ArrayFieldInit<T> = (info: ArrayFieldInitInfo) => ArrayFieldConfig<T>
-
 export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit<T>): FieldWrapper<T[], ArrayFieldActions, false> {
-  const ctx = inject<FormContext>(formContext)
-  if (!ctx) throw GlobalInfo.invalidField
+  const ctx = inject(formContext) as FormContext
 
   const { field, root, arrayUnwrapKey } = ctx
   if (field.type === "ary") {
     return useFormArrayItem({
       ctx,
       init: p => createArrayField(name, ctx, init, p),
-      afterInit: updateField,
+      afterInit: handleFieldUpdate,
       index: name as number
     })
   }
 
   const { _field, _actions } = createArrayField(name, ctx, init)
   field.struct.set(name, _field)
-  updateField(_field, ctx, () => {
+  handleFieldUpdate(_field, ctx, () => {
     field.struct.delete(name)
   })
 
@@ -69,13 +48,17 @@ export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit
   }
 }
 
-function updateField(_field: ArrayField, ctx: FormContext, clean: Function) {
+function handleFieldUpdate(_field: ArrayField, ctx: FormContext, clean: Function) {
   const { name } = _field
   const provideContext: FormContext = { ...ctx, field: _field, currentInitValue: [..._field.getter()] }
   provide(formContext, provideContext)
 
   _field.subscribe(() => {
-    if (_field.setting) return (_field.setting = false)
+    if (_field.setting) {
+      _field.setting = false
+      return 
+    }
+    // ???
     _field.struct = _field.fieldValue.value.map((item: Field) => {
       return safeGetProperty(item, "__uform_aryItem_field") ? (item as any).__aryValue : item
     })
@@ -105,7 +88,8 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     _field.struct = _fieldStruct
     _field.fieldValue.value = _fieldValue
   }
-  const setValue: SetValue = (index, e) => {
+
+  const setValue: ArrayActionSetValue = (index, e) => {
     e = toRaw(e)
     const { struct } = _field
     if (index >= struct.length) struct.push(e)
@@ -113,19 +97,22 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     else struct[index] = e
     _setStruct()
   }
-  const delValue: DelValue = index => {
+
+  const delValue: ArrayActionDelValue = index => {
     const { struct } = _field
     if (index >= struct.length) struct.pop()
     else if (index === -1) struct.shift()
     else struct.splice(index, 1)
     _setStruct()
   }
+
   const clear = () => {
     const { struct } = _field
     struct.length = 0
     _setStruct()
   }
-  const swap: Swap = (i1, i2) => {
+
+  const swap: ArrayActionSwap = (i1, i2) => {
     const { struct } = _field
     if (i1 < 0 || i2 >= struct.length) {
       return console.error("arrayField.swap 要交换的下标越界")
@@ -135,13 +122,18 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     struct[i2] = t
     _setStruct()
   }
-  const pop = () => delValue(_field.fieldValue.value.length)
-  const shift = () => delValue(-1)
-  const push = (e: any) => {
+
+  const pop: ArrayActionPop = () => delValue(_field.fieldValue.value.length)
+
+  const shift: ArrayActionShift = () => delValue(-1)
+
+  const push: ArrayActionPush = (e: any) => {
     setValue(_field.fieldValue.value.length, e)
   }
-  const unshift = (e: any) => setValue(-1, e)
-  const _actions = { setValue, delValue, swap, pop, shift, push, unshift, clear }
+
+  const unshift: ArrayActionUnshift = (e: any) => setValue(-1, e)
+
+  const _arrayActions = { setValue, delValue, swap, pop, shift, push, unshift, clear }
 
   const _field: ArrayField = {
     type: "ary",
@@ -153,8 +145,8 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     parent: ctx.field,
     toJson,
     __uform_field: true,
-    ...useFieldValue([...(initValue ?? _defaultValue ?? [])], _actions, () => name)
+    ...useFieldValue([...(initValue ?? _defaultValue ?? [])], _arrayActions, () => name)
   }
 
-  return { _field, _actions }
+  return { _field, _actions: _arrayActions }
 }

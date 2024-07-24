@@ -1,5 +1,5 @@
 import { Ref, ShallowRef, nextTick, shallowRef, unref, watch } from "vue"
-import { FieldName } from "./form.helper"
+import { FieldName } from "../form/field.type"
 
 export type FieldGetter = () => any
 export type FieldSetter = (value: any, method?: string) => any
@@ -12,16 +12,18 @@ export type FieldClearSubscribes = () => void
 
 export type FieldValue = {
   fieldKey: ShallowRef<number>
-  fieldValue: Ref<any>
+  fieldValue: ShallowRef<any>
   getter: () => any
   setter: FieldSetter
   subscribe: FieldSubscribe
   clearSubscribers: FieldClearSubscribes
 }
 
-export function useFieldValue(value: any, actions: Record<any, any>, getFieldName: () => FieldName): FieldValue {
-  const subscribers: FieldSubscribeHandle[] = []
+export function useFieldValue<T>(value: T, actions: Record<any, any>, getFieldName: () => FieldName): FieldValue {
   const fieldValue = shallowRef(value)
+  const fieldKey = shallowRef(0)
+  const subscribers: FieldSubscribeHandle[] = []
+
   watch(fieldValue, (newValue, oldValue) => {
     for (const fn of subscribers) {
       try {
@@ -33,6 +35,7 @@ export function useFieldValue(value: any, actions: Record<any, any>, getFieldNam
   })
 
   const getter: FieldGetter = () => unref(fieldValue)
+
   const setter: FieldSetter = (_value, method) => {
     if (method) {
       return actions[method]?.(_value)
@@ -43,6 +46,7 @@ export function useFieldValue(value: any, actions: Record<any, any>, getFieldNam
       fieldValue.value = _value
     })
   }
+
   const subscribe: FieldSubscribe = (handle, config = {}) => {
     subscribers.push(handle)
 
@@ -60,10 +64,10 @@ export function useFieldValue(value: any, actions: Record<any, any>, getFieldNam
       if (i > -1) subscribers.splice(i, 1)
     }
   }
+
   const clearSubscribers: FieldClearSubscribes = () => {
     subscribers.length = 0
   }
 
-  const fieldKey = shallowRef(0)
   return { fieldValue, fieldKey, getter, setter, subscribe, clearSubscribers }
 }

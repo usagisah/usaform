@@ -1,19 +1,9 @@
-import { useFormActions } from "./actions/hooks"
-import { ArrayEmptyItem, ArrayField } from "./arrayField"
-import { FormContext } from "./context"
-import { createFieldRender } from "./fieldRender"
-import { FieldWrapper, FormField, resolveArrayItem, safeGetProperty } from "./form.helper"
-
-export interface ArrayItemInitParams {
-  initValue: any
-}
-
-export interface ArrayItemConfig {
-  ctx: FormContext
-  init: (p: ArrayItemInitParams) => { _field: FormField; _actions?: any }
-  afterInit: (_field: any, ctx: FormContext, clean: Function) => any
-  index: number
-}
+import { useFormActions } from "../actions/hooks"
+import { FieldWrapper } from "../form/field.type"
+import { createFieldRender } from "../shared/fieldRender"
+import { resolveArrayItem, safeGetProperty } from "../shared/resolve"
+import { ArrayEmptyItem } from "./arrayField"
+import { ArrayField, ArrayItemConfig } from "./arrayField.type"
 
 export function useFormArrayItem({ ctx, init, afterInit, index }: ArrayItemConfig): FieldWrapper<any, any, any> {
   const { field, root, arrayUnwrapKey } = ctx

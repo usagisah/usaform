@@ -1,29 +1,24 @@
-import { onBeforeUnmount, provide, toRaw } from "vue"
-import { FormBaseActions, useFormActions } from "./actions/hooks"
-import { FormContext, formContext } from "./context"
-import { createFieldRender } from "./fieldRender"
-import { BaseFiled, Field, FieldName, FormConfig } from "./form.helper"
-import { FieldValue, useFieldValue } from "./useFieldValue"
+import { onBeforeUnmount, provide } from "vue"
+import { useFormActions } from "../actions/hooks"
+import { createFieldRender } from "../shared/fieldRender"
+import { useFieldValue } from "../shared/useFieldValue"
+import { formContext, FormContext } from "./context"
+import { RootField } from "./field.type"
+import { FormConfig } from "./form.type"
 
-export interface RootField extends BaseFiled, FieldValue {
-  type: "root"
-  struct: Map<FieldName, Field>
-  userConfig: Record<any, any>
-}
+export function useForm(formConfig?: FormConfig) {
+  if (!formConfig) {
+    formConfig = {}
+  }
 
-export interface FormActions extends FormBaseActions {
-  provide: () => void
-}
-
-export function useForm(formConfig: FormConfig = {}) {
-  const { defaultValue, defaultFormData, arrayUnwrapKey, arrayUnwrapArrayKey, toJson } = toRaw(formConfig)
-  const _arrayUnwrapArrayKey = arrayUnwrapKey ? (Array.isArray(arrayUnwrapKey) ? arrayUnwrapKey : [arrayUnwrapArrayKey]) : ["value", "children"]
+  const { defaultFormData, arrayUnwrapKey, toJson } = formConfig
+  const _arrayUnwrapKey = arrayUnwrapKey ? (Array.isArray(arrayUnwrapKey) ? arrayUnwrapKey : [arrayUnwrapKey]) : ["value", "children"]
   const field: RootField = {
     type: "root",
     name: "root",
     struct: new Map(),
     order: 0,
-    parent: null,
+    parent: undefined,
     userConfig: {},
     toJson,
     __uform_field: true,
@@ -33,20 +28,19 @@ export function useForm(formConfig: FormConfig = {}) {
   const context: FormContext = {
     field,
     root: field,
-    defaultValue,
     currentInitValue: { ...defaultFormData },
-    arrayUnwrapKey: _arrayUnwrapArrayKey,
+    arrayUnwrapKey: _arrayUnwrapKey,
     formConfig
   }
 
-  function formProvide() {
+  function formContextProvide() {
     provide(formContext, context)
     handleUpdate(field, context)
   }
 
   return {
     field,
-    actions: { ...useFormActions(field, field, _arrayUnwrapArrayKey), provide: formProvide },
+    actions: { ...useFormActions(field, field, _arrayUnwrapKey), provide: formContextProvide },
     FieldRender: createFieldRender(field.fieldKey, field.fieldValue)
   }
 }

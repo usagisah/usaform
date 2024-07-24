@@ -3,7 +3,7 @@
   "description": "表单",
   "type": "module",
   "scripts": {
-    "format": "prettier --w packages/{examples,vue,element-plus}/*/*{.ts,.tsx,.vue}",
+    "format": "prettier --w src/*/*{.ts,.tsx}",
     "test-vue": "vitest dev -c vitest.vue.config.ts",
     "build:vue": "cd packages/vue && npm run build",
     "build:form": "cd packages/element-plus && npm run build",
