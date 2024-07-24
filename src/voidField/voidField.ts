@@ -21,9 +21,9 @@ export function useFormVoidField(name: FieldName, init: VoidFieldInit): void {
   }
 
   if (field.type === "ary") {
-    field.struct[name] = voidField
+    field.struct[name as number] = voidField
     onBeforeUnmount(() => {
-      field.struct[name] = ArrayEmptyItem as any
+      field.struct[name as number] = ArrayEmptyItem as any
     })
   } else {
     field.struct.set(name, voidField)

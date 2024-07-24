@@ -1,4 +1,6 @@
 import { App, computed, defineComponent, hasInjectionContext, inject, provide, toRaw, unref } from "vue"
+import { FormItem } from "../controller/FormItem"
+import { CFormConfig } from "./form.type"
 
 export function normalizeFormConfig(currentConfig: CFormConfig): CFormConfig {
   const { Elements, Rules, layoutProps, ...c } = currentConfig

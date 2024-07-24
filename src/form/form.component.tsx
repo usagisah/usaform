@@ -1,59 +1,13 @@
-import { FormActions, FormConfig, PlainFieldActions, RootField, useForm as _useForm } from "@usaform/vue"
-import { InternalRuleItem, RuleItem, SyncValidateResult, ValidateOption } from "async-validator"
-import { MaybeRef, computed, defineComponent, h, shallowRef } from "vue"
+import { computed, defineComponent, h, shallowRef, unref } from "vue"
+import { CFormValidateError } from "../controller/rule"
+import { buildScopeElement } from "../shared/helper"
 import { normalizeFormConfig } from "./Provider"
-import { CFormItemProps } from "./controller/FormItem"
-import { buildScopeElement } from "./helper"
+import { useForm } from "./form"
+import { CFormConfig, CFormExpose, CFormProps } from "./form.type"
 
-export interface CFormRuleItem extends Omit<RuleItem, "validator" | "asyncValidator"> {
-  trigger?: "change" | "blur"
-  value?: any
-  validator?: (value: any, options: InternalRuleItem & { value: any; actions: PlainFieldActions }) => SyncValidateResult | void
-}
-
-export interface CFormConfig extends FormConfig {
-  // 默认使用的表单布局组件
-  defaultFormLayout?: string | Record<any, any>
-  // 默认使用的控制器
-  plainFieldController?: string | Record<any, any>
-  objectFieldController?: string | Record<any, any>
-  arrayFieldController?: string | Record<any, any>
-  // 全局布局参数
-  layoutProps?: MaybeRef<CFormItemProps>
-  // 双向绑定的 key
-  modelValue?: string
-  // 用于指定 key 的元素
-  Elements?: MaybeRef<Record<string, any>>
-  // 默认的校验选项
-  defaultValidateOption?: ValidateOption
-  // 用于指定 key 的规则
-  Rules?: MaybeRef<Record<any, (value: any) => CFormRuleItem>>
-}
-
-export interface CFormProps {
-  config?: CFormConfig
-  layout?: any
-  layoutProps?: Record<any, any>
-  dynamic?: boolean
-}
-
-export interface CFormValidateError {
-  path: string
-  field: string
-  message: string
-}
-
-export interface CFormExpose extends Omit<FormActions, "provide"> {
-  validate: () => Promise<CFormValidateError[]>
-  reset: () => void
-  callLayout: (path: string, key: string, ...params: any[]) => Record<string, any>
-  callElement: (path: string, key: string, ...params: any[]) => Record<string, any>
-  field: RootField
-}
-
-export function useForm(formConfig?: CFormConfig) {
+export function useComponentForm(formConfig?: CFormConfig) {
   const config = normalizeFormConfig(formConfig ?? {})
-  const { actions, FieldRender, field } = _useForm(config)
+  const { actions, FieldRender, field } = useForm(config)
 
   const validate: CFormExpose["validate"] = async () => {
     const res = actions.call("all", "validate", { fieldTypes: ["plain"] })
@@ -106,11 +60,11 @@ export function createForm(props: CFormProps = {}) {
     return defineComponent({
       name: "Form",
       setup(_, { attrs, slots, expose }) {
-        const { FieldRender, config, actions, createFormExpose } = useForm(props.config)
+        const { FieldRender, config, actions, createFormExpose } = useComponentForm(props.config)
         Object.assign(config.Elements!.value, buildScopeElement(slots))
 
         const { defaultFormLayout } = config
-        const gFormLayout = typeof defaultFormLayout === "string" ? config.Elements!.value[defaultFormLayout] : defaultFormLayout
+        const gFormLayout = typeof defaultFormLayout === "string" ? unref(config.Elements!)[defaultFormLayout] : defaultFormLayout
 
         actions.provide()
 
@@ -120,7 +74,7 @@ export function createForm(props: CFormProps = {}) {
 
         return () => {
           const { layout, layoutProps } = props
-          const Layout = typeof layout === "string" ? config.Elements!.value[layout] : (layout ?? gFormLayout)
+          const Layout = typeof layout === "string" ? unref(config.Elements!)[layout] : (layout ?? gFormLayout)
           return (
             <FieldRender>
               {Layout ? (

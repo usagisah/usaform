@@ -1,12 +1,13 @@
-import { FormStructJson } from "@usaform/vue"
-import { Component, computed, defineComponent, h, shallowRef } from "vue"
-import { ArrayField } from "./ArrayField"
-import { CFormExpose, CFormProps, useForm } from "./Form"
-import { ObjectField } from "./ObjectField"
-import { PlainField } from "./PlainField"
-import { VoidField } from "./VoidField"
-import { CFormItemProps } from "./controller/FormItem"
-import { buildScopeElement } from "./helper"
+import { Component, computed, defineComponent, h, shallowRef, unref } from "vue"
+import { ArrayField } from "../arrayField/arrayField.component"
+import { CFormItemProps } from "../controller/FormItem.type"
+import { ObjectField } from "../objectField/ObjectField.component"
+import { PlainField } from "../plainField/plainField.object"
+import { buildScopeElement } from "../shared/helper"
+import { FormStructJson } from "../user.helper"
+import { VoidField } from "../voidField/voidField.component"
+import { useComponentForm } from "./form.component"
+import { CFormExpose, CFormProps } from "./form.type"
 
 export type JsonFormStructJson = Omit<FormStructJson, "children"> & {
   type: "plain" | "object" | "ary" | "void"
@@ -48,7 +49,7 @@ function createArrayItem(children: JsonFormStructJson[], deep: number, ctx: Rend
 }
 
 type RenderJsonStructContext = { memo: Map<string, any>; Elements: Record<string, any>; arrayKeys: string[] }
-const renderStrategy = { plain: PlainField, object: ObjectField, ary: ArrayField, void: VoidField }
+const renderStrategy: Record<string, Component> = { plain: PlainField, object: ObjectField, ary: ArrayField, void: VoidField }
 function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStructContext): any {
   const { type, children, ...attrs } = struct
   const FormFieldComponent = renderStrategy[type as keyof typeof renderStrategy]
@@ -86,10 +87,10 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
       name: "Form",
       setup(_, { attrs, slots, expose }) {
         const { arrayKeys = ["key", "id"], config: formConfig } = jsonFormConfig
-        const { config, actions, createFormExpose, FieldRender } = useForm(formConfig)
+        const { config, actions, createFormExpose, FieldRender } = useComponentForm(formConfig)
 
         const { defaultFormLayout } = config
-        const gFormLayout = typeof defaultFormLayout === "string" ? config.Elements!.value[defaultFormLayout] : defaultFormLayout
+        const gFormLayout = typeof defaultFormLayout === "string" ? unref(config.Elements!)[defaultFormLayout] : defaultFormLayout
 
         actions.provide()
 
@@ -103,7 +104,7 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
         return () => {
           const { struct, layout, layoutProps } = jsonFormConfig
           const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
-          const Layout = typeof layout === "string" ? config.Elements!.value[layout] : (layout ?? gFormLayout)
+          const Layout = typeof layout === "string" ? unref(config.Elements!)[layout] : (layout ?? gFormLayout)
           return (
             <FieldRender>
               {Layout ? (

@@ -1,7 +1,10 @@
+import { ShallowRef } from "vue"
 import { FormBaseActions } from "../actions/hooks"
+import { CFormItemProps } from "../controller/FormItem.type"
+import { CFormRuleItem } from "../controller/rule"
 import { FormContext } from "../form/context"
 import { BaseFiled, Field, FieldToJson, FormField } from "../form/field.type"
-import { FormConfig } from "../form/form.type"
+import { CFormConfig, FormConfig } from "../form/form.type"
 import { Obj } from "../shared/type"
 import { FieldValue } from "../shared/useFieldValue"
 
@@ -43,4 +46,30 @@ export type ArrayItemConfig = {
   init: (p: ArrayItemInitParams) => { _field: FormField; _actions?: any }
   afterInit: (_field: any, ctx: FormContext, clean: Function) => unknown
   index: number
+}
+
+export interface CArrayFieldProps {
+  name: string | number
+
+  initValue?: any[]
+
+  layout?: string | Record<any, any>
+  layoutProps?: CFormItemProps
+
+  element?: string | Record<any, any>
+  props?: Record<any, any>
+}
+
+export interface CArrayFieldActions extends ArrayFieldActions {}
+
+export interface CArrayFieldLayoutInfo {
+  type: "array"
+  fieldValue: ShallowRef<any[]>
+  actions: CArrayFieldActions
+  Rules: Record<any, (value: any) => CFormRuleItem>
+  props: Record<any, any>
+  layoutProps: CFormItemProps
+  formConfig: CFormConfig
+  fieldProps: Record<any, any>
+  children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
 }

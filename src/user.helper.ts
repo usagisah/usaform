@@ -1,6 +1,6 @@
 import { getCurrentInstance, nextTick, onBeforeUnmount } from "vue"
-import { RootField } from "./form"
-import { Field, FieldName } from "./form.helper"
+import { Field, FieldName, RootField } from "./form/field.type"
+
 export function onNextTick(fn: () => any) {
   const ins = getCurrentInstance()
   nextTick(() => {

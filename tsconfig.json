@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "target": "ES2020",
+    "module": "ES2020",
+    "moduleResolution": "Bundler",
+    "declaration": true,
+    "sourceMap": true,
+    "incremental": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "jsx": "preserve",
+    "jsxImportSource": "vue"
+  },
+  "include": [
+    "./src/**/*.tsx",
+    "./src/**/*.ts"
+  ]
+}

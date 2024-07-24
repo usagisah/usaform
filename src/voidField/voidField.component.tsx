@@ -1,6 +1,6 @@
-import { useFormVoidField } from "@usaform/vue"
 import { SlotsType, defineComponent, h } from "vue"
-import { createFormCFieldToJson, resolveScopeElement } from "./helper"
+import { createFormCFieldToJson, resolveScopeElement } from "../shared/helper"
+import { useFormVoidField } from "./voidField"
 
 export interface CVoidFieldProps {
   name: string | number

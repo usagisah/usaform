@@ -1,39 +1,8 @@
-import { ArrayFieldActions, ObjectFieldActions, PlainFieldActions } from "@usaform/vue"
 import Schema from "async-validator"
 import { SlotsType, computed, defineComponent, h, onUnmounted, reactive, shallowRef, watch, watchEffect } from "vue"
-import { CFormRuleItem } from "../Form"
-import { isPlainObject } from "../helper"
-import { FormControllerProps, FormControllerSetValidate, FormControllerValidateState } from "./helper"
-
-export interface CFormItemProps {
-  // 标题
-  label?: string | Record<any, any> | ((...props: any[]) => any)
-  // 标题宽度
-  labelWidth?: string | number
-  // 尺寸
-  size?: "small" | "large" | "default"
-  // 禁用
-  disabled?: boolean
-  // 布局模式
-  mode?: "left" | "right" | "top"
-  // 设置容器为行内
-  inline?: boolean
-  // 当前字段的校验规则
-  rules?: (CFormRuleItem | [string] | [string, any])[]
-  // 自定义布局 class
-  classNames?: string[]
-
-  [x: string]: any
-}
-
-export interface CFormSlotAttrs {
-  id: string
-  size: "small" | "large" | "default"
-  status: string
-  disabled: boolean
-  onBlur: (e: any) => void
-  actions?: PlainFieldActions & ObjectFieldActions & ArrayFieldActions
-}
+import { isPlainObject } from "../shared/check"
+import { CFormSlotAttrs, FormControllerProps, FormControllerSetValidate, FormControllerValidateState } from "./FormItem.type"
+import { CFormRuleItem } from "./rule"
 
 let randomIdCount = 0
 export const FormItem = defineComponent({

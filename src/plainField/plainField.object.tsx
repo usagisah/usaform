@@ -1,39 +1,10 @@
-import { FormActionCallInfo, PlainFieldActions, useFormPlainField } from "@usaform/vue"
-import { Component, Ref, SlotsType, computed, defineComponent, h, reactive, ref, unref, useAttrs } from "vue"
-import { CFormConfig, CFormRuleItem } from "./Form"
-import { CFormItemProps } from "./controller/FormItem"
-import { CFormItemExpose } from "./controller/helper"
-import { callFuncWithError, createFormCFieldToJson, isPlainObject, resolveScopeElement } from "./helper"
-
-export interface CPlainFieldProps {
-  name: string | number
-
-  // 初始值
-  initValue?: any
-
-  // 双向绑定的 key
-  modelValue?: string
-
-  layout?: string | Record<any, any>
-  layoutProps?: CFormItemProps
-
-  element?: string | Record<any, any>
-  props?: Record<any, any>
-
-  slots?: Record<string, Component | string>
-}
-
-export interface CPlainFieldLayoutInfo {
-  type: "plain"
-  fieldValue: Ref<any>
-  actions: PlainFieldActions
-  Rules: Record<any, (value: any) => CFormRuleItem>
-  props: Record<any, any>
-  layoutProps: CFormItemProps
-  children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
-  fieldProps: Record<any, any>
-  formConfig: CFormConfig
-}
+import { SlotsType, computed, defineComponent, h, reactive, ref, unref, useAttrs } from "vue"
+import { FormActionCallInfo } from "../actions/hooks"
+import { CFormItemExpose } from "../controller/FormItem.type"
+import { isPlainObject } from "../shared/check"
+import { callFuncWithError, createFormCFieldToJson, resolveScopeElement } from "../shared/helper"
+import { useFormPlainField } from "./plainField"
+import { CPlainFieldLayoutInfo, CPlainFieldProps } from "./plainField.type"
 
 export const PlainField = defineComponent<CPlainFieldProps>({
   name: "PlainField",
