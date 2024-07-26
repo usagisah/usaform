@@ -3,7 +3,7 @@ import { FormBaseActions } from "../actions/hooks"
 import { CFormItemProps } from "../controller/FormItem.type"
 import { CFormRuleItem } from "../controller/rule"
 import { BaseFiled, Field, FieldName, FieldToJson } from "../form/field.type"
-import { CFormConfig, FormConfig } from "../form/form.type"
+import { FormConfig } from "../form/form.type"
 import { Obj } from "../shared/type"
 import { FieldValue } from "../shared/useFieldValue"
 
@@ -42,7 +42,7 @@ export interface CObjectFieldLayoutInfo {
   Rules: Record<string, (value: any) => CFormRuleItem>
   props: Obj
   layoutProps: CFormItemProps
-  formConfig: CFormConfig
+  formConfig: FormConfig
   fieldAttrs: HTMLAttributes & Obj
   children: (p: { bind: Obj; props: Obj }) => any
 }

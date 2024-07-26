@@ -7,17 +7,17 @@ import { Obj } from "../shared/type"
 import { FormStructJson } from "../user.helper"
 import { FieldToJson, RootField } from "./field.type"
 
-export type FormConfig = {
-  defaultFormData?: Obj
-  arrayUnwrapKey?: string | string[]
-  toJson?: FieldToJson
-} & Obj
-
 export type FormActions = FormBaseActions & {
   provide: () => void
 }
 
-export interface CFormConfig extends FormConfig {
+export interface FormConfig {
+  // 默认的数据
+  defaultFormData?: Obj
+  // 结构数据的顺序
+  arrayUnwrapKey?: string | string[]
+  // 转 json
+  toJson?: FieldToJson
   // 默认使用的表单布局组件
   defaultFormLayout?: string | Component
   // 默认使用的控制器
@@ -37,7 +37,7 @@ export interface CFormConfig extends FormConfig {
 }
 
 export interface CFormProps {
-  config?: CFormConfig
+  config?: FormConfig
   layout?: string | Component
   layoutProps?: Obj
   dynamic?: boolean

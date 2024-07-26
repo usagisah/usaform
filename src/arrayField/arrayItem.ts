@@ -1,6 +1,6 @@
 import { useFormActions } from "../actions/hooks"
 import { FieldWrapper } from "../form/field.type"
-import { createFieldRender } from "../shared/fieldRender"
+import { createFieldRender } from "../shared/field"
 import { resolveArrayItem, safeGetProperty } from "../shared/resolve"
 import { ArrayEmptyItem } from "./arrayField"
 import { ArrayField, ArrayItemConfig } from "./arrayField.type"

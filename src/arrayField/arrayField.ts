@@ -2,7 +2,7 @@ import { inject, onBeforeUnmount, provide, toRaw } from "vue"
 import { useFormActions } from "../actions/hooks"
 import { formContext, FormContext } from "../form/context"
 import { Field, FieldName, FieldWrapper } from "../form/field.type"
-import { createFieldRender } from "../shared/fieldRender"
+import { createFieldRender } from "../shared/field"
 import { getFieldStructSize, resolveFieldDefaultValue, safeGetProperty, setProperty } from "../shared/resolve"
 import { useFieldValue } from "../shared/useFieldValue"
 import {

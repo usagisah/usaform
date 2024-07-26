@@ -1,7 +1,7 @@
 export { ArrayField } from "./arrayField/arrayField.component"
 export type { CArrayFieldActions, CArrayFieldLayoutInfo, CArrayFieldProps } from "./arrayField/arrayField.type"
 export { createForm } from "./form/form.component"
-export type { CFormConfig, CFormExpose, CFormProps, JsonFormConfig, JsonFormStructJson } from "./form/form.type"
+export type { CFormExpose, CFormProps, FormConfig, JsonFormConfig, JsonFormStructJson } from "./form/form.type"
 export { createJsonForm } from "./form/JsonForm"
 export { CFormPlugin, CFormProvider } from "./form/Provider"
 export { ObjectField } from "./objectField/ObjectField.component"

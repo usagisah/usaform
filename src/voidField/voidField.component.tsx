@@ -1,4 +1,4 @@
-import { SlotsType, defineComponent, h } from "vue"
+import { SlotsType, defineComponent, h, unref } from "vue"
 import { createFormCFieldToJson, resolveScopeElement } from "../shared/helper"
 import { useFormVoidField } from "./voidField"
 import { CVoidFieldProps } from "./voidField.type"
@@ -17,7 +17,7 @@ export const VoidField = defineComponent<CVoidFieldProps>({
 
     useFormVoidField(name, ({ formConfig }) => {
       if (typeof element === "string") {
-        element = resolveScopeElement(element, formConfig.Elements.value)
+        element = resolveScopeElement(element, unref(formConfig.Elements!))
       }
       return {
         toJson: createFormCFieldToJson(props, null, element)

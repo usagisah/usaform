@@ -3,9 +3,9 @@ import { CFormValidateError } from "../controller/rule"
 import { buildScopeElement } from "../shared/helper"
 import { normalizeFormConfig } from "./Provider"
 import { useForm } from "./form"
-import { CFormConfig, CFormExpose, CFormProps } from "./form.type"
+import { CFormExpose, CFormProps, FormConfig } from "./form.type"
 
-export function useComponentForm(formConfig?: CFormConfig) {
+export function useComponentForm(formConfig?: FormConfig) {
   const config = normalizeFormConfig(formConfig ?? {})
   const { actions, FieldRender, field } = useForm(config)
 

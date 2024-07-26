@@ -1,7 +1,8 @@
-import { SlotsType, computed, defineComponent, h, reactive, ref, unref } from "vue"
+import { SlotsType, computed, defineComponent, h, reactive, shallowRef, unref } from "vue"
 import { FormActionCallInfo } from "../actions/hooks"
-import { isPlainObject } from "../shared/check"
-import { callFuncWithError, createFormCFieldToJson, resolveScopeElement } from "../shared/helper"
+import { FieldComponentConfig, resolveFieldComponentConfig } from "../shared/field"
+import { callFuncWithError, createFormCFieldToJson } from "../shared/helper"
+import { Obj } from "../shared/type"
 import { useFormObjectField } from "./objectField"
 import { CObjectFieldLayoutInfo, CObjectFieldProps, ObjectFieldActions } from "./objectField.type"
 
@@ -17,31 +18,14 @@ export const ObjectField = defineComponent<CObjectFieldProps>({
       throw "非法的使用方式，请正确使用 ObjectField 组件"
     }
 
-    const fieldLayoutRef = ref<Record<any, any> | null>(null)
-    const fieldElementRef = ref<Record<any, any> | null>(null)
-
-    let FieldLayout: any
-    let FieldElement: any
-    let FieldSlot = slots.default
-
-    let gLayoutProps: any = {}
-    let gFieldRules: any = {}
-
-    let formConfig_ = {} as any
-
+    let fieldComponentConfig: FieldComponentConfig
+    const fieldLayoutRef = shallowRef<Obj | null>(null)
+    const fieldElementRef = shallowRef<Obj | null>(null)
     const { fieldValue, FieldRender, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
-      const { Elements, layoutProps, Rules, objectFieldController } = formConfig
-      if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements.value[layout]
-      if (!FieldLayout && objectFieldController) FieldLayout = isPlainObject(objectFieldController) ? objectFieldController : Elements.value[objectFieldController]
-      if (element) FieldElement = isPlainObject(element) ? element : resolveScopeElement(element, Elements.value)
-
-      gLayoutProps = layoutProps
-      gFieldRules = Rules
-      formConfig_ = formConfig
-
+      fieldComponentConfig = resolveFieldComponentConfig("object", formConfig, props, slots)
       return {
         initValue: initValue === undefined ? props.initValue : initValue,
-        toJson: createFormCFieldToJson(props, layout, element),
+        toJson: createFormCFieldToJson(props, layout, element, fieldComponentConfig.fieldSlotsMap),
         callLayout(_: any, { key, point, params }: FormActionCallInfo) {
           return callFuncWithError(() => {
             const f = fieldLayoutRef.value?.[key]
@@ -57,37 +41,30 @@ export const ObjectField = defineComponent<CObjectFieldProps>({
       }
     })
 
-    const controllerProps = computed(() => {
-      if (!FieldLayout) return null
-      const p: CObjectFieldLayoutInfo = {
+    const { fieldElement, fieldLayout, fieldSlots, gLayoutProps, gRules, formConfig } = fieldComponentConfig!
+    const objectControllerProps = computed<CObjectFieldLayoutInfo>(() => {
+      return {
         type: "object",
         fieldValue,
         actions,
         props: props.props ?? {},
         layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}) },
-        Rules: unref(gFieldRules),
-        formConfig: formConfig_,
+        Rules: unref(gRules),
+        formConfig: formConfig,
         fieldAttrs: attrs,
-        children: ({ bind, props }) => {
-          const _props = { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
-          if (FieldElement) {
-            return [h(FieldElement, _props)]
-          } else {
-            Object.assign(_props, { bind: { ...bind, ref: fieldElementRef } })
-            return FieldSlot?.(_props)
-          }
-        }
+        children: resolveRenderElement
       }
-      return p
     })
-
-    const resolveRenderElement = () => {
-      const _props = { ...props.props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
-      return FieldElement ? h(FieldElement, _props) : FieldSlot?.(_props)
+    const resolveRenderElement = ({ props, bind }: Obj = {}) => {
+      if (fieldElement) {
+        return h(fieldElement, { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef })
+      } else {
+        return fieldSlots.default?.({ bind: { ...bind, ref: fieldElementRef }, value: fieldValue.value, actions })
+      }
     }
 
     return () => {
-      return <FieldRender>{FieldLayout ? h(FieldLayout, { FormControllerProps: controllerProps.value, ref: fieldLayoutRef }) : resolveRenderElement()}</FieldRender>
+      return <FieldRender>{fieldLayout ? h(fieldLayout, { FormControllerProps: objectControllerProps.value, ref: fieldLayoutRef }) : resolveRenderElement()}</FieldRender>
     }
   }
 })

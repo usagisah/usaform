@@ -3,7 +3,7 @@ import { FormBaseActions } from "../actions/hooks"
 import { CFormItemProps } from "../controller/FormItem.type"
 import { CFormRuleItem } from "../controller/rule"
 import { BaseFiled, FieldToJson } from "../form/field.type"
-import { CFormConfig, FormConfig } from "../form/form.type"
+import { FormConfig } from "../form/form.type"
 import { Obj } from "../shared/type"
 import { FieldValue } from "../shared/useFieldValue"
 
@@ -53,5 +53,5 @@ export interface CPlainFieldLayoutInfo {
   layoutProps: CFormItemProps
   children: (p: { bind: Obj; props: Obj }) => any
   fieldAttrs: HTMLAttributes & Obj
-  formConfig: CFormConfig
+  formConfig: FormConfig
 }
