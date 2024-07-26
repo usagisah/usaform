@@ -1,4 +1,4 @@
-import { ShallowRef } from "vue"
+import { Component, HTMLAttributes, ShallowRef } from "vue"
 import { FormBaseActions } from "../actions/hooks"
 import { CFormItemProps } from "../controller/FormItem.type"
 import { CFormRuleItem } from "../controller/rule"
@@ -23,26 +23,26 @@ export type ObjectFieldActions = FormBaseActions
 export type ObjectFieldConfig<T = unknown> = { initValue?: T; toJson?: FieldToJson }
 export type ObjectFieldInit<T> = (info: ObjectFieldInitInfo) => ObjectFieldConfig<T>
 
-export interface CObjectFieldProps {
+export interface CObjectFieldProps extends HTMLAttributes, Obj {
   name: string | number
 
   initValue?: any
 
-  layout?: string | Record<any, any>
+  layout?: string | Component
   layoutProps?: CFormItemProps
 
-  element?: string | Record<any, any>
-  props?: Record<any, any>
+  element?: string | Component
+  props?: Obj
 }
 
 export interface CObjectFieldLayoutInfo {
   type: "object"
   fieldValue: ShallowRef<any>
   actions: ObjectFieldActions
-  Rules: Record<any, (value: any) => CFormRuleItem>
+  Rules: Record<string, (value: any) => CFormRuleItem>
   props: Obj
   layoutProps: CFormItemProps
   formConfig: CFormConfig
-  fieldProps: Obj
+  fieldAttrs: HTMLAttributes & Obj
   children: (p: { bind: Obj; props: Obj }) => any
 }

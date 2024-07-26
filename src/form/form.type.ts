@@ -4,6 +4,7 @@ import { FormBaseActions } from "../actions/hooks"
 import { CFormItemProps } from "../controller/FormItem.type"
 import { CFormRuleItem, CFormValidateError } from "../controller/rule"
 import { Obj } from "../shared/type"
+import { FormStructJson } from "../user.helper"
 import { FieldToJson, RootField } from "./field.type"
 
 export type FormConfig = {
@@ -48,4 +49,19 @@ export interface CFormExpose extends Omit<FormActions, "provide"> {
   callLayout: (path: string, key: string, ...params: any[]) => Record<string, any>
   callElement: (path: string, key: string, ...params: any[]) => Record<string, any>
   field: RootField
+}
+
+export type JsonFormStructJson = Omit<FormStructJson, "children"> & {
+  type: "plain" | "object" | "ary" | "void"
+  layout?: string
+  layoutProps?: CFormItemProps
+  element?: string
+  props?: Record<any, any>
+  slots?: Record<string, string | Component>
+  children?: JsonFormStructJson[]
+}
+
+export type JsonFormConfig = CFormProps & {
+  struct: JsonFormStructJson[]
+  arrayKeys?: string[]
 }

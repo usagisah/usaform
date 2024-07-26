@@ -1,4 +1,3 @@
-import { provide } from "vue"
 import { FormField, NestField } from "./field.type"
 import { FormConfig } from "./form.type"
 

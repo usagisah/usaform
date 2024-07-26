@@ -1,3 +1,4 @@
+import { Component } from "vue"
 import { ArrayFieldActions, CArrayFieldLayoutInfo } from "../arrayField/arrayField.type"
 import { CObjectFieldLayoutInfo, ObjectFieldActions } from "../objectField/objectField.type"
 import { CPlainFieldLayoutInfo, PlainFieldActions } from "../plainField/plainField.type"
@@ -14,7 +15,7 @@ export type CFormItemExpose = {
 
 export interface CFormItemProps {
   // 标题
-  label?: string | Record<any, any> | ((...props: any[]) => any)
+  label?: string | Component
   // 标题宽度
   labelWidth?: string | number
   // 尺寸

@@ -67,7 +67,7 @@ export const ObjectField = defineComponent<CObjectFieldProps>({
         layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}) },
         Rules: unref(gFieldRules),
         formConfig: formConfig_,
-        fieldProps: attrs,
+        fieldAttrs: attrs,
         children: ({ bind, props }) => {
           const _props = { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
           if (FieldElement) {

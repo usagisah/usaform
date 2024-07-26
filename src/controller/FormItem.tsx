@@ -5,14 +5,14 @@ import { CFormSlotAttrs, FormControllerProps, FormControllerSetValidate, FormCon
 import { CFormRuleItem } from "./rule"
 
 let randomIdCount = 0
-export const FormItem = defineComponent({
+export const FormItem = defineComponent<{ FormControllerProps?: FormControllerProps }>({
   name: "FormItem",
-  props: ["FormControllerProps"],
+  props: ["FormControllerProps"] as any as undefined,
   inheritAttrs: true,
   slots: Object as SlotsType<{
     default: (props?: CFormSlotAttrs) => any
   }>,
-  setup(props: { FormControllerProps?: FormControllerProps }, { slots, expose }) {
+  setup(props, { slots, expose }) {
     if (!props.FormControllerProps) {
       return () => {
         return slots.default?.()
@@ -77,7 +77,7 @@ export const FormItem = defineComponent({
       const _props: CFormSlotAttrs = { ...elemProps, id, size: size.value, status: validateState.status, disabled: disabled.value, onBlur }
 
       return (
-        <div class={classNames.value}>
+        <div class={classNames.value} {...props.FormControllerProps?.fieldAttrs}>
           {LabelElem}
           <div class="ufi-content">
             {children({ props: _props, bind: _props })}

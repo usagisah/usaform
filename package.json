@@ -3,7 +3,8 @@
   "description": "表单",
   "type": "module",
   "scripts": {
-    "dev": "tsc",
+    "dev": "tsc -w",
+    "build": "tsc",
     "format": "prettier --w src/*/*{.ts,.tsx}",
     "test-vue": "vitest dev -c vitest.vue.config.ts",
     "build:vue": "cd packages/vue && npm run build",

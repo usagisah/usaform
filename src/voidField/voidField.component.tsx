@@ -1,22 +1,16 @@
 import { SlotsType, defineComponent, h } from "vue"
 import { createFormCFieldToJson, resolveScopeElement } from "../shared/helper"
 import { useFormVoidField } from "./voidField"
+import { CVoidFieldProps } from "./voidField.type"
 
-export interface CVoidFieldProps {
-  name: string | number
-
-  element: string | Record<any, any>
-  props?: Record<any, any>
-}
-
-export const VoidField = defineComponent({
+export const VoidField = defineComponent<CVoidFieldProps>({
   name: "VoidField",
-  props: ["name", "element", "props"],
+  props: ["name", "element"] as any as undefined,
   slots: Object as SlotsType<{
     default: () => any
   }>,
-  setup(props: CVoidFieldProps, { slots }) {
-    let { name, element, props: elementProps } = props
+  setup(props, { slots, attrs }) {
+    let { name, element } = props
     if (name !== 0 && !name) {
       throw "非法的使用方式，请正确使用 VoidField 组件"
     }
@@ -31,7 +25,7 @@ export const VoidField = defineComponent({
     })
 
     return () => {
-      return element ? h(element, elementProps) : slots.default?.()
+      return element ? h(element, attrs) : slots.default?.()
     }
   }
 })

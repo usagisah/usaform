@@ -56,7 +56,7 @@ function handleFieldUpdate(_field: ArrayField, ctx: FormContext, clean: Function
   _field.subscribe(() => {
     if (_field.setting) {
       _field.setting = false
-      return 
+      return
     }
     // ???
     _field.struct = _field.fieldValue.value.map((item: Field) => {

@@ -95,7 +95,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
         layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}) },
         Rules: unref(gFieldRules),
         formConfig: formConfig_,
-        fieldProps: attrs,
+        fieldAttrs: attrs,
         children: ({ bind, props }) => {
           const _props = { ...props, [vModel.v]: fieldValue.value, [vModel.e]: setFieldValue, actions, ref: fieldElementRef }
           if (FieldElement) {

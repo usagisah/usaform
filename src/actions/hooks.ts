@@ -1,6 +1,6 @@
 import { FormField } from "../form/field.type"
 import { FieldSubscribeConfig, FieldSubscribeHandle } from "../shared/useFieldValue"
-import { mapFieldToRecord } from "./mapToRecord"
+import { mapFieldToRecord } from "./mapFieldToRecord"
 import { resolveFields } from "./resolve"
 
 export interface FormActionGetConfig {

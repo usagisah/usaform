@@ -1,4 +1,4 @@
-import { ShallowRef } from "vue"
+import { Component, HTMLAttributes, ShallowRef } from "vue"
 import { FormBaseActions } from "../actions/hooks"
 import { CFormItemProps } from "../controller/FormItem.type"
 import { CFormRuleItem } from "../controller/rule"
@@ -48,16 +48,16 @@ export type ArrayItemConfig = {
   index: number
 }
 
-export interface CArrayFieldProps {
+export interface CArrayFieldProps extends HTMLAttributes, Obj {
   name: string | number
 
   initValue?: any[]
 
-  layout?: string | Record<any, any>
+  layout?: string | Component
   layoutProps?: CFormItemProps
 
-  element?: string | Record<any, any>
-  props?: Record<any, any>
+  element?: string | Component
+  props?: Obj
 }
 
 export interface CArrayFieldActions extends ArrayFieldActions {}
@@ -66,10 +66,10 @@ export interface CArrayFieldLayoutInfo {
   type: "array"
   fieldValue: ShallowRef<any[]>
   actions: CArrayFieldActions
-  Rules: Record<any, (value: any) => CFormRuleItem>
-  props: Record<any, any>
+  Rules: Record<string, (value: any) => CFormRuleItem>
+  props: Obj
   layoutProps: CFormItemProps
   formConfig: CFormConfig
-  fieldProps: Record<any, any>
-  children: (p: { bind: Record<any, any>; props: Record<any, any> }) => any
+  fieldAttrs: HTMLAttributes & Obj
+  children: (p: { bind: Obj; props: Obj }) => any
 }

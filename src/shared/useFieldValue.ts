@@ -1,4 +1,4 @@
-import { Ref, ShallowRef, nextTick, shallowRef, unref, watch } from "vue"
+import { ShallowRef, nextTick, shallowRef, unref, watch } from "vue"
 import { FieldName } from "../form/field.type"
 
 export type FieldGetter = () => any

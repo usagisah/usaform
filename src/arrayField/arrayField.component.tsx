@@ -2,6 +2,7 @@ import { SlotsType, computed, defineComponent, h, reactive, ref, unref } from "v
 import { FormActionCallInfo } from "../actions/hooks"
 import { isPlainObject } from "../shared/check"
 import { callFuncWithError, createFormCFieldToJson, resolveScopeElement } from "../shared/helper"
+import { Obj } from "../shared/type"
 import { useFormArrayField } from "./arrayField"
 import { CArrayFieldActions, CArrayFieldLayoutInfo, CArrayFieldProps } from "./arrayField.type"
 
@@ -9,7 +10,7 @@ export const ArrayField = defineComponent<CArrayFieldProps>({
   name: "ArrayField",
   props: ["name", "initValue", "layout", "layoutProps", "element", "props"] as any as undefined,
   slots: Object as SlotsType<{
-    default: (props: { fieldValue: any[]; actions: CArrayFieldActions } & Record<any, any>) => any
+    default: (props: { fieldValue: any[]; actions: CArrayFieldActions } & Obj) => any
   }>,
   setup(props, { slots, attrs }) {
     const { name, layout, element } = props
@@ -71,7 +72,7 @@ export const ArrayField = defineComponent<CArrayFieldProps>({
         layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}) },
         Rules: unref(gFieldRules),
         formConfig: formConfig_,
-        fieldProps: attrs,
+        fieldAttrs: attrs,
         children: ({ bind, props }) => {
           const _props = { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }
           if (FieldElement) {

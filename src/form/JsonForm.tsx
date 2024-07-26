@@ -1,27 +1,11 @@
 import { Component, computed, defineComponent, h, shallowRef, unref } from "vue"
 import { ArrayField } from "../arrayField/arrayField.component"
-import { CFormItemProps } from "../controller/FormItem.type"
 import { ObjectField } from "../objectField/ObjectField.component"
-import { PlainField } from "../plainField/plainField.object"
+import { PlainField } from "../plainField/plainField.component"
 import { buildScopeElement } from "../shared/helper"
-import { FormStructJson } from "../user.helper"
 import { VoidField } from "../voidField/voidField.component"
 import { useComponentForm } from "./form.component"
-import { CFormExpose, CFormProps } from "./form.type"
-
-export type JsonFormStructJson = Omit<FormStructJson, "children"> & {
-  type: "plain" | "object" | "ary" | "void"
-  layout?: string
-  layoutProps?: CFormItemProps
-  element?: string
-  props?: Record<any, any>
-  slots?: Record<string, string | Component>
-  children?: JsonFormStructJson[]
-}
-export type JsonFormConfig = CFormProps & {
-  struct: JsonFormStructJson[]
-  arrayKeys?: string[]
-}
+import { CFormExpose, JsonFormConfig, JsonFormStructJson } from "./form.type"
 
 function createArrayItem(children: JsonFormStructJson[], deep: number, ctx: RenderJsonStructContext) {
   return defineComponent({

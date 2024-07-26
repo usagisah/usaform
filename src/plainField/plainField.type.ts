@@ -1,4 +1,4 @@
-import { Component, ShallowRef } from "vue"
+import { Component, HTMLAttributes, ShallowRef } from "vue"
 import { FormBaseActions } from "../actions/hooks"
 import { CFormItemProps } from "../controller/FormItem.type"
 import { CFormRuleItem } from "../controller/rule"
@@ -26,7 +26,7 @@ export type PlainFieldConfig<T = unknown> = {
 }
 export type PlainFieldInit<T> = (info: PlainFieldInitInfo) => PlainFieldConfig<T>
 
-export interface CPlainFieldProps {
+export interface CPlainFieldProps extends HTMLAttributes, Obj {
   name: string | number
 
   // 初始值
@@ -52,6 +52,6 @@ export interface CPlainFieldLayoutInfo {
   props: Obj
   layoutProps: CFormItemProps
   children: (p: { bind: Obj; props: Obj }) => any
-  fieldProps: Obj
+  fieldAttrs: HTMLAttributes & Obj
   formConfig: CFormConfig
 }
