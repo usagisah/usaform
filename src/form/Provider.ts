@@ -5,7 +5,7 @@ import { FormConfig } from "./form.type"
 export function normalizeFormConfig(currentConfig: FormConfig): FormConfig {
   const { Elements, Rules, layoutProps, ...c } = currentConfig
   const parentConfig = (hasInjectionContext() ? inject(FormContextConfigKey) : {}) as FormConfig
-  const config = { ...parentConfig, ...c }
+  const config = { plainFieldController: "FormItem", ...parentConfig, ...c }
 
   config.Elements = computed(() => ({ FormItem, ...unref(parentConfig.Elements), ...unref(Elements) }))
   config.Rules = computed(() => ({ ...unref(parentConfig.Rules), ...unref(Rules) }))

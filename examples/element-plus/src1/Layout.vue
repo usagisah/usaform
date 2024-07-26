@@ -12,6 +12,26 @@ import InnerSlots from "./InnerSlots/InnerSlots.vue"
 import Json from "./json/Json.vue"
 import Step from "./step/Step.vue"
 
+/* 
+plain   slot  key  to-json
+object  slot  key  to-json
+array   slot  key  to-json
+innerSlot
+nest    object+plain         to-json
+nest    array+object+plain   to-json 
+formItem  customRule    to-json
+formItem  customLabel   to-json
+formItem  otherAttr     to-json
+dynamic struct/json && reactive attr  to-json
+from-json  plain    to-json
+from-json  object   to-json
+from-json  array    to-json
+from-json  object+plain         to-json
+from-json  array+object+plain   to-json
+step-form
+call-key-action
+call-custom-action
+*/
 const list = shallowReactive([
   { n: "普通平铺", d: "基本的平铺写法，与直接使用 ElForm 差不多", c: Basic },
   { n: "对象嵌套", d: "以对象的形式深层次嵌套", c: Obj },

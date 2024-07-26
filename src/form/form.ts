@@ -6,11 +6,7 @@ import { formContext, FormContext } from "./context"
 import { RootField } from "./field.type"
 import { FormConfig } from "./form.type"
 
-export function useForm(formConfig?: FormConfig) {
-  if (!formConfig) {
-    formConfig = {}
-  }
-
+export function useForm(formConfig: FormConfig) {
   const { defaultFormData, arrayUnwrapKey, toJson } = formConfig
   const _arrayUnwrapKey = arrayUnwrapKey ? (Array.isArray(arrayUnwrapKey) ? arrayUnwrapKey : [arrayUnwrapKey]) : ["value", "children"]
   const field: RootField = {

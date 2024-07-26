@@ -26,7 +26,7 @@ export type PlainFieldConfig<T = unknown> = {
 }
 export type PlainFieldInit<T> = (info: PlainFieldInitInfo) => PlainFieldConfig<T>
 
-export interface CPlainFieldProps extends HTMLAttributes, Obj {
+export interface CPlainFieldProps extends HTMLAttributes {
   name: string | number
 
   // 初始值
@@ -42,6 +42,8 @@ export interface CPlainFieldProps extends HTMLAttributes, Obj {
   props?: Obj
 
   slots?: Record<string, Component | string>
+
+  [x: string]: any
 }
 
 export interface CPlainFieldLayoutInfo {
