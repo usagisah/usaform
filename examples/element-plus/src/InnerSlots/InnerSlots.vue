@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { h } from "vue"
-import { createForm, FormItem, PlainField, exportFormStructJson } from "@usaform/element-plus"
+import { createForm, exportFormStructJson, FormItem, PlainField } from "@shoroi/form"
 import { ElButton, ElCard, ElOption, ElSelect, ElSpace } from "element-plus"
+import { h } from "vue"
 import Append from "./Append.vue"
 
 const [Form, form] = createForm({ config: { plainFieldController: FormItem } })
@@ -23,7 +23,13 @@ const PrependComp = () => [h("div", "prepend")]
       </template>
 
       <!-- 外部插槽需要显示指定，内部插槽会自动传递 -->
-      <PlainField name="input" element="ElInput" :props="{ style: 'width:100%' }" :layoutProps="{ label: '传递插槽' }" :slots="{ suffix: 'InputSuffix', prepend: PrependComp, append: Append }">
+      <PlainField
+        name="input"
+        element="ElInput"
+        :props="{ style: 'width:100%' }"
+        :layoutProps="{ label: '传递插槽' }"
+        :slots="{ suffix: 'InputSuffix', prepend: PrependComp, append: Append }"
+      >
         <template #prefix>prefix-slot</template>
       </PlainField>
       <template #InputSuffix>

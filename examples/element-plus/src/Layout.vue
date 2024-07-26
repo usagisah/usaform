@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { ElAlert, ElButton, ElDivider, ElSpace } from "element-plus"
 import { ref, shallowReactive } from "vue"
-import Basic from "./basic/Basic.vue"
-import Obj from "./group/Object.vue"
 import Arr from "./array/Array.vue"
-import Dynamic from "./dynamic/DynamicNest.vue"
+import Basic from "./basic/Basic.vue"
 import Custom from "./custom/Custom.vue"
-import Step from "./step/Step.vue"
-import Json from "./json/Json.vue"
-import ForceRender from "./forceRender/ForceRender.vue"
+import Dynamic from "./dynamic/DynamicNest.vue"
 import dynamicStruct from "./dynamicStruct/dynamicStruct.vue"
+import ForceRender from "./forceRender/ForceRender.vue"
+import Obj from "./group/Object.vue"
 import InnerSlots from "./InnerSlots/InnerSlots.vue"
+import Json from "./json/Json.vue"
+import Step from "./step/Step.vue"
 
 const list = shallowReactive([
   { n: "普通平铺", d: "基本的平铺写法，与直接使用 ElForm 差不多", c: Basic },
@@ -22,7 +22,7 @@ const list = shallowReactive([
   { n: "json 转表单", d: "", c: Json },
   { n: "强制刷新", d: "", c: ForceRender },
   { n: "模拟if动态结构", d: "", c: dynamicStruct },
-  { n: "内联渲染", d: "", c: InnerSlots },
+  { n: "内联渲染", d: "", c: InnerSlots }
 ])
 const act = ref(0)
 </script>

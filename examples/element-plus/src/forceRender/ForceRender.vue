@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { shallowRef, reactive } from "vue"
-import { createForm, PlainField } from "@usaform/element-plus"
+import { createForm, PlainField } from "@shoroi/form"
 import { ElButton, ElInput, ElSpace } from "element-plus"
+import { reactive, shallowRef } from "vue"
 
 const disabled = shallowRef(false)
 const [Form, _, forceRender] = createForm({

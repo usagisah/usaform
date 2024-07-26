@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { createForm, PlainField } from "@shoroi/form"
 import { ElButton, ElCard, ElDivider, ElInput, ElSpace, ElStep, ElSteps } from "element-plus"
-import { createForm, PlainField } from "@usaform/element-plus"
+import { ref } from "vue"
 
 const active = ref(1)
 const next = () => active.value++

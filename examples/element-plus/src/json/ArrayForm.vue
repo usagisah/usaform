@@ -1,40 +1,39 @@
 <script lang="ts" setup>
-import { CFormExpose, JsonFormStructJson, createJsonForm } from "@usaform/element-plus"
+import { JsonFormStructJson, createJsonForm } from "@shoroi/form"
 import { ElButton } from "element-plus"
-import { shallowRef } from "vue"
 
 const struct: JsonFormStructJson[] = [
-    { type: "void", name: "title", element: "ElDividerLine", props: { contentPosition: "center", content: "基本表单元素" } },
-    {
-      type: "plain",
-      name: "input",
-      layout: "FormItem",
-      layoutProps: { label: "名称" },
-      element: "ElInput",
-      props: { placeholder: "请输入名称" }
-    },
-    {
-      type: "ary",
-      name: "ary",
-      children: [
-        {
-          type: "object",
-          name: "",
-          children: [
-            {
-              type: "plain",
-              name: "input",
-              layout: "FormItem",
-              layoutProps: { label: "名称" },
-              element: "ElInput",
-              props: { placeholder: "请输入名称" }
-            }
-          ]
-        }
-      ]
-    },
-    { type: "void", name: "actions", element: "submit" }
-  ]
+  { type: "void", name: "title", element: "ElDividerLine", props: { contentPosition: "center", content: "基本表单元素" } },
+  {
+    type: "plain",
+    name: "input",
+    layout: "FormItem",
+    layoutProps: { label: "名称" },
+    element: "ElInput",
+    props: { placeholder: "请输入名称" }
+  },
+  {
+    type: "ary",
+    name: "ary",
+    children: [
+      {
+        type: "object",
+        name: "",
+        children: [
+          {
+            type: "plain",
+            name: "input",
+            layout: "FormItem",
+            layoutProps: { label: "名称" },
+            element: "ElInput",
+            props: { placeholder: "请输入名称" }
+          }
+        ]
+      }
+    ]
+  },
+  { type: "void", name: "actions", element: "submit" }
+]
 
 const [Form, FormRef] = createJsonForm({
   struct,

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { ElButton, ElCard } from "element-plus"
 import { shallowReactive } from "vue"
-import PlainForm from "./PlainForm.vue"
-import ObjectForm from "./ObjectForm.vue"
 import ArrayForm from "./ArrayForm.vue"
+import ObjectForm from "./ObjectForm.vue"
+import PlainForm from "./PlainForm.vue"
 
 const formOptions = shallowReactive({ current: "PlainForm", PlainForm, ObjectForm, ArrayForm })
 </script>

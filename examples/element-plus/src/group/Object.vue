@@ -1,7 +1,22 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue"
-import { ElSelect, ElOption, ElInput, ElRadio, ElRadioGroup, ElCheckbox, ElCheckboxGroup, ElInputNumber, ElDivider, ElCard, ElButton, ElDatePicker, ElCascader, ElSpace } from "element-plus"
-import { createForm, FormItem, PlainField, CFormExpose, ObjectField, exportFormStructJson } from "@usaform/element-plus"
+import { createForm, exportFormStructJson, FormItem, ObjectField, PlainField } from "@shoroi/form"
+import {
+  ElButton,
+  ElCard,
+  ElCascader,
+  ElCheckbox,
+  ElCheckboxGroup,
+  ElDatePicker,
+  ElDivider,
+  ElInput,
+  ElInputNumber,
+  ElOption,
+  ElRadio,
+  ElRadioGroup,
+  ElSelect,
+  ElSpace
+} from "element-plus"
+import { onMounted } from "vue"
 
 const CascaderOptions = [
   {
@@ -362,7 +377,13 @@ onMounted(() => {
           <PlainField name="number" layout="FormItem" :layout-props="{ label: '数量' }" element="ElInputNumber" :props="{ placeholder: '请输入数量' }" />
           <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉' }" element="Select" :props="{ placeholder: '请选择' }" />
           <PlainField name="radio" layout="FormItem" :layout-props="{ label: '按钮' }" element="Radio" />
-          <PlainField name="Cascader" layout="FormItem" :layout-props="{ label: '级联' }" element="ElCascader" :props="{ options: CascaderOptions, props: { expandTrigger: 'hover' } }" />
+          <PlainField
+            name="Cascader"
+            layout="FormItem"
+            :layout-props="{ label: '级联' }"
+            element="ElCascader"
+            :props="{ options: CascaderOptions, props: { expandTrigger: 'hover' } }"
+          />
           <ObjectField name="object2">
             <PlainField name="Checkbox" layout="FormItem" :layout-props="{ label: '多选' }" element="Checkbox" />
             <PlainField name="DatePicker" layout="FormItem" :layout-props="{ label: '时间' }" element="ElDatePicker" :props="{ type: 'date', placeholder: 'Pick a day' }" />

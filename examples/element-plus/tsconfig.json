@@ -24,7 +24,11 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitAny": false,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@shoroi/form": ["../../dist/index"]
+    }
   },
   "include": [
     "src/**/*.ts",

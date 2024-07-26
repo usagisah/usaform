@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { createForm, PlainField } from "@usaform/element-plus"
+import { createForm, PlainField } from "@shoroi/form"
+import { ElButton, ElSpace } from "element-plus"
 import CustomElement from "./CustomElement.vue"
 import CustomLayout from "./CustomLayout.vue"
-import { ElButton, ElSpace } from "element-plus"
 
 const [Form, form] = createForm({ config: { Elements: { CustomElement, CustomLayout } } })
 const layoutIncrease = () => {

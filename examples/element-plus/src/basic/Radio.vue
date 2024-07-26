@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { ElRadioGroup, ElRadio } from "element-plus"
-
+import { ElRadio, ElRadioGroup } from "element-plus"
 </script>
 
 <template>

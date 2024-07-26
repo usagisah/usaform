@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { shallowRef } from "vue"
-import { createForm, PlainField } from "@usaform/element-plus"
+import { createForm, PlainField } from "@shoroi/form"
 import { ElButton, ElInput, ElSpace } from "element-plus"
+import { shallowRef } from "vue"
 
 const count = shallowRef(0)
 const [Form, form] = createForm({

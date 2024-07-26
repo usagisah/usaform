@@ -1,6 +1,21 @@
 <script lang="tsx" setup>
-import { ElSelect, ElOption, ElInput, ElRadio, ElRadioGroup, ElCheckbox, ElCheckboxGroup, ElInputNumber, ElDivider, ElCard, ElButton, ElDatePicker, ElCascader, ElSpace } from "element-plus"
-import { createForm, FormItem, PlainField } from "@usaform/element-plus"
+import { createForm, FormItem, PlainField } from "@shoroi/form"
+import {
+  ElButton,
+  ElCard,
+  ElCascader,
+  ElCheckbox,
+  ElCheckboxGroup,
+  ElDatePicker,
+  ElDivider,
+  ElInput,
+  ElInputNumber,
+  ElOption,
+  ElRadio,
+  ElRadioGroup,
+  ElSelect,
+  ElSpace
+} from "element-plus"
 
 const CascaderOptions = [
   {
@@ -288,7 +303,11 @@ const customLabel = (attrs: any) => <div {...attrs}>时间</div>
       <template #header>插槽</template>
       <FormSlot>
         <ElDivider content-position="center">(布局样式) 基本表单元素</ElDivider>
-        <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', labelWidth: '60px', mode: 'left', rules: [{ trigger: 'blur', required: true, message: '该字段是必填的' }] }">
+        <PlainField
+          name="input"
+          layout="FormItem"
+          :layout-props="{ label: '名称', labelWidth: '60px', mode: 'left', rules: [{ trigger: 'blur', required: true, message: '该字段是必填的' }] }"
+        >
           <template #default="{ bind }">
             <ElInput v-bind="bind" placeholder="请输入名称" />
           </template>

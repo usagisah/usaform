@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ArrayField } from "@usaform/element-plus"
+import { ArrayField } from "@shoroi/form"
 import { ElDivider } from "element-plus"
 const props = defineProps<{ fieldValue: any; actions: any }>()
 </script>

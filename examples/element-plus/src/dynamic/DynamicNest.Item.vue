@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ObjectField, PlainField, CArrayFieldActions } from "@usaform/element-plus"
+import { CArrayFieldActions, ObjectField, PlainField } from "@shoroi/form"
 import { ElButton, ElSpace } from "element-plus"
 const props = defineProps<{ fieldValue: any[]; actions: any }>()
 const api: CArrayFieldActions = props.actions

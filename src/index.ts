@@ -14,3 +14,5 @@ export type { CVoidFieldProps } from "./voidField/voidField.type"
 export { FormItem } from "./controller/FormItem.jsx"
 export type { CFormSlotAttrs, FormControllerProps, FormControllerValidateState } from "./controller/FormItem.type"
 export * from "./controller/rule"
+
+export * from "./user.helper"

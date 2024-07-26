@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { JsonFormStructJson, createJsonForm } from "@usaform/element-plus"
+import { JsonFormStructJson, createJsonForm } from "@shoroi/form"
 import { ElButton } from "element-plus"
 import { h } from "vue"
 import Append from "../InnerSlots/Append.vue"

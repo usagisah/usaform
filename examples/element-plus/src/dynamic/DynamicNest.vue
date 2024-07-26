@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import { ArrayField, createForm, FormItem } from "@shoroi/form"
+import { ElButton, ElCard, ElDivider } from "element-plus"
 import { onUnmounted, provide, reactive, ref } from "vue"
-import { ElDivider, ElCard, ElButton } from "element-plus"
-import { FormConfig, FormItem, CFormExpose, ArrayField, createForm } from "@usaform/element-plus"
 
 /* -------------- 模拟三级表单中的内容，这里为了方便，写死并用 provide 共享 -------------- */
 const fetchData = reactive({

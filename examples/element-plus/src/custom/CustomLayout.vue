@@ -1,7 +1,7 @@
 <script lang="tsx" setup>
-import { ref } from "vue"
-import { FormControllerProps } from "@usaform/element-plus"
+import { FormControllerProps } from "@shoroi/form"
 import { ElCard, ElDivider } from "element-plus"
+import { ref } from "vue"
 
 const props = defineProps<{ FormControllerProps: FormControllerProps }>()
 const { children } = props.FormControllerProps
@@ -22,4 +22,3 @@ defineExpose({
     </div>
   </ElCard>
 </template>
-

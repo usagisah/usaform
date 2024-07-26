@@ -1,36 +1,49 @@
 {
-  "name": "usaform",
+  "name": "@shoroi/form",
   "description": "表单",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./style/*": {
+      "default": "./style/*.scss"
+    }
+  },
+  "files": [
+    "dist",
+    "style"
+  ],
   "scripts": {
-    "dev": "tsc -w",
+    "prebuild": "npm run build:vue && npm run build:form",
     "build": "tsc",
-    "format": "prettier --w src/*/*{.ts,.tsx}",
-    "test-vue": "vitest dev -c vitest.vue.config.ts",
-    "build:vue": "cd packages/vue && npm run build",
     "build:form": "cd packages/element-plus && npm run build",
-    "prebuild": "npm run build:vue && npm run build:form"
+    "build:vue": "cd packages/vue && npm run build",
+    "dev": "tsc -w",
+    "format": "prettier --w src/**/*{.ts,.tsx}",
+    "format:examples": "prettier --w examples/**/*{.ts,.vue}",
+    "test-vue": "vitest dev -c vitest.vue.config.ts"
   },
   "devDependencies": {
     "@types/node": "^20.14.11",
     "@vitejs/plugin-vue": "^5.0.5",
     "@vitejs/plugin-vue-jsx": "^3.1.0",
     "@volar/vue-typescript": "^1.6.5",
+    "@vue/test-utils": "^2.4.6",
     "execa": "^8.0.1",
     "jsdom": "^23.2.0",
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-packagejson": "^2.5.1",
+    "puppeteer": "^21.11.0",
     "sass": "^1.77.8",
     "typescript": "^5.5.3",
     "vite": "^5.3.4",
-    "vitest": "^1.6.0",
-    "vue": "^3.4.33"
+    "vitest": "^1.6.0"
   },
-  "private": true,
-  "dependencies": {
-    "@vue/test-utils": "^2.4.6",
+  "peerDependencies": {
     "async-validator": "^4.2.5",
-    "puppeteer": "^21.11.0"
+    "vue": "^3.4.33"
   }
 }

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { CArrayFieldActions, onNextTick } from "@usaform/element-plus"
+import { CArrayFieldActions, onNextTick } from "@shoroi/form"
 import { ElOption, ElSelect } from "element-plus"
 
 import { inject, ref } from "vue"
@@ -15,7 +15,7 @@ onNextTick(() => {
     (v, ov, info) => {
       const o = (operates.value = _data.operates[v])
       value.value = o[0]
-      console.log( "发生变化的字段:", info)
+      console.log("发生变化的字段:", info)
     },
     { immediate: true }
   )

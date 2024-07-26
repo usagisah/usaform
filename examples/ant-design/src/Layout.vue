@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Space, Alert, Button, Divider } from "ant-design-vue"
+import { Alert, Button, Divider, Space } from "ant-design-vue"
 import { ref, shallowReactive } from "vue"
 import Basic from "./basic/Basic.vue"
 

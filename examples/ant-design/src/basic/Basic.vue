@@ -1,7 +1,7 @@
 <script lang="tsx" setup>
+import { CFormExpose, Form, FormItem, PlainField } from "@usaform/element-plus"
+import { Button, Card, Checkbox, CheckboxGroup, DatePicker, Divider, Input, InputNumber, RadioGroup, Select, Space } from "ant-design-vue"
 import { ref } from "vue"
-import { Space, Card, Input, InputNumber, Button, Select, CheckboxGroup, DatePicker, Divider, RadioGroup, Checkbox } from "ant-design-vue"
-import { Form, FormItem, PlainField, CFormExpose } from "@usaform/element-plus"
 
 const formSlot = ref<CFormExpose | null>(null)
 const callSlot = async (key: string) => {
@@ -19,7 +19,11 @@ const customLabel = (attrs: any) => <div {...attrs}>自定义标题:时间</div>
       <Form ref="formSlot">
         <Divider content-position="center">(布局样式) 基本表单元素</Divider>
 
-        <PlainField name="input" layout="FormItem" :layout-props="{ label: '名称', labelWidth: '60px', mode: 'left', rules: [{ trigger: 'blur', required: true, message: '该字段是必填的' }] }">
+        <PlainField
+          name="input"
+          layout="FormItem"
+          :layout-props="{ label: '名称', labelWidth: '60px', mode: 'left', rules: [{ trigger: 'blur', required: true, message: '该字段是必填的' }] }"
+        >
           <template #default="{ bind }">
             <Input v-bind="bind" placeholder="请输入名称" />
           </template>
@@ -31,7 +35,11 @@ const customLabel = (attrs: any) => <div {...attrs}>自定义标题:时间</div>
           </template>
         </PlainField>
 
-        <PlainField name="select" layout="FormItem" :layout-props="{ label: '下拉', mode: 'top', rules: [{ trigger: 'blur', required: true, type: 'number', message: '该字段是必填的' }] }">
+        <PlainField
+          name="select"
+          layout="FormItem"
+          :layout-props="{ label: '下拉', mode: 'top', rules: [{ trigger: 'blur', required: true, type: 'number', message: '该字段是必填的' }] }"
+        >
           <template #default="{ bind }">
             <Select
               v-bind="bind"

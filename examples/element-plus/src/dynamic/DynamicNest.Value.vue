@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { CArrayFieldAttrs, onNextTick } from "@usaform/element-plus"
+import { CArrayFieldAttrs, onNextTick } from "@shoroi/form"
 import { ElInput } from "element-plus"
 const props = defineProps<{ actions: any }>()
 const value = defineModel<string>()

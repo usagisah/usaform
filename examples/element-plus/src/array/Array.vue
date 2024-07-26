@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { ElInput, ElDivider, ElCard, ElButton, ElSpace } from "element-plus"
-import { createForm, FormItem, PlainField, CFormExpose, ArrayField, exportFormStructJson } from "@usaform/element-plus"
+import { ArrayField, createForm, exportFormStructJson, FormItem, PlainField } from "@shoroi/form"
+import { ElButton, ElCard, ElDivider, ElInput, ElSpace } from "element-plus"
 import ArrayKey from "./Array.slot.vue"
 
 const [FormSlot, formSlot] = createForm()

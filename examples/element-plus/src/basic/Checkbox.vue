@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ElCheckbox, ElCheckboxGroup } from "element-plus"
-
 </script>
 
 <template>
