@@ -35,14 +35,14 @@ export const FormItem = defineComponent<{ FormControllerProps?: FormControllerPr
     })
 
     const classNames = computed(() => {
-      const { inline = false, mode = "right", classNames = [] } = props.FormControllerProps!.layoutProps ?? {}
+      const { inline = false, mode = "right" } = props.FormControllerProps!.layoutProps ?? {}
       const _inline = `ufi-${inline ? "inline" : "block"}`
       const _mode = `ufi-mode-${mode ?? "right"}`
       const _required = fieldRequired.value ? "ufi-required" : ""
       const _disabled = disabled.value ? "ufi-disabled" : ""
       const _size = `ufi-size-${size.value}`
       const _status = validateState.status.length > 0 ? `ufi-status-${validateState.status}` : ""
-      return ["ufi", _size, _inline, _mode, _required, _disabled, _status, ...classNames].join(" ").trim()
+      return ["ufi", _size, _inline, _mode, _required, _disabled, _status].join(" ").trim()
     })
 
     const labelStyle = computed(() => {
@@ -77,7 +77,7 @@ export const FormItem = defineComponent<{ FormControllerProps?: FormControllerPr
       const _props: CFormSlotAttrs = { ...elemProps, id, size: size.value, status: validateState.status, disabled: disabled.value, onBlur }
 
       return (
-        <div class={classNames.value} {...props.FormControllerProps?.fieldAttrs}>
+        <div class={classNames.value}>
           {LabelElem}
           <div class="ufi-content">
             {children({ props: _props, bind: _props })}

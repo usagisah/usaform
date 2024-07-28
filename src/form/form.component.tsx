@@ -33,11 +33,11 @@ export function useComponentForm(formConfig?: FormConfig) {
   }
 
   const callLayout: CFormExpose["callLayout"] = (path, key, point, ...params) => {
-    return actions.call(path, "callLayout", { params: [{ key, point, params }] })
+    return actions.call(path, "callLayout", { fieldTypes: ["plain"], params: [{ key, point, params }] })
   }
 
   const callElement: CFormExpose["callElement"] = (path, key, point, ...params) => {
-    return actions.call(path, "callElement", { params: [{ key, point, params }] })
+    return actions.call(path, "callElement", { fieldTypes: ["plain"], params: [{ key, point, params }] })
   }
 
   const createFormExpose = (): CFormExpose => {

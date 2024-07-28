@@ -70,7 +70,7 @@ export function useFormActions(field: FormField, rootField: FormField, arrayUnwr
     const _fields = path.length === 0 ? [{ path: "", name: field.name.toString(), field }] : resolveFields({ path, field, rootField, first: !!first })
     const result: Record<string, any> = {}
     _fields.forEach(({ path, name, field }) => {
-      if (fieldTypes.includes(field.type as any) || (fieldTypes.includes("ary-item") && field.__uform_aryItem_field)) {
+      if (fieldTypes.includes(field.type as any) || (field.type === "plain" && fieldTypes.includes("ary-item") && field.__uform_aryItem_field)) {
         const action = field.userConfig[key]
         try {
           if (typeof action === "function") {

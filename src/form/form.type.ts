@@ -46,8 +46,8 @@ export interface CFormProps {
 export interface CFormExpose extends Omit<FormActions, "provide"> {
   validate: () => Promise<CFormValidateError[]>
   reset: () => void
-  callLayout: (path: string, key: string, ...params: any[]) => Record<string, any>
-  callElement: (path: string, key: string, ...params: any[]) => Record<string, any>
+  callLayout: (path: string, key: string, ptr?: any, ...params: any[]) => Record<string, any>
+  callElement: (path: string, key: string, ptr?: any, ...params: any[]) => Record<string, any>
   field: RootField
 }
 

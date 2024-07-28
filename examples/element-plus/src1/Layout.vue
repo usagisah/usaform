@@ -1,79 +1,11 @@
 <script lang="ts" setup>
-import { ElAlert, ElButton, ElDivider, ElSpace } from "element-plus"
-import { ref, shallowReactive } from "vue"
-import Arr from "./array/Array.vue"
-import Basic from "./basic/Basic.vue"
-import Custom from "./custom/Custom.vue"
-import Dynamic from "./dynamic/DynamicNest.vue"
-import dynamicStruct from "./dynamicStruct/dynamicStruct.vue"
-import ForceRender from "./forceRender/ForceRender.vue"
-import Obj from "./group/Object.vue"
-import InnerSlots from "./InnerSlots/InnerSlots.vue"
-import Json from "./json/Json.vue"
-import Step from "./step/Step.vue"
-
 /* 
-
-formItem  customRule    to-json
-formItem  customLabel   to-json
-formItem  otherAttr     to-json
-dynamic struct/json && reactive attr  to-json
 from-json  plain    to-json
 from-json  object   to-json
 from-json  array    to-json
 from-json  object+plain         to-json
 from-json  array+object+plain   to-json
-step-form
-call-key-action
-call-custom-action
+
+类型提供方式改下
 */
-const list = shallowReactive([
-  { n: "普通平铺", d: "基本的平铺写法，与直接使用 ElForm 差不多", c: Basic },
-  { n: "对象嵌套", d: "以对象的形式深层次嵌套", c: Obj },
-  { n: "数组表单", d: "数组形式的动态表单", c: Arr },
-  { n: "复杂嵌套", d: "3者混合的动态表单，演示功能：多层嵌套，多字段联动，动态更新，跨字段监听", c: Dynamic },
-  { n: "自定义", d: "", c: Custom },
-  { n: "分步表单", d: "", c: Step },
-  { n: "json 转表单", d: "", c: Json },
-  { n: "强制刷新", d: "", c: ForceRender },
-  { n: "模拟if动态结构", d: "", c: dynamicStruct },
-  { n: "内联渲染", d: "", c: InnerSlots }
-])
-const act = ref(0)
 </script>
-
-<template>
-  <div class="layout">
-    <ElSpace>
-      <ElButton v-for="(item, index) in list" :key="item.n" @click="act = index" :type="index === act ? 'primary' : 'default'">
-        {{ item.n }}
-      </ElButton>
-    </ElSpace>
-    <ElSpace>
-      <ElAlert v-if="act <= 3" style="width: 400px" center :closable="false" title="打开vue的调试工具(devTools)可以看到具体的更新范围，点提交可以在控制台看到返回的数据结构" />
-      <ElAlert v-if="list[act].d.length > 0" style="width: 400px" center :closable="false" :title="list[act].d" />
-    </ElSpace>
-    <ElDivider title="内容区域"></ElDivider>
-    <div class="form">
-      <component :is="list[act].c" />
-    </div>
-  </div>
-</template>
-
-<style lang="scss" scoped>
-.layout {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  width: 100vw;
-}
-.form {
-  width: 100%;
-  flex-direction: column;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-</style>

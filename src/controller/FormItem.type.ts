@@ -28,8 +28,6 @@ export interface CFormItemProps {
   inline?: boolean
   // 当前字段的校验规则
   rules?: (CFormRuleItem | [string] | [string, any])[]
-  // 自定义布局 class
-  classNames?: string[]
 }
 
 export interface CFormSlotAttrs {
