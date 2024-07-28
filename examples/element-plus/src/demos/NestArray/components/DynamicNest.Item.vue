@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { CArrayFieldActions, ObjectField, PlainField } from "@shoroi/form"
 import { ElButton, ElSpace } from "element-plus"
-const props = defineProps<{ fieldValue: any[]; actions: any }>()
+
+const props = defineProps<{ value: any[]; actions: CArrayFieldActions }>()
 const api: CArrayFieldActions = props.actions
 
 const add = () => {
@@ -20,11 +21,11 @@ const remove = (i: number) => {
 </script>
 
 <template>
-  <ObjectField v-for="(item, index) in props.fieldValue" :key="item.itemId" :name="index" layout="FormItem">
+  <ObjectField v-for="(item, index) in props.value" :key="item.itemId" :name="index" layout="FormItem">
     <PlainField layout="FormItem" :layout-props="{ label: '运算类型' }" name="type" element="DynamicType" />
     <PlainField layout="FormItem" :layout-props="{ label: '运算方式' }" name="operate" element="DynamicOperate" />
     <PlainField layout="FormItem" :layout-props="{ label: '运算备注' }" name="value" element="DynamicValue" />
-    <ElButton v-if="props.fieldValue.length !== 1" type="danger" @click="remove(index)">移除条目</ElButton>
+    <ElButton v-if="props.value.length !== 1" type="danger" @click="remove(index)">移除条目</ElButton>
   </ObjectField>
   <ElSpace>
     <ElButton type="primary" @click="add">添加条目</ElButton>

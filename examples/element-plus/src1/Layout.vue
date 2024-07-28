@@ -13,12 +13,7 @@ import Json from "./json/Json.vue"
 import Step from "./step/Step.vue"
 
 /* 
-plain   slot  key  to-json
-object  slot  key  to-json
-array   slot  key  to-json
-innerSlot
-nest    object+plain         to-json
-nest    array+object+plain   to-json 
+
 formItem  customRule    to-json
 formItem  customLabel   to-json
 formItem  otherAttr     to-json

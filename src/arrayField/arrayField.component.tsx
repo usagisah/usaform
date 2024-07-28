@@ -6,13 +6,13 @@ import { Obj } from "../shared/type"
 import { useFormArrayField } from "./arrayField"
 import { CArrayFieldActions, CArrayFieldLayoutInfo, CArrayFieldProps } from "./arrayField.type"
 
-export const ArrayField = defineComponent<CArrayFieldProps>({
+export const ArrayField = defineComponent({
   name: "ArrayField",
   props: ["name", "initValue", "layout", "layoutProps", "element", "props"] as any as undefined,
   slots: Object as SlotsType<{
-    default: (props: { fieldValue: any[]; actions: CArrayFieldActions } & Obj) => any
+    default: { value: any[]; actions: CArrayFieldActions } & Obj
   }>,
-  setup(props, { slots, attrs }) {
+  setup(props: CArrayFieldProps, { slots, attrs }) {
     const { name, layout, element } = props
     if (name !== 0 && !name) {
       throw "非法的使用方式，请正确使用 ArrayField 组件"
@@ -23,14 +23,6 @@ export const ArrayField = defineComponent<CArrayFieldProps>({
     const fieldElementRef = shallowRef<Obj | null>(null)
     const { fieldValue, actions, FieldRender } = useFormArrayField(name, ({ initValue, formConfig }) => {
       fieldComponentConfig = resolveFieldComponentConfig("array", formConfig, props, slots)
-      // const { Elements, layoutProps, Rules, arrayFieldController } = formConfig
-      // if (layout) FieldLayout = isPlainObject(layout) ? layout : Elements.value[layout]
-      // if (!FieldLayout && arrayFieldController) FieldLayout = isPlainObject(arrayFieldController) ? arrayFieldController : Elements.value[arrayFieldController]
-      // if (element) FieldElement = isPlainObject(element) ? element : resolveScopeElement(element, Elements.value)
-
-      // gLayoutProps = layoutProps!
-      // gFieldRules = Rules!
-      // formConfig_ = formConfig
       return {
         initValue: initValue === undefined ? props.initValue : initValue,
         toJson: createFormCFieldToJson(props, layout, element, fieldComponentConfig.fieldSlotsMap),
@@ -69,7 +61,7 @@ export const ArrayField = defineComponent<CArrayFieldProps>({
 
     const resolveRenderElement = ({ bind, props }: Obj = {}) => {
       if (fieldElement) {
-        return h(fieldElement, { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef })
+        return h(fieldElement, { ...props, value: fieldValue.value, actions, ref: fieldElementRef })
       } else {
         return fieldSlots.default?.({ bind: { ...bind, ref: fieldElementRef }, value: fieldValue.value, actions })
       }

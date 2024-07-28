@@ -2,6 +2,11 @@
 import { ArrayField, createForm, FormItem } from "@shoroi/form"
 import { ElButton, ElCard, ElDivider } from "element-plus"
 import { onUnmounted, provide, reactive, ref } from "vue"
+import DynamicGroup from "./components/DynamicNest.Group.vue"
+import DynamicItem from "./components/DynamicNest.Item.vue"
+import DynamicOperate from "./components/DynamicNest.Operate.vue"
+import DynamicType from "./components/DynamicNest.Type.vue"
+import DynamicValue from "./components/DynamicNest.Value.vue"
 
 /* -------------- 模拟三级表单中的内容，这里为了方便，写死并用 provide 共享 -------------- */
 const fetchData = reactive({
@@ -17,7 +22,7 @@ const fetchData = reactive({
 provide("formData", fetchData)
 
 /* -------------- 设置默认值 -------------- */
-const fidFirstData = {
+const firstScreenFormData = {
   dynamic: [
     {
       groupId: 1,
@@ -36,7 +41,9 @@ const fidFirstData = {
 }
 
 /* -------------- 基础操作 -------------- */
-const [Form, form] = createForm({ config: { defaultFormData: fidFirstData } })
+const [Form, form] = createForm({
+  config: { Elements: { DynamicGroup, DynamicItem, DynamicType, DynamicOperate, DynamicValue }, defaultFormData: firstScreenFormData }
+})
 const submit = () => {
   console.log(form.value!.getFormData())
 }
@@ -45,11 +52,11 @@ const validate = async () => {
 }
 const reset = () => {
   form.value!.reset()
-  form.value!.set("", fidFirstData)
+  form.value!.set("", firstScreenFormData)
 }
 
 /* -------------- 动态更新 -------------- */
-const t = ref(6)
+const t = ref(5)
 const id = setInterval(() => {
   if (t.value <= 0) {
     form.value?.set("dynamic", [
@@ -78,11 +85,11 @@ onUnmounted(() => {
 
 <template>
   <ElDivider content-position="center">首屏 {{ t }} 秒后，模拟接口动态更新表单，注意第一条的内容变化</ElDivider>
-  <ElCard style="width: 1000px">
-    <template #header>指定 key</template>
+  <ElCard style="margin: auto; width: 1000px">
+    <template #header>封装一个，复杂的，动态的，多层嵌套的表单</template>
     <Form>
       <ArrayField name="dynamic" element="DynamicGroup" />
-      <ElDivider content-position="center">(布局样式) 提交</ElDivider>
+      <ElDivider content-position="center">提交</ElDivider>
       <FormItem>
         <ElButton @click="submit">submit</ElButton>
         <ElButton @click="validate">validate</ElButton>

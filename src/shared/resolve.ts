@@ -42,7 +42,7 @@ export function resolveFieldDefaultValue(name: FieldName, { currentInitValue }: 
 export function resolveArrayItem(target: Record<any, any>, arrayUnwrapKey: string[]) {
   for (const k of arrayUnwrapKey) {
     const v = target[k]
-    if (v) return v
+    if (v !== undefined) return v
   }
   return target
 }

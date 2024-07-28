@@ -31,8 +31,13 @@ function fieldToJson(field: Field, realName?: FieldName): FormStructJson {
       return { type, name: realName ?? name, ...toJson?.() }
     }
     case "ary": {
-      const { type, name, toJson } = field
-      return { type, name: realName ?? name, ...toJson?.() }
+      const { type, name, struct, toJson } = field
+      return {
+        type,
+        name: realName ?? name,
+        children: struct.map((item, index) => fieldToJson(item, index)),
+        ...toJson?.()
+      }
     }
     case "void": {
       const { type, name, userConfig, toJson } = field
