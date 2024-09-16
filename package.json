@@ -26,8 +26,8 @@
     "test-vue": "vitest dev -c vitest.vue.config.ts"
   },
   "devDependencies": {
-    "@types/node": "^20.14.11",
-    "@vitejs/plugin-vue": "^5.0.5",
+    "@types/node": "^20.16.5",
+    "@vitejs/plugin-vue": "^5.1.3",
     "@vitejs/plugin-vue-jsx": "^3.1.0",
     "@volar/vue-typescript": "^1.6.5",
     "@vue/test-utils": "^2.4.6",
@@ -35,11 +35,11 @@
     "jsdom": "^23.2.0",
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^3.2.4",
-    "prettier-plugin-packagejson": "^2.5.1",
+    "prettier-plugin-packagejson": "^2.5.2",
     "puppeteer": "^21.11.0",
-    "sass": "^1.77.8",
-    "typescript": "^5.5.3",
-    "vite": "^5.3.4",
+    "sass": "^1.78.0",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.5",
     "vitest": "^1.6.0"
   },
   "peerDependencies": {

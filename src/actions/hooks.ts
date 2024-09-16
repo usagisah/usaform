@@ -54,9 +54,9 @@ export function useFormActions(field: FormField, rootField: FormField, arrayUnwr
     if (path.length === 0) return [field.getter()]
     const _fields = resolveFields({ path, field, rootField, first: _first })
 
-    if (_shallow) return _fields.map(({ field }) => field.getter())
-    return _fields.map(({ path, field }) => {
-      return { [path]: mapFieldToRecord(field, arrayUnwrapKey) }
+    if (_shallow) return _fields.map(({ name, path, field }) => [name, field.getter(), path])
+    return _fields.map(({ name, path, field }) => {
+      return [name, mapFieldToRecord(field, arrayUnwrapKey), path]
     })
   }
 
