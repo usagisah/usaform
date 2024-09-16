@@ -1,6 +1,7 @@
-import { SlotsType, computed, defineComponent, h, reactive, shallowRef, unref } from "vue"
+import { SlotsType, computed, defineComponent, h, reactive, shallowReactive, shallowRef, unref } from "vue"
 import { FormActionCallInfo } from "../actions/hooks"
 import { CFormItemExpose } from "../controller/FormItem.type"
+import { isPlainObject } from "../shared/check"
 import { FieldComponentConfig, resolveFieldComponentConfig } from "../shared/field"
 import { callFuncWithError, createFormCFieldToJson } from "../shared/helper"
 import { Obj } from "../shared/type"
@@ -22,6 +23,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
     let fieldComponentConfig: FieldComponentConfig
     const fieldLayoutRef = shallowRef<(CFormItemExpose & Obj) | null>(null)
     const fieldElementRef = shallowRef<Obj | null>(null)
+    const outerProps = shallowReactive({ props: {} as Obj, layoutProps: {} as Obj })
     const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig }) => {
       fieldComponentConfig = resolveFieldComponentConfig("plain", formConfig, props, slots)
       return {
@@ -34,13 +36,23 @@ export const PlainField = defineComponent<CPlainFieldProps>({
         validate({ path }: FormActionCallInfo) {
           return fieldLayoutRef.value?.validate(path, fieldValue.value)
         },
-        callLayout(_: any, { key, point, params }: FormActionCallInfo) {
+        setProps(_: FormActionCallInfo, setter: any) {
+          let res = setter({ ...outerProps })
+          if (!isPlainObject(res)) {
+            res = {}
+          }
+
+          const { props, layoutProps } = res
+          if (isPlainObject(props)) outerProps.props = props
+          if (isPlainObject(layoutProps)) outerProps.layoutProps = layoutProps
+        },
+        callLayout(_: FormActionCallInfo, { key, point, params }: Obj) {
           return callFuncWithError(() => {
             const f = fieldLayoutRef.value?.[key]
             if (typeof f === "function") f.apply(point, params)
           })
         },
-        callElement(_: any, { key, point, params }: FormActionCallInfo) {
+        callElement(_: FormActionCallInfo, { key, point, params }: Obj) {
           return callFuncWithError(() => {
             const f = fieldElementRef.value?.[key]
             if (typeof f === "function") f.apply(point, params)
@@ -56,8 +68,8 @@ export const PlainField = defineComponent<CPlainFieldProps>({
         type: "plain",
         fieldValue,
         actions,
-        props: props.props ?? {},
-        layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}) },
+        props: { ...reactive(props.props ?? {}), ...outerProps.props },
+        layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}), ...outerProps.layoutProps },
         Rules: unref(gRules),
         formConfig: formConfig,
         fieldAttrs: attrs,

@@ -56,5 +56,3 @@ onMounted(() => {
     </ElSpace>
   </ElCard>
 </template>
-
-<style lang="scss" scoped></style>

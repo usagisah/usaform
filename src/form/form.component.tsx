@@ -40,9 +40,13 @@ export function useComponentForm(formConfig?: FormConfig) {
     return actions.call(path, "callElement", { fieldTypes: ["plain"], params: [{ key, point, params }] })
   }
 
+  const setProps: CFormExpose["setProps"] = (path, setter) => {
+    return actions.call(path, "setProps", { fieldTypes: ["plain"], params: [setter] })
+  }
+
   const createFormExpose = (): CFormExpose => {
     const { provide, ..._actions } = actions
-    return { ..._actions, validate, reset, callLayout, callElement, field }
+    return { ..._actions, validate, reset, callLayout, callElement, setProps, field }
   }
 
   return { actions, config, field, FieldRender, validate, reset, callLayout, callElement, createFormExpose }

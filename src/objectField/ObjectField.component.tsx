@@ -26,13 +26,13 @@ export const ObjectField = defineComponent<CObjectFieldProps>({
       return {
         initValue: initValue === undefined ? props.initValue : initValue,
         toJson: createFormCFieldToJson(props, layout, element, fieldComponentConfig.fieldSlotsMap),
-        callLayout(_: any, { key, point, params }: FormActionCallInfo) {
+        callLayout(_: FormActionCallInfo, { key, point, params }: Obj) {
           return callFuncWithError(() => {
             const f = fieldLayoutRef.value?.[key]
             if (typeof f === "function") f.apply(point, params)
           })
         },
-        callElement(_: any, { key, point, params }: FormActionCallInfo) {
+        callElement(_: FormActionCallInfo, { key, point, params }: Obj) {
           return callFuncWithError(() => {
             const f = fieldElementRef.value?.[key]
             if (typeof f === "function") f.apply(point, params)

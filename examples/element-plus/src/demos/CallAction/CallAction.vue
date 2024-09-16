@@ -17,16 +17,23 @@ const printJson = () => {
   console.log(exportFormStructJson(form.value!.field))
 }
 const callField = () => {
-  form.value?.call(".*?", "reset", {
+  form.value?.call("input1", "reset", {
     fieldTypes: ["plain"],
     first: true
   })
 }
 const callElement = () => {
-  console.log(form.value?.callElement("input", "focus"))
+  console.log(form.value?.callElement("input1", "focus"))
 }
 const callLayout = () => {
-  console.log(form.value?.callLayout("input", "validate"))
+  console.log(form.value?.callLayout("input1", "validate"))
+}
+const setProps = () => {
+  console.log(
+    form.value?.setProps("input1", () => {
+      return { props: { placeholder: "请输入" } }
+    })
+  )
 }
 </script>
 
@@ -50,9 +57,10 @@ const callLayout = () => {
         <ElButton @click="reset">清空</ElButton>
         <ElButton @click="printJson">打印json</ElButton>
         <ElButton @click="submit">提交</ElButton>
-        <ElButton @click="callField">调用指定字段方法-first-reset</ElButton>
+        <ElButton @click="callField">调用指定字段方法-reset</ElButton>
         <ElButton @click="callElement">调用指定数据字段方法-focus</ElButton>
         <ElButton @click="callLayout">调用指定控制器方法-validate</ElButton>
+        <ElButton @click="setProps">修改指定字段参数-setProps</ElButton>
       </Form>
     </ElCard>
   </div>
