@@ -1,11 +1,11 @@
-import { Component, computed, defineComponent, h, shallowRef, unref } from "vue"
+import { Component, computed, defineComponent, h, nextTick, shallowRef, unref } from "vue"
 import { ArrayField } from "../arrayField/arrayField.component"
 import { ObjectField } from "../objectField/ObjectField.component"
 import { PlainField } from "../plainField/plainField.component"
 import { buildScopeElement } from "../shared/helper"
 import { VoidField } from "../voidField/voidField.component"
 import { useComponentForm } from "./form.component"
-import { CFormExpose, JsonFormConfig, JsonFormStructJson } from "./form.type"
+import { CFormExpose, JsonFormConfig, JsonFormStructJson, OnForceRenderForm } from "./form.type"
 
 function createArrayItem(children: JsonFormStructJson[], deep: number, ctx: RenderJsonStructContext) {
   return defineComponent({
@@ -59,12 +59,24 @@ function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStr
 }
 
 export function createJsonForm(jsonFormConfig: JsonFormConfig) {
-  const formActions = shallowRef<CFormExpose | null>(null)
-  const flushKey = shallowRef(0)
+  let prevFlushKey = 0
+  const flushKey = shallowRef(prevFlushKey)
+
   const forceRender = () => {
-    formActions.value = null
+    formActions.value = { onForceRenderForm } as any
     flushKey.value++
   }
+
+  const forceRenderPost: ((expose: CFormExpose) => any)[] = []
+  const onForceRenderForm: OnForceRenderForm = fn => {
+    if (typeof fn === "function") forceRenderPost.push(fn)
+    return function clean() {
+      const index = forceRenderPost.indexOf(fn)
+      if (index > -1) forceRenderPost.splice(index, 1)
+    }
+  }
+
+  const formActions = shallowRef<CFormExpose>({ onForceRenderForm } as any)
 
   const createFormRender = () => {
     return defineComponent({
@@ -79,8 +91,18 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
         actions.provide()
 
         const formExpose = createFormExpose()
-        formActions.value = formExpose
-        expose(formExpose)
+        expose((formActions.value = { ...formExpose, onForceRenderForm }))
+        if (prevFlushKey !== flushKey.value) {
+          // 内部会置空，在重新赋值
+          nextTick(() => {
+            setTimeout(() => {
+              nextTick(() => {
+                prevFlushKey = flushKey.value
+                forceRenderPost.forEach(fn => fn(formActions.value))
+              })
+            }, 0)
+          })
+        }
 
         const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements!.value, arrayKeys }
         Object.assign(config.Elements!.value, buildScopeElement(slots))
@@ -104,6 +126,7 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
       }
     })
   }
+
   const ProxyForm = defineComponent({
     name: "ProxyForm",
     setup(_, { attrs, slots }) {

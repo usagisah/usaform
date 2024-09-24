@@ -1,9 +1,9 @@
-import { computed, defineComponent, h, shallowRef, unref } from "vue"
+import { computed, defineComponent, h, nextTick, shallowRef, unref } from "vue"
 import { CFormValidateError } from "../controller/rule"
 import { buildScopeElement } from "../shared/helper"
 import { normalizeFormConfig } from "./Provider"
 import { useForm } from "./form"
-import { CFormExpose, CFormProps, FormConfig } from "./form.type"
+import { CFormExpose, CFormProps, FormConfig, OnForceRenderForm } from "./form.type"
 
 export function useComponentForm(formConfig?: FormConfig) {
   const config = normalizeFormConfig(formConfig ?? {})
@@ -44,7 +44,7 @@ export function useComponentForm(formConfig?: FormConfig) {
     return actions.call(path, "setProps", { fieldTypes: ["plain"], params: [setter] })
   }
 
-  const createFormExpose = (): CFormExpose => {
+  const createFormExpose = (): Omit<CFormExpose, "onForceRenderForm"> => {
     const { provide, ..._actions } = actions
     return { ..._actions, validate, reset, callLayout, callElement, setProps, field }
   }
@@ -53,12 +53,24 @@ export function useComponentForm(formConfig?: FormConfig) {
 }
 
 export function createForm(props: CFormProps = {}) {
-  const formActions = shallowRef<CFormExpose | null>(null)
-  const flushKey = shallowRef(0)
+  let prevFlushKey = 0
+  const flushKey = shallowRef(prevFlushKey)
+
   const forceRender = () => {
-    formActions.value = null
+    formActions.value = { onForceRenderForm } as any
     flushKey.value++
   }
+
+  const forceRenderPost: ((expose: CFormExpose) => any)[] = []
+  const onForceRenderForm: OnForceRenderForm = fn => {
+    if (typeof fn === "function") forceRenderPost.push(fn)
+    return function clean() {
+      const index = forceRenderPost.indexOf(fn)
+      if (index > -1) forceRenderPost.splice(index, 1)
+    }
+  }
+
+  const formActions = shallowRef<CFormExpose>({ onForceRenderForm } as any)
 
   const createFormRender = () => {
     return defineComponent({
@@ -73,8 +85,18 @@ export function createForm(props: CFormProps = {}) {
         actions.provide()
 
         const formExpose = createFormExpose()
-        formActions.value = formExpose
-        expose(formExpose)
+        expose((formActions.value = { ...formExpose, onForceRenderForm }))
+        if (prevFlushKey !== flushKey.value) {
+          // 内部会置空，在重新赋值
+          nextTick(() => {
+            setTimeout(() => {
+              nextTick(() => {
+                prevFlushKey = flushKey.value
+                forceRenderPost.forEach(fn => fn(formActions.value))
+              })
+            }, 0)
+          })
+        }
 
         return () => {
           const { layout, layoutProps } = props
@@ -94,6 +116,7 @@ export function createForm(props: CFormProps = {}) {
       }
     })
   }
+
   const ProxyForm = defineComponent({
     name: "ProxyForm",
     setup(_, { attrs, slots }) {
@@ -103,5 +126,6 @@ export function createForm(props: CFormProps = {}) {
       return () => h(Form.value, attrs, slots)
     }
   })
+
   return [(props.dynamic ?? true) ? ProxyForm : createFormRender(), formActions, forceRender] as const
 }

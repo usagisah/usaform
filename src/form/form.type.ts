@@ -43,12 +43,17 @@ export interface CFormProps {
   dynamic?: boolean
 }
 
+export interface OnForceRenderForm {
+  (fn: (expose: CFormExpose) => any): () => void
+}
+
 export interface CFormExpose extends Omit<FormActions, "provide"> {
   validate: () => Promise<CFormValidateError[]>
   reset: () => void
   callLayout: (path: string, key: string, ptr?: any, ...params: any[]) => Record<string, any>
   callElement: (path: string, key: string, ptr?: any, ...params: any[]) => Record<string, any>
   setProps: (path: string, setter: (props: { props: Obj; layoutProps: Obj }) => void | { props?: Obj; layoutProps?: Obj }) => Record<string, any>
+  onForceRenderForm: OnForceRenderForm
   field: RootField
 }
 

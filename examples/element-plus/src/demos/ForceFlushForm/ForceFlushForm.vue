@@ -25,6 +25,10 @@ async function apiFormJson() {
   ] as JsonFormStructJson[]
 }
 
+formRef.value?.onForceRenderForm(() => {
+  formRef.value.subscribe("group/.*", console.log)
+})
+
 function flush() {
   setTimeout(async () => {
     const [data, json] = await Promise.all([apiState(), apiFormJson()])
