@@ -1,4 +1,4 @@
-import { SlotsType, computed, defineComponent, h, reactive, shallowRef, unref } from "vue"
+import { Fragment, SlotsType, computed, defineComponent, h, reactive, shallowRef, unref } from "vue"
 import { FormActionCallInfo } from "../actions/hooks"
 import { FieldComponentConfig, resolveFieldComponentConfig } from "../shared/field"
 import { callFuncWithError, createFormCFieldToJson } from "../shared/helper"
@@ -21,7 +21,7 @@ export const ObjectField = defineComponent<CObjectFieldProps>({
     let fieldComponentConfig: FieldComponentConfig
     const fieldLayoutRef = shallowRef<Obj | null>(null)
     const fieldElementRef = shallowRef<Obj | null>(null)
-    const { fieldValue, FieldRender, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
+    const { fieldValue, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
       fieldComponentConfig = resolveFieldComponentConfig("object", formConfig, props, slots)
       return {
         initValue: initValue === undefined ? props.initValue : initValue,
@@ -63,8 +63,9 @@ export const ObjectField = defineComponent<CObjectFieldProps>({
       }
     }
 
+    let _iota = 0
     return () => {
-      return <FieldRender>{fieldLayout ? h(fieldLayout, { FormControllerProps: objectControllerProps.value, ref: fieldLayoutRef }) : resolveRenderElement()}</FieldRender>
+      return <Fragment key={_iota++}>{fieldLayout ? h(fieldLayout, { FormControllerProps: objectControllerProps.value, ref: fieldLayoutRef }) : resolveRenderElement()}</Fragment>
     }
   }
 })

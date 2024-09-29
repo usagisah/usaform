@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { createJsonForm, JsonFormConfig, JsonFormStructJson } from "@shoroi/form"
 import { ElButton, ElCard, ElSpace } from "element-plus"
-import { nextTick, onMounted, shallowReactive } from "vue"
+import { nextTick, onMounted, reactive } from "vue"
 
-const jsonFormConfig: JsonFormConfig = shallowReactive({ struct: [], config: { layoutProps: { labelWidth: "80px" } } })
+const jsonFormConfig: JsonFormConfig = reactive({ struct: [], config: { defaultFormData: {}, layoutProps: { labelWidth: "80px" } } })
 const [Form, formRef, forceUpdateForm] = createJsonForm(jsonFormConfig)
 
 // 模拟异步获取数据
@@ -25,24 +25,18 @@ async function apiFormJson() {
   ] as JsonFormStructJson[]
 }
 
-formRef.value?.onForceRenderForm(() => {
+formRef.value?.onForceRenderForm(async () => {
+  await nextTick()
+  console.log("forceRender", formRef.value.getFormData())
   formRef.value.subscribe("group/.*", console.log)
 })
 
 function flush() {
   setTimeout(async () => {
     const [data, json] = await Promise.all([apiState(), apiFormJson()])
-
-    // 如果正常流程不生效，可以试试加着两行
-    forceUpdateForm()
-    await nextTick()
-
     jsonFormConfig.struct = json
-    formRef.value?.set("", data)
-
-    setTimeout(() => {
-      console.log(Object.fromEntries(formRef.value?.get("group/.*", { shallow: false }) as any[]))
-    }, 0)
+    jsonFormConfig.config!.defaultFormData = data
+    forceUpdateForm()
   }, 200)
 }
 

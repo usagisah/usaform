@@ -1,4 +1,4 @@
-import { App, computed, defineComponent, hasInjectionContext, inject, provide, toRaw, unref } from "vue"
+import { App, computed, customRef, defineComponent, hasInjectionContext, inject, provide, toRaw, unref } from "vue"
 import { FormItem } from "../controller/FormItem"
 import { FormConfig } from "./form.type"
 
@@ -7,7 +7,22 @@ export function normalizeFormConfig(currentConfig: FormConfig): FormConfig {
   const parentConfig = (hasInjectionContext() ? inject(FormContextConfigKey) : {}) as FormConfig
   const config = { plainFieldController: "FormItem", ...parentConfig, ...c }
 
-  config.Elements = computed(() => ({ FormItem, ...unref(parentConfig.Elements), ...unref(Elements) }))
+
+  config.Elements = customRef((track, trigger) => {
+    let value: any
+    return {
+      get() {
+        track()
+        if (!value) {
+          value = { FormItem, ...unref(parentConfig.Elements), ...unref(Elements) }
+        }
+        return value
+      },
+      set(_value) {
+        value = _value
+      },
+    }
+  })
   config.Rules = computed(() => ({ ...unref(parentConfig.Rules), ...unref(Rules) }))
   config.layoutProps = computed(() => ({ ...unref(parentConfig.layoutProps), ...unref(layoutProps) }))
 

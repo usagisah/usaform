@@ -8,7 +8,7 @@ import { getFieldStructSize, resolveFieldDefaultValue, setProperty } from "../sh
 import { useFieldValue } from "../shared/useFieldValue"
 import { PlainField, PlainFieldActions, PlainFieldInit } from "./plainField.type"
 
-export function useFormPlainField<T = unknown>(name: FieldName, init: PlainFieldInit<T>): FieldWrapper<T, PlainFieldActions, true> {
+export function useFormPlainField<T = unknown>(name: FieldName, init: PlainFieldInit<T>): FieldWrapper<T, PlainFieldActions> {
   const ctx = inject(formContext) as FormContext
 
   const { field, root, arrayUnwrapKey } = ctx
@@ -29,8 +29,7 @@ export function useFormPlainField<T = unknown>(name: FieldName, init: PlainField
 
   return {
     fieldValue: _field.fieldValue,
-    actions: useFormActions(_field, root, arrayUnwrapKey),
-    FieldRender: null
+    actions: useFormActions(_field, root, arrayUnwrapKey)
   }
 }
 

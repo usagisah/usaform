@@ -32,7 +32,7 @@ const printJson = () => {
       <ElButton @click="validate()">校验</ElButton>
       <ElButton @click="reset()">清空</ElButton>
       <ElButton @click="printJson()">打印json</ElButton>
-      <ElButton @click="submit()">提交</ElButton>
+      <ElButton @click="submit(true)">提交</ElButton>
     </ElCard>
 
     <ElCard style="width: 45%">
@@ -61,7 +61,7 @@ const printJson = () => {
       <ElDivider>提交操作</ElDivider>
       <ElButton @click="validate()">校验</ElButton>
       <ElButton @click="reset()">清空</ElButton>
-      <ElButton @click="submit()">提交</ElButton>
+      <ElButton @click="submit(false)">提交</ElButton>
     </ElCard>
   </div>
 </template>

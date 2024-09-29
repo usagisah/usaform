@@ -2,7 +2,6 @@ import { inject, onBeforeUnmount, provide, toRaw } from "vue"
 import { useFormActions } from "../actions/hooks"
 import { formContext, FormContext } from "../form/context"
 import { Field, FieldName, FieldWrapper } from "../form/field.type"
-import { createFieldRender } from "../shared/field"
 import { getFieldStructSize, resolveFieldDefaultValue, safeGetProperty, setProperty } from "../shared/resolve"
 import { useFieldValue } from "../shared/useFieldValue"
 import {
@@ -22,7 +21,7 @@ import { useFormArrayItem } from "./arrayItem"
 
 export const ArrayEmptyItem = Symbol()
 
-export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit<T>): FieldWrapper<T[], ArrayFieldActions, false> {
+export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit<T>): FieldWrapper<T[], ArrayFieldActions> {
   const ctx = inject(formContext) as FormContext
 
   const { field, root, arrayUnwrapKey } = ctx
@@ -43,8 +42,7 @@ export function useFormArrayField<T = any>(name: FieldName, init: ArrayFieldInit
 
   return {
     fieldValue: _field.fieldValue,
-    actions: { ...useFormActions(_field, root, arrayUnwrapKey), ..._actions },
-    FieldRender: createFieldRender(_field.fieldKey, _field.fieldValue)
+    actions: { ...useFormActions(_field, root, arrayUnwrapKey), ..._actions }
   }
 }
 
@@ -58,7 +56,6 @@ function handleFieldUpdate(_field: ArrayField, ctx: FormContext, clean: Function
       _field.setting = false
       return
     }
-    // ???
     _field.struct = _field.fieldValue.value.map((item: Field) => {
       return safeGetProperty(item, "__uform_aryItem_field") ? (item as any).__aryValue : item
     })
@@ -67,7 +64,6 @@ function handleFieldUpdate(_field: ArrayField, ctx: FormContext, clean: Function
   onBeforeUnmount(() => {
     _field.struct = []
     _field.clearSubscribers()
-    setProperty(ctx.currentInitValue, name, null)
     clean()
   })
 }

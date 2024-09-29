@@ -7,7 +7,7 @@ import { CFormExpose, CFormProps, FormConfig, OnForceRenderForm } from "./form.t
 
 export function useComponentForm(formConfig?: FormConfig) {
   const config = normalizeFormConfig(formConfig ?? {})
-  const { actions, FieldRender, field } = useForm(config)
+  const { actions, field } = useForm(config)
 
   const validate: CFormExpose["validate"] = async () => {
     const res = actions.call("all", "validate", { fieldTypes: ["plain"] })
@@ -49,7 +49,7 @@ export function useComponentForm(formConfig?: FormConfig) {
     return { ..._actions, validate, reset, callLayout, callElement, setProps, field }
   }
 
-  return { actions, config, field, FieldRender, validate, reset, callLayout, callElement, createFormExpose }
+  return { actions, config, field, validate, reset, callLayout, callElement, createFormExpose }
 }
 
 export function createForm(props: CFormProps = {}) {
@@ -76,8 +76,8 @@ export function createForm(props: CFormProps = {}) {
     return defineComponent({
       name: "Form",
       setup(_, { attrs, slots, expose }) {
-        const { FieldRender, config, actions, createFormExpose } = useComponentForm(props.config)
-        Object.assign(config.Elements!.value, buildScopeElement(slots))
+        const { config, actions, createFormExpose } = useComponentForm(props.config)
+        config.Elements!.value = { ...config.Elements!.value, ...buildScopeElement(slots) }
 
         const { defaultFormLayout } = config
         const gFormLayout = typeof defaultFormLayout === "string" ? unref(config.Elements!)[defaultFormLayout] : defaultFormLayout
@@ -87,30 +87,22 @@ export function createForm(props: CFormProps = {}) {
         const formExpose = createFormExpose()
         expose((formActions.value = { ...formExpose, onForceRenderForm }))
         if (prevFlushKey !== flushKey.value) {
-          // 内部会置空，在重新赋值
           nextTick(() => {
-            setTimeout(() => {
-              nextTick(() => {
-                prevFlushKey = flushKey.value
-                forceRenderPost.forEach(fn => fn(formActions.value))
-              })
-            }, 0)
+            prevFlushKey = flushKey.value
+            forceRenderPost.forEach(fn => fn(formActions.value))
           })
         }
 
         return () => {
           const { layout, layoutProps } = props
           const Layout = typeof layout === "string" ? unref(config.Elements!)[layout] : (layout ?? gFormLayout)
+
+          if (Layout) return h(Layout, { ...layoutProps, ...attrs }, () => slots.default?.())
+
           return (
-            <FieldRender>
-              {Layout ? (
-                h(Layout, { ...layoutProps, ...attrs }, () => slots.default?.())
-              ) : (
-                <div class="u-form" {...attrs}>
-                  {slots.default?.()}
-                </div>
-              )}
-            </FieldRender>
+            <div class="u-form" key={formExpose.field.fieldValue.value} {...attrs}>
+              {slots.default?.()}
+            </div>
           )
         }
       }

@@ -1,4 +1,4 @@
-import { SlotsType, computed, defineComponent, h, reactive, shallowRef, unref } from "vue"
+import { Fragment, SlotsType, computed, defineComponent, h, reactive, shallowRef, unref } from "vue"
 import { FormActionCallInfo } from "../actions/hooks"
 import { FieldComponentConfig, resolveFieldComponentConfig } from "../shared/field"
 import { callFuncWithError, createFormCFieldToJson } from "../shared/helper"
@@ -21,7 +21,7 @@ export const ArrayField = defineComponent({
     let fieldComponentConfig: FieldComponentConfig
     const fieldLayoutRef = shallowRef<Obj | null>(null)
     const fieldElementRef = shallowRef<Obj | null>(null)
-    const { fieldValue, actions, FieldRender } = useFormArrayField(name, ({ initValue, formConfig }) => {
+    const { fieldValue, actions } = useFormArrayField(name, ({ initValue, formConfig }) => {
       fieldComponentConfig = resolveFieldComponentConfig("array", formConfig, props, slots)
       return {
         initValue: initValue === undefined ? props.initValue : initValue,
@@ -67,8 +67,11 @@ export const ArrayField = defineComponent({
       }
     }
 
+    let _iota = 0
     return () => {
-      return <FieldRender>{fieldLayout ? h(fieldLayout, { FormControllerProps: controllerProps.value, ref: fieldLayoutRef }) : resolveRenderElement()}</FieldRender>
+      return (
+        <Fragment key={_iota++}>{fieldLayout ? h(fieldLayout, { FormControllerProps: controllerProps.value, ref: fieldLayoutRef }) : resolveRenderElement()}</Fragment>
+      )
     }
   }
 })

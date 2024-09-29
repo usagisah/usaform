@@ -83,7 +83,7 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
       name: "Form",
       setup(_, { attrs, slots, expose }) {
         const { arrayKeys = ["key", "id"], config: formConfig } = jsonFormConfig
-        const { config, actions, createFormExpose, FieldRender } = useComponentForm(formConfig)
+        const { config, actions, createFormExpose } = useComponentForm(formConfig)
 
         const { defaultFormLayout } = config
         const gFormLayout = typeof defaultFormLayout === "string" ? unref(config.Elements!)[defaultFormLayout] : defaultFormLayout
@@ -93,34 +93,26 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
         const formExpose = createFormExpose()
         expose((formActions.value = { ...formExpose, onForceRenderForm }))
         if (prevFlushKey !== flushKey.value) {
-          // 内部会置空，在重新赋值
           nextTick(() => {
-            setTimeout(() => {
-              nextTick(() => {
-                prevFlushKey = flushKey.value
-                forceRenderPost.forEach(fn => fn(formActions.value))
-              })
-            }, 0)
+            prevFlushKey = flushKey.value
+            forceRenderPost.forEach(fn => fn(formActions.value))
           })
         }
 
         const ctx: RenderJsonStructContext = { memo: new Map(), Elements: config.Elements!.value, arrayKeys }
-        Object.assign(config.Elements!.value, buildScopeElement(slots))
+        config.Elements!.value = { ...config.Elements!.value, ...buildScopeElement(slots) }
 
         return () => {
           const { struct, layout, layoutProps } = jsonFormConfig
           const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
           const Layout = typeof layout === "string" ? unref(config.Elements!)[layout] : (layout ?? gFormLayout)
+
+          if (Layout) return h(Layout, { ...layoutProps, ...attrs }, { default: () => childrenSlots })
+
           return (
-            <FieldRender>
-              {Layout ? (
-                h(Layout, { ...layoutProps, ...attrs }, { default: () => childrenSlots })
-              ) : (
-                <div class="u-form" {...attrs}>
-                  {childrenSlots}
-                </div>
-              )}
-            </FieldRender>
+            <div class="u-form" key={formExpose.field.fieldValue.value} {...attrs}>
+              {childrenSlots}
+            </div>
           )
         }
       }

@@ -1,6 +1,5 @@
 import { onBeforeUnmount, provide } from "vue"
 import { useFormActions } from "../actions/hooks"
-import { createFieldRender } from "../shared/field"
 import { useFieldValue } from "../shared/useFieldValue"
 import { formContext, FormContext } from "./context"
 import { RootField } from "./field.type"
@@ -36,8 +35,7 @@ export function useForm(formConfig: FormConfig) {
 
   return {
     field,
-    actions: { ...useFormActions(field, field, _arrayUnwrapKey), provide: formContextProvide },
-    FieldRender: createFieldRender(field.fieldKey, field.fieldValue)
+    actions: { ...useFormActions(field, field, _arrayUnwrapKey), provide: formContextProvide }
   }
 }
 

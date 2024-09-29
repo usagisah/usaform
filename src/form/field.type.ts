@@ -1,14 +1,13 @@
-import { DefineComponent, ShallowRef } from "vue"
+import { ShallowRef } from "vue"
 import { ArrayField } from "../arrayField/arrayField.type"
 import { ObjectField } from "../objectField/objectField.type"
 import { PlainField } from "../plainField/plainField.type"
 import { FieldValue } from "../shared/useFieldValue"
 import { VoidField } from "../voidField/voidField.type"
 
-export type FieldWrapper<T, A, Plain extends boolean> = {
+export type FieldWrapper<T, A> = {
   fieldValue: ShallowRef<T>
   actions: A
-  FieldRender: Plain extends false ? DefineComponent<{ render?: () => any }, any, any> : null
 }
 
 export type RootField = BaseFiled &

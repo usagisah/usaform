@@ -2,33 +2,10 @@ import { CArrayFieldProps } from "src/arrayField/arrayField.type"
 import { FormConfig } from "src/form/form.type"
 import { CObjectFieldProps } from "src/objectField/objectField.type"
 import { CPlainFieldProps } from "src/plainField/plainField.type"
-import { PropType, ShallowRef, defineComponent, h, unref, useAttrs } from "vue"
+import { h, unref, useAttrs } from "vue"
 import { isPlainObject } from "./check"
 import { resolveScopeElement } from "./helper"
 import { Obj } from "./type"
-
-export function createFieldRender(fieldKey: ShallowRef<number>, fieldValue: ShallowRef<unknown>) {
-  let key = fieldKey.value
-  return defineComponent({
-    name: "FieldRender",
-    props: {
-      render: {
-        required: false,
-        type: Function as PropType<() => any>
-      }
-    },
-    setup(props, { slots }) {
-      return () => {
-        if (key !== fieldKey.value) {
-          key = fieldKey.value
-          return fieldValue.value, null
-        }
-        if (props.render) return props.render?.()
-        return slots.default?.()
-      }
-    }
-  })
-}
 
 export function resolveFieldComponentConfig(
   fieldType: "plain" | "object" | "array",

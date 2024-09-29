@@ -9,15 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "ant-design-vue": "^4.2.3",
-    "sass": "^1.77.5",
-    "vue": "^3.4.27"
+    "ant-design-vue": "^4.2.5",
+    "sass": "^1.79.4",
+    "vue": "^3.5.10"
   },
   "devDependencies": {
-    "@usaform/element-plus": "workspace:^",
-    "@vitejs/plugin-vue": "^5.0.5",
-    "@vitejs/plugin-vue-jsx": "^4.0.0",
-    "typescript": "^5.4.5",
-    "vite": "^5.2.13"
+    "@vitejs/plugin-vue": "^5.1.4",
+    "@vitejs/plugin-vue-jsx": "^4.0.1",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
   }
 }

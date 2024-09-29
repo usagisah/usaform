@@ -4,12 +4,11 @@ import { ArrayItemInitParams } from "../arrayField/arrayField.type"
 import { useFormArrayItem } from "../arrayField/arrayItem"
 import { formContext, FormContext } from "../form/context"
 import { FieldName, FieldWrapper } from "../form/field.type"
-import { createFieldRender } from "../shared/field"
 import { getFieldStructSize, resolveFieldDefaultValue, setProperty } from "../shared/resolve"
 import { useFieldValue } from "../shared/useFieldValue"
 import { ObjectField, ObjectFieldActions, ObjectFieldInit } from "./objectField.type"
 
-export function useFormObjectField<T = any>(name: FieldName, init: ObjectFieldInit<T>): FieldWrapper<T, ObjectFieldActions, false> {
+export function useFormObjectField<T = any>(name: FieldName, init: ObjectFieldInit<T>): FieldWrapper<T, ObjectFieldActions> {
   const ctx = inject(formContext) as FormContext
 
   const { field, root, arrayUnwrapKey } = ctx
@@ -30,8 +29,7 @@ export function useFormObjectField<T = any>(name: FieldName, init: ObjectFieldIn
 
   return {
     fieldValue: _field.fieldValue,
-    actions: useFormActions(_field, root, arrayUnwrapKey),
-    FieldRender: createFieldRender(_field.fieldKey, _field.fieldValue)
+    actions: useFormActions(_field, root, arrayUnwrapKey)
   }
 }
 
@@ -47,7 +45,6 @@ function handleFieldUpdate(_field: ObjectField, ctx: FormContext, clean: Functio
   onBeforeUnmount(() => {
     _field.struct.clear()
     _field.clearSubscribers()
-    setProperty(ctx.currentInitValue, name, undefined)
     clean()
   })
 }
