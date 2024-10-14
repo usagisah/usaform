@@ -1,4 +1,4 @@
-# 表单组件
+# 表单构造器
 
 
 
@@ -9,100 +9,71 @@
 完整的类型如下
 
 ```ts
-function createForm(props?: CFormProps): [Form,actions,forceRender]
+function createForm(props?: CFormProps): [Form, actions, forceFormRender]
 
-type CFormProps = {
+interface CFormProps {
   //针对于表单和表单字段的配置
-  config?: CFormConfig
+  config?: FormConfig
   //自定义最外层的布局组件
-  layout?: any
+  layout?: string | Component
   //默认传递给 layout 组件的参数，优先级比模版中传递的 低
   layoutProps?: Record<any, any>
   //是否允许被强制销毁，默认 true
   dynamic?: boolean
 }
-
-interface FormConfig {
-    defaultValue?: any;
-    defaultFormData?: Record<any, any>;
-    arrayUnwrapKey?: string | string[];
-    toJson?: FieldToJson;
-    [x: string]: any;
-}
-
-interface CFormConfig extends FormConfig {
-  // 默认使用的控制器
-  plainFieldController?: string | Record<any, any>
-  objectFieldController?: string | Record<any, any>
-  arrayFieldController?: string | Record<any, any>
-  // 全局布局参数
-  layoutProps?: MaybeRef<CFormItemProps>
-  // 双向绑定的 key
-  modelValue?: string
-  // 用于指定 key 的元素
-  Elements?: MaybeRef<Record<string, any>>
-  // 默认的校验选项
-  defaultValidateOption?: ValidateOption
-  // 用于指定 key 的规则
-  Rules?: MaybeRef<Record<any, (value: any) => CFormRuleItem>>
-}
 ```
 
 
 
+## 返回值-1 `<Form />` 
+
+表单最外层的 `Vue` 包裹器组件，使用 `ref` 获取到的实例同 `actions` 
+
+```vue
+<script>
+const [Form] = createForm()
+</script>
+
+<template>
+<Form>
+	<PlainField name="..." />  
+</Form>
+</template>
+```
 
 
-## 返回值
 
-返回值是一个有着三个元素组成的元组数组
+## 返回值-2 `Actions`
 
-1. 是一个 `Vue` 组件
-2. 表单操作对象
-3. 强制刷新函数
-
-强制刷新函数通常并不会使用到它，所以请不要过度依赖
-
-但是当一个表单需要根据不同的参数，动态改变内部结构时，某些情况可能并不会按照预期的方式工作。使用强制刷新函数可以使得表单整体，被强制销毁并重新创建
+这是表单互操作对象，具体行为看相关文档
 
 
+
+## 返回值-3 `forceFormRender`
+
+强制刷新表单的函数
+
+使用时内部会把表单的所有状态全部清空，包括所有的订阅等等，和字段产生的副作用，并且强制重新创建新的表单
+
+例如我们在重新请求接口，想要用新的数据结构刷新表单时
+
+我们可以，可以动态更改传递给 `createForm` 等表单构造器的配置选项`FormConfig.defaultFormData`，然后强制刷新表单，就可以全部回填数据进表单中
 
 
 
 ## 参数
 
-`CFormProps` 为表单的参数
+`config` 参数同公共表单参数
 
-其中`config: CFormConfig` 为公共参数，详细解释请看 [表单公共配置](./config.md)
+`dynamic` 决定了表单能否被，返回值 `forceFormRender` 给强制干掉在刷一遍
 
+`layout` 是针对于最外层表单的自定义包裹元素，如果需要自定义样式会使用到它
 
-
-### `layout`
-
-该选项用于指定，是否要在表单组件最外层嵌套一层，用于布局的组件
-
-它接收一个组件，或者是一个被注册的组件 `key`
-
-使用该选项可以很好的满足，内置选项不支持的布局等
+`layoutProps` 是传递给最外层 `<Form/>` 组件的参数，它的优先级小于组件的直接传参
 
 
 
-### `layoutProps`
 
-该选项只有在 `layout` 存在时生效
-
-它和在模版中直接传递选项给表单组件效果一致
-
-存在的主要目的在于自定义封装时，可以内置一些公共的参数进去，优先级低于模版
-
-
-
-### `dynamic`
-
-动态选项用于规定表单组件能否被强制销毁在重建，默认为 `true`
-
-只有当开启时，`forceRender` 函数还能生效
-
-当关闭时可以减少内部组件的嵌套，提高一点性能
 
 
 
@@ -116,7 +87,7 @@ interface CFormConfig extends FormConfig {
 
 1. 由于要监听的参数过多，相关的判断会非常的复杂不稳定
 2. 依赖于 `vue` 的组件上下文很难彻底的销毁重建
-3. 为了和表单交互一定会有一个 `ref` 来获取
-
-通过函数创建则可以轻松规避很多没有必要的 `BUG` 和判断
+3. 为了和表单交互一定会有一个 `ref` 来获取，使用函数创建就可以提前把 `ref` 实例暴露出来
+3. 利于二次封装
+3. 通过函数创建则可以轻松规避很多没有必要的 `BUG` 和判断
 

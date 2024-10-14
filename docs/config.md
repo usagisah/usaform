@@ -1,51 +1,54 @@
 # 表单公共配置
 
+表单配置选项，适用于全局，以及各种表单构造器函数
+
+
+
 ## 完整的配置
 
 ```ts
 interface FormConfig {
-    defaultValue?: any;
-    defaultFormData?: Record<any, any>;
-    arrayUnwrapKey?: string[];
-    toJson?: FieldToJson;
-    [x: string]: any;
-}
-
-interface CFormConfig extends FormConfig {
+  // 默认的数据
+  defaultFormData?: Obj
+  // 解构数据的顺序
+  arrayUnwrapKey?: string | string[]
+  // 转 json
+  toJson?: FieldToJson
+  // 默认使用的表单布局组件
+  defaultFormLayout?: string | Component
   // 默认使用的控制器
-  plainFieldController?: string | Record<any, any>
-  objectFieldController?: string | Record<any, any>
-  arrayFieldController?: string | Record<any, any>
+  plainFieldController?: string | Component
+  objectFieldController?: string | Component
+  arrayFieldController?: string | Component
   // 全局布局参数
   layoutProps?: MaybeRef<CFormItemProps>
   // 双向绑定的 key
   modelValue?: string
   // 用于指定 key 的元素
-  Elements?: MaybeRef<Record<string, any>>
+  Elements?: MaybeRef<Record<string, Component>>
   // 默认的校验选项
   defaultValidateOption?: ValidateOption
   // 用于指定 key 的规则
-  Rules?: MaybeRef<Record<any, CFormRuleItem>>
+  Rules?: MaybeRef<Record<string, (value: any) => CFormRuleItem>>
 }
 ```
 
-### `defaultValue`
 
-用于数据组件`PlainField.initValue` 的默认值
 
 ### `defaultFormData`
 
 用于创建表单时的初始默认值，如果字段能够匹配就使用，否则会被跳过
 
+
+
 ### `arrayUnwrapKey`
 
-字符串数组，在数组字段进行嵌套时，会尝试对数组的子项进行结构，能找到就用，找不到会使用原始的数据项，默认值是`[value, children]`
+字符串数组，在数组字段进行嵌套时，会尝试对数组的子项进行解构，能找到就用，找不到会使用原始的数据项，默认值是`[value, children]`
 
-举个自理
+举个例子，使用数组时可以很轻松的写出这种代码，因为必须存在值和唯一标识，我们可以根据组件结构写出以下数据结构
 
-使用数组时可以很轻松的写出这种代码，因为必须存在值和唯一标识，我们可以根据组件结构写出以下数据结构
-
-```ts
+```tsx
+//初始数据对象，可以是从接口里来
 const initFormData = {
   arr: [//对应 name=arr
     { //数组的每一项，对应 :name=0
@@ -54,6 +57,13 @@ const initFormData = {
     }
   ]
 }
+
+//为了表达意思的，伪组件结构
+const Comp = () => <Form>
+  <ArrayField name="arr">
+  	<PlainField />
+  </ArrayField>
+</Form>
 ```
 
 此时会发现，使用 `ElInput` 填充的 `PlainField` 组件对应的数据成了对象，而真正应该对应的应该是 `value` 字段才对，所以**数组项为了支持初始化数据的开箱即用，必须要解构赋值，把对象中的 value 字段提取出来**
@@ -61,11 +71,12 @@ const initFormData = {
 可框架内部并不知道要提取哪个，所以需要进行配置
 
 ```ts
-const config: CFormConfig = {
+const config: FormConfig = {
   arrayUnwrapKey: ['value', 'children']
 }
-arrayUnwrapKey` 是一个字符串数组，框架内部会循环数组，逐个尝试，找到就用，找不到会使用原始的数据项，默认值是`[value, children]
 ```
+
+`arrayUnwrapKey` 是一个字符串数组，框架内部会循环数组，逐个尝试，找到就用，找不到会使用原始的数据项，默认值是`[value, children]`
 
 对于这个例子来说
 
@@ -90,19 +101,19 @@ arrayUnwrapKey` 是一个字符串数组，框架内部会循环数组，逐个�
 
 
 
-## 通过插件配置
+## 以插件形式配置
 
 ```ts
-createApp().use(CFormPlugin, 配置)
+createApp().use(CFormPlugin, FormConfig)
 ```
 
 
 
-## 通过上下文配置
+## 通过组件上下文配置
 
 ```vue
 <template>
-	<CFormProvider :config=配置>
+	<CFormProvider :config="FormConfig">
   	<App />
   </CFormProvider>
 </template>

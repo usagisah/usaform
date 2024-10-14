@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { createJsonForm, JsonFormConfig, JsonFormStructJson } from "@shoroi/form"
 import { ElButton, ElCard, ElSpace } from "element-plus"
-import { nextTick, onMounted, reactive } from "vue"
+import { onMounted, reactive } from "vue"
 
 const jsonFormConfig: JsonFormConfig = reactive({ struct: [], config: { defaultFormData: {}, layoutProps: { labelWidth: "80px" } } })
 const [Form, formRef, forceUpdateForm] = createJsonForm(jsonFormConfig)
@@ -25,8 +25,7 @@ async function apiFormJson() {
   ] as JsonFormStructJson[]
 }
 
-formRef.value?.onForceRenderForm(async () => {
-  await nextTick()
+formRef.value?.onForceRenderForm(() => {
   console.log("forceRender", formRef.value.getFormData())
   formRef.value.subscribe("group/.*", console.log)
 })

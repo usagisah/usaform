@@ -80,7 +80,9 @@ interface CPlainFieldProps {
 
 `slots` 用于传递插槽，详细用法请看 [slots](./slots.md)
 
-### 提取插槽到单个文件被引用
+
+
+### 自定义填充组件
 
 ```vue
 <script lang="ts" setup>

@@ -14,7 +14,7 @@ export type FormActions = FormBaseActions & {
 export interface FormConfig {
   // 默认的数据
   defaultFormData?: Obj
-  // 结构数据的顺序
+  // 解构数据的顺序
   arrayUnwrapKey?: string | string[]
   // 转 json
   toJson?: FieldToJson
