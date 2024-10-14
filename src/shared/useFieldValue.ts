@@ -1,5 +1,6 @@
-import { ShallowRef, shallowRef, unref, watch } from "vue"
-import { FieldName } from "../form/field.type"
+import { ShallowRef, shallowRef, toRaw, unref, watch } from "vue"
+import { Field, FieldName } from "../form/field.type"
+import { isPlainObject } from "./check"
 
 export type FieldGetter = () => any
 export type FieldSetter = (value: any, method?: string) => any
@@ -10,6 +11,12 @@ export type FieldUnSubscribe = () => void
 export type FieldSubscribe = (handle: FieldSubscribeHandle, config?: FieldSubscribeConfig) => FieldUnSubscribe
 export type FieldClearSubscribes = () => void
 
+export type CreateFieldValueOptions<T> = {
+  value: T
+  actions: Record<any, any>
+  getField: () => Field
+}
+
 export type FieldValue = {
   fieldValue: ShallowRef<any>
   getter: () => any
@@ -18,14 +25,15 @@ export type FieldValue = {
   clearSubscribers: FieldClearSubscribes
 }
 
-export function useFieldValue<T>(value: T, actions: Record<any, any>, getFieldName: () => FieldName): FieldValue {
+export function useFieldValue<T>({ value, actions, getField }: CreateFieldValueOptions<T>): FieldValue {
   const fieldValue = shallowRef(value)
   const subscribers: FieldSubscribeHandle[] = []
 
   watch(fieldValue, (newValue, oldValue) => {
+    const field = getField()
     for (const fn of subscribers) {
       try {
-        fn(newValue, oldValue, { name: getFieldName() })
+        fn(newValue, oldValue, { name: field.name })
       } catch (e) {
         console.error(e)
       }
@@ -38,7 +46,9 @@ export function useFieldValue<T>(value: T, actions: Record<any, any>, getFieldNa
     if (method) {
       return actions[method]?.(_value)
     }
-    fieldValue.value = _value
+
+    const field = getField()
+    recursiveSetter(field, _value)
   }
 
   const subscribe: FieldSubscribe = (handle, config = {}) => {
@@ -47,7 +57,8 @@ export function useFieldValue<T>(value: T, actions: Record<any, any>, getFieldNa
     const { immediate } = config
     if (immediate) {
       try {
-        handle(unref(fieldValue), undefined, { name: getFieldName() })
+        const field = getField()
+        handle(unref(fieldValue), undefined, { name: field.name })
       } catch (e) {
         console.error(e)
       }
@@ -64,4 +75,27 @@ export function useFieldValue<T>(value: T, actions: Record<any, any>, getFieldNa
   }
 
   return { fieldValue, getter, setter, subscribe, clearSubscribers }
+}
+
+function recursiveSetter(field: Field, value: any) {
+  value = toRaw(value)
+  switch (field.type) {
+    case "root":
+    case "object": {
+      if (isPlainObject(value)) {
+        for (const key in value) {
+          const subField = field.struct.get(key)
+          if (subField) {
+            recursiveSetter(subField, value[key])
+          }
+        }
+      }
+      break
+    }
+    case "plain":
+    case "ary": {
+      field.fieldValue.value = value
+      break
+    }
+  }
 }

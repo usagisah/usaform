@@ -4,7 +4,7 @@ import { ArrayItemInitParams } from "../arrayField/arrayField.type"
 import { useFormArrayItem } from "../arrayField/arrayItem"
 import { formContext, FormContext } from "../form/context"
 import { FieldName, FieldWrapper } from "../form/field.type"
-import { getFieldStructSize, resolveFieldDefaultValue, setProperty } from "../shared/resolve"
+import { getFieldStructSize, resolveFieldDefaultValue } from "../shared/resolve"
 import { useFieldValue } from "../shared/useFieldValue"
 import { ObjectField, ObjectFieldActions, ObjectFieldInit } from "./objectField.type"
 
@@ -56,7 +56,7 @@ export function createObjectField(name: FieldName, ctx: FormContext, init: Objec
     type: "object",
     name,
     order: getFieldStructSize(ctx.field),
-    ...useFieldValue(initValue ?? _defaultValue, {}, () => name),
+    ...useFieldValue({ value: initValue ?? _defaultValue, actions: {}, getField: () => _field }),
     struct: new Map(),
     parent: ctx.field,
     toJson,

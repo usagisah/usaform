@@ -52,7 +52,10 @@ export interface CFormExpose extends Omit<FormActions, "provide"> {
   reset: () => void
   callLayout: (path: string, key: string, ptr?: any, ...params: any[]) => Record<string, any>
   callElement: (path: string, key: string, ptr?: any, ...params: any[]) => Record<string, any>
-  setProps: (path: string, setter: (props: { props: Obj; layoutProps: Obj }) => void | { props?: Obj; layoutProps?: Obj }) => Record<string, any>
+  setProps: (
+    path: string,
+    setter: (extraProps: { props: Obj; layoutProps: Obj }, renderProps: { props: Obj; layoutProps: Obj }) => void | { props?: Obj; layoutProps?: Obj }
+  ) => Record<string, any>
   onForceRenderForm: OnForceRenderForm
   field: RootField
 }

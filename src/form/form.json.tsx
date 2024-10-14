@@ -1,4 +1,4 @@
-import { Component, computed, defineComponent, h, nextTick, shallowRef, unref } from "vue"
+import { Component, computed, defineComponent, h, nextTick, shallowRef, unref, watch } from "vue"
 import { ArrayField } from "../arrayField/arrayField.component"
 import { ObjectField } from "../objectField/ObjectField.component"
 import { PlainField } from "../plainField/plainField.component"
@@ -83,7 +83,15 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
       name: "Form",
       setup(_, { attrs, slots, expose }) {
         const { arrayKeys = ["key", "id"], config: formConfig } = jsonFormConfig
-        const { config, actions, createFormExpose } = useComponentForm(formConfig)
+        const { config, actions, createFormExpose, field } = useComponentForm(formConfig)
+
+        console.log(jsonFormConfig.config?.defaultFormData)
+        watch(
+          () => jsonFormConfig.config?.defaultFormData,
+          data => {
+            field.setter(data)
+          }
+        )
 
         const { defaultFormLayout } = config
         const gFormLayout = typeof defaultFormLayout === "string" ? unref(config.Elements!)[defaultFormLayout] : defaultFormLayout

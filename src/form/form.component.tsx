@@ -1,4 +1,4 @@
-import { computed, defineComponent, h, nextTick, shallowRef, unref } from "vue"
+import { computed, defineComponent, h, nextTick, shallowRef, unref, watch } from "vue"
 import { CFormValidateError } from "../controller/rule"
 import { buildScopeElement } from "../shared/helper"
 import { normalizeFormConfig } from "./Provider"
@@ -76,8 +76,15 @@ export function createForm(props: CFormProps = {}) {
     return defineComponent({
       name: "Form",
       setup(_, { attrs, slots, expose }) {
-        const { config, actions, createFormExpose } = useComponentForm(props.config)
+        const { config, actions, createFormExpose, field } = useComponentForm(props.config)
         config.Elements!.value = { ...config.Elements!.value, ...buildScopeElement(slots) }
+
+        watch(
+          () => props.config?.defaultFormData,
+          data => {
+            field.setter(data)
+          }
+        )
 
         const { defaultFormLayout } = config
         const gFormLayout = typeof defaultFormLayout === "string" ? unref(config.Elements!)[defaultFormLayout] : defaultFormLayout

@@ -49,7 +49,7 @@ export function createPlainField(name: FieldName, ctx: FormContext, init: PlainF
     type: "plain",
     name,
     order: getFieldStructSize(ctx.field),
-    ...useFieldValue(initValue ?? _defaultValue, {}, () => name),
+    ...useFieldValue({ value: initValue ?? _defaultValue, actions: {}, getField: () => _field }),
     parent: ctx.field,
     toJson,
     userConfig: _conf,

@@ -2,7 +2,7 @@ import { inject, onBeforeUnmount, provide, toRaw } from "vue"
 import { useFormActions } from "../actions/hooks"
 import { formContext, FormContext } from "../form/context"
 import { Field, FieldName, FieldWrapper } from "../form/field.type"
-import { getFieldStructSize, resolveFieldDefaultValue, safeGetProperty, setProperty } from "../shared/resolve"
+import { getFieldStructSize, resolveFieldDefaultValue, safeGetProperty } from "../shared/resolve"
 import { useFieldValue } from "../shared/useFieldValue"
 import {
   ArrayActionDelValue,
@@ -141,7 +141,7 @@ export function createArrayField(name: FieldName, ctx: FormContext, init: ArrayF
     parent: ctx.field,
     toJson,
     __uform_field: true,
-    ...useFieldValue([...(initValue ?? _defaultValue ?? [])], _arrayActions, () => name)
+    ...useFieldValue({ value: [...(initValue ?? _defaultValue ?? [])], actions: _arrayActions, getField: () => _field })
   }
 
   return { _field, _actions: _arrayActions }

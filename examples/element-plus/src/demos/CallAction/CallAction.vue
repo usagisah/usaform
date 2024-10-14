@@ -29,11 +29,10 @@ const callLayout = () => {
   console.log(form.value?.callLayout("input1", "validate"))
 }
 const setProps = () => {
-  console.log(
-    form.value?.setProps("input1", () => {
-      return { props: { placeholder: "请输入" } }
-    })
-  )
+  form.value?.setProps("input1", (...props) => {
+    console.log(props)
+    return { props: { placeholder: "请输入" } }
+  })
 }
 </script>
 

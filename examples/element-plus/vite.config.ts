@@ -12,5 +12,12 @@ export default defineConfig({
       "@shoroi/form": resolve(process.cwd(), "../../dist/index.js"),
       "@style/element-plus": resolve(process.cwd(), "../../style/element-plus.scss")
     }
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        silenceDeprecations: ["legacy-js-api"]
+      }
+    }
   }
 })

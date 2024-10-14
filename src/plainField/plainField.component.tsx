@@ -23,7 +23,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
     let fieldComponentConfig: FieldComponentConfig
     const fieldLayoutRef = shallowRef<(CFormItemExpose & Obj) | null>(null)
     const fieldElementRef = shallowRef<Obj | null>(null)
-    const outerProps = shallowReactive({ props: {} as Obj, layoutProps: {} as Obj })
+    const extraProps = shallowReactive({ props: {} as Obj, layoutProps: {} as Obj })
     const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig }) => {
       fieldComponentConfig = resolveFieldComponentConfig("plain", formConfig, props, slots)
       return {
@@ -37,14 +37,19 @@ export const PlainField = defineComponent<CPlainFieldProps>({
           return fieldLayoutRef.value?.validate(path, fieldValue.value)
         },
         setProps(_: FormActionCallInfo, setter: any) {
-          let res = setter({ ...outerProps })
+          let res = setter(
+            { ...extraProps },
+            {
+              props: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}), ...extraProps.layoutProps },
+              layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}), ...extraProps.layoutProps }
+            }
+          )
           if (!isPlainObject(res)) {
             res = {}
           }
 
-          const { props, layoutProps } = res
-          if (isPlainObject(props)) outerProps.props = props
-          if (isPlainObject(layoutProps)) outerProps.layoutProps = layoutProps
+          if (isPlainObject(res.props)) extraProps.props = res.props
+          if (isPlainObject(res.layoutProps)) extraProps.layoutProps = res.layoutProps
         },
         callLayout(_: FormActionCallInfo, { key, point, params }: Obj) {
           return callFuncWithError(() => {
@@ -68,8 +73,8 @@ export const PlainField = defineComponent<CPlainFieldProps>({
         type: "plain",
         fieldValue,
         actions,
-        props: { ...reactive(props.props ?? {}), ...outerProps.props },
-        layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}), ...outerProps.layoutProps },
+        props: { ...reactive(props.props ?? {}), ...extraProps.props },
+        layoutProps: { ...unref(gLayoutProps), ...reactive(props.layoutProps ?? {}), ...extraProps.layoutProps },
         Rules: unref(gRules),
         formConfig: formConfig,
         fieldAttrs: attrs,
