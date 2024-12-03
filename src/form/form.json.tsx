@@ -22,7 +22,7 @@ function createArrayItem(children: JsonFormStructJson[], deep: number, ctx: Rend
             <div key={key ? item[key] : Math.random()}>
               {children.map(item => {
                 item.name = index
-                return renderFormItem(item, deep + 1, ctx)
+                return renderFormItem(item, index, deep + 1, ctx)
               })}
             </div>
           )
@@ -34,8 +34,8 @@ function createArrayItem(children: JsonFormStructJson[], deep: number, ctx: Rend
 
 type RenderJsonStructContext = { memo: Map<string, any>; Elements: Record<string, any>; arrayKeys: string[] }
 const renderStrategy: Record<string, Component> = { plain: PlainField, object: ObjectField, ary: ArrayField, void: VoidField }
-function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStructContext): any {
-  const { type, children, ...attrs } = struct
+function renderFormItem(struct: JsonFormStructJson, order: number, deep = 0, ctx: RenderJsonStructContext): any {
+  const { type, name, children, ...attrs } = struct
   const FormFieldComponent = renderStrategy[type as keyof typeof renderStrategy]
   if (!FormFieldComponent) {
     throw new Error("未知的表单渲染类型")
@@ -51,11 +51,11 @@ function renderFormItem(struct: JsonFormStructJson, deep = 0, ctx: RenderJsonStr
       Elements[key] = memoChildren
       attrs.element = key
     } else {
-      _children = { default: () => children.map(item => renderFormItem(item, deep + 1, ctx)) }
+      _children = { default: () => children.map((item, index) => renderFormItem(item, index, deep + 1, ctx)) }
     }
   }
 
-  return h(FormFieldComponent, attrs, _children)
+  return h(FormFieldComponent, { ...attrs, name, key: name, order }, _children)
 }
 
 export function createJsonForm(jsonFormConfig: JsonFormConfig) {
@@ -85,7 +85,6 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
         const { arrayKeys = ["key", "id"], config: formConfig } = jsonFormConfig
         const { config, actions, createFormExpose, field } = useComponentForm(formConfig)
 
-        console.log(jsonFormConfig.config?.defaultFormData)
         watch(
           () => jsonFormConfig.config?.defaultFormData,
           data => {
@@ -112,7 +111,7 @@ export function createJsonForm(jsonFormConfig: JsonFormConfig) {
 
         return () => {
           const { struct, layout, layoutProps } = jsonFormConfig
-          const childrenSlots = struct.map(item => renderFormItem(item, 0, ctx))
+          const childrenSlots = struct.map((item, index) => renderFormItem(item, index, 0, ctx))
           const Layout = typeof layout === "string" ? unref(config.Elements!)[layout] : (layout ?? gFormLayout)
 
           if (Layout) return h(Layout, { ...layoutProps, ...attrs }, { default: () => childrenSlots })

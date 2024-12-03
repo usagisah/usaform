@@ -58,7 +58,7 @@ export const FormItem = defineComponent<{ FormControllerProps?: FormControllerPr
 
     return () => {
       const { props: elemProps, layoutProps, children } = props.FormControllerProps!
-      const { label: _label } = layoutProps
+      const { label: _label, contentAttributes } = layoutProps
 
       const labelProps = { class: "ufi-label", style: labelStyle.value, id }
       let LabelElem: any = null
@@ -74,12 +74,22 @@ export const FormItem = defineComponent<{ FormControllerProps?: FormControllerPr
         }
       }
 
-      const _props: CFormSlotAttrs = { ...elemProps, id, size: size.value, status: validateState.status, disabled: disabled.value, onBlur }
+      const _props: CFormSlotAttrs = {
+        ...elemProps,
+        id,
+        size: size.value,
+        status: validateState.status,
+        disabled: disabled.value,
+        onBlur: e => {
+          onBlur()
+          elemProps.onBlur?.(e)
+        }
+      }
 
       return (
         <div class={classNames.value}>
           {LabelElem}
-          <div class="ufi-content">
+          <div class="ufi-content" {...contentAttributes}>
             {children({ props: _props, bind: _props })}
             {validateState.status.length > 0 && <div class={`ufi-content-${validateState.status}`}>{validateState.message}</div>}
           </div>
@@ -145,9 +155,9 @@ function useRules(props: FormControllerProps, setValidate: FormControllerSetVali
   }
 
   watch(
-    () => props.fieldValue,
-    v => {
-      validate(changeRules, "", v).catch(() => null)
+    () => props.fieldValue.value,
+    (v, ov) => {
+      if (!Object.is(v, ov)) validate(changeRules, "", v).catch(() => null)
     }
   )
 

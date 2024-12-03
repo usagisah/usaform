@@ -28,6 +28,10 @@ export interface CFormItemProps {
   inline?: boolean
   // 当前字段的校验规则
   rules?: (CFormRuleItem | [string] | [string, any])[]
+  // 自定义内容区域的属性
+  contentAttributes?: Record<any, any>
+
+  [x: string]: any
 }
 
 export interface CFormSlotAttrs {

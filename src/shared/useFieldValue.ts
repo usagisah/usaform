@@ -94,7 +94,9 @@ function recursiveSetter(field: Field, value: any) {
     }
     case "plain":
     case "ary": {
-      field.fieldValue.value = value
+      if (!Object.is(field.fieldValue.value, value)) {
+        field.fieldValue.value = value
+      }
       break
     }
   }
