@@ -19,6 +19,7 @@ export function normalizeFormConfig(currentConfig: FormConfig): FormConfig {
       },
       set(_value) {
         value = _value
+        trigger()
       }
     }
   })

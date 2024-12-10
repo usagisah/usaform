@@ -30,14 +30,14 @@
 <template>
   <Form>
 		<!-- 插槽 -->
-    <PlainField name="a" :layoutProps="{ label: '' }">
+    <PlainField key="a" :layoutProps="{ label: '' }">
       <template #default="{ bind }">
         <ElInput v-bind="bind" />
       </template>
     </PlainField>
 
 		<!-- 指定key -->
-    <PlainField name="b" element="ElInput" :layout-props="{ label: '' }"></PlainField>
+    <PlainField key="b" element="ElInput" :layout-props="{ label: '' }"></PlainField>
   </Form>
 </template>
 ```

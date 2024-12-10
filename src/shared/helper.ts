@@ -24,7 +24,7 @@ export function createFormCFieldToJson(props: Record<any, any>, layout: any, ele
 }
 
 export function buildScopeElemKey(key: string) {
-  return "_$u" + key
+  return "_$u_" + key
 }
 export function buildScopeElement(slots: Record<string, any>) {
   const elements: Record<string, any> = {}

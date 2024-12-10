@@ -8,7 +8,7 @@
 本质上来说`@shoroi/form`只是一个表单的粘合层工具，设计之初的目的就是为了拆分和扩展日益变大的表单。
 
 如果你有以下的需求，或许你可以尝试使用它
-- 字段很多，对管理有要求，比如批量的操作，*监听，修改，获取，传参*
+- 字段很多，对管理有要求，比如批量的操作，*监听，修改，获取，传参，联动*
 - 表单有层级关系，比如存在嵌套行为，再比如嵌套的对象字段结构
 - 动态表单，表单结构允许被动态的批量改变
 - json 表单，这对低代码和表单存储，快速创建，都很有帮助
@@ -87,7 +87,7 @@ app.use(CFormPlugin, {
 
 这里，`<Form/>`是最外层的表单包裹器，主要用于做一些，布局样式，或者是传参
 
-`<PlainField/>` 为字段组件，它会向表单内部的控制器注册字段进行统一管理，`name` 是注册的名字，通过 `formActions.value.getFormData()`，点击按钮后会打印出，以`name`串起来的一个表单的对象
+`<PlainField/>` 为字段组件，它会向表单内部的控制器注册字段进行统一管理，`key` 是注册的名字，通过 `formActions.value.getFormData()`，点击按钮后会打印出，以`key`串起来的一个表单的对象
 
 
 ```vue
@@ -100,8 +100,8 @@ const submit = () => console.log(formActions.value.getFormData())
 
 <template>
 	<Form>
-    <PlainField name="username" element="ElInput" :props="{ placeholder: '请输入' }" :layoutProps="{ label: '用户名' }" />
-    <PlainField name="pwd" element="ElInput" :layoutProps="{ label: '密码' }" />
+    <PlainField key="username" element="ElInput" :props="{ placeholder: '请输入' }" :layoutProps="{ label: '用户名' }" />
+    <PlainField key="pwd" element="ElInput" :layoutProps="{ label: '密码' }" />
   </Form>
 
 	<ElSpace>

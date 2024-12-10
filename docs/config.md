@@ -50,8 +50,8 @@ interface FormConfig {
 ```tsx
 //初始数据对象，可以是从接口里来
 const initFormData = {
-  arr: [//对应 name=arr
-    { //数组的每一项，对应 :name=0
+  arr: [//对应 key=arr
+    { //数组的每一项，对应 :key=0
       id: 0, //数组项唯一标识 id
       value: "xxx" //数组项实际的值
     }
@@ -60,7 +60,7 @@ const initFormData = {
 
 //为了表达意思的，伪组件结构
 const Comp = () => <Form>
-  <ArrayField name="arr">
+  <ArrayField key="arr">
   	<PlainField />
   </ArrayField>
 </Form>

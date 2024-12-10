@@ -82,7 +82,7 @@ export type ArrayFieldActions = FormBaseActions & {
 export interface CFormValidateError {
   //字段路径
   path: string
-  //字段 name
+  //字段 key
   field: string
   //报错信息
   message: string

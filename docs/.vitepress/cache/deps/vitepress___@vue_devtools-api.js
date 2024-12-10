@@ -1,6 +1,6 @@
 import "./chunk-5WRI5ZAA.js";
 
-// node_modules/.pnpm/@vue+devtools-shared@7.4.6/node_modules/@vue/devtools-shared/dist/index.js
+// node_modules/.pnpm/@vue+devtools-shared@7.6.7/node_modules/@vue/devtools-shared/dist/index.js
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -30,7 +30,7 @@ var __toESM = (mod, isNodeMode, target2) => (target2 = mod != null ? __create(__
   mod
 ));
 var init_esm_shims = __esm({
-  "../../node_modules/.pnpm/tsup@8.3.0_@microsoft+api-extractor@7.43.0_@types+node@20.16.5__@swc+core@1.5.29_jiti@1.21.6__ldnw4a7r4ccknnz6q542psuydy/node_modules/tsup/assets/esm_shims.js"() {
+  "../../node_modules/.pnpm/tsup@8.3.5_@microsoft+api-extractor@7.48.0_@types+node@22.10.1__@swc+core@1.5.29_jiti@2.0.0_p_swvvp2d4pgn6xuiiec4l4x2i7a/node_modules/tsup/assets/esm_shims.js"() {
     "use strict";
   }
 });
@@ -229,7 +229,8 @@ var isBrowser = typeof navigator !== "undefined";
 var target = typeof window !== "undefined" ? window : typeof globalThis !== "undefined" ? globalThis : typeof global !== "undefined" ? global : {};
 var isInChromePanel = typeof target.chrome !== "undefined" && !!target.chrome.devtools;
 var isInIframe = isBrowser && target.self !== target.top;
-var isInElectron = typeof navigator !== "undefined" && navigator.userAgent.toLowerCase().includes("electron");
+var _a;
+var isInElectron = typeof navigator !== "undefined" && ((_a = navigator.userAgent) == null ? void 0 : _a.toLowerCase().includes("electron"));
 var isNuxtApp = typeof window !== "undefined" && !!window.__NUXT__;
 init_esm_shims();
 var import_rfdc = __toESM(require_rfdc(), 1);
@@ -241,7 +242,10 @@ function classify(str) {
   return str && `${str}`.replace(classifyRE, toUpper);
 }
 function basename(filename, ext) {
-  const normalizedFilename = filename.replace(/^[a-z]:/i, "").replace(/\\/g, "/");
+  let normalizedFilename = filename.replace(/^[a-z]:/i, "").replace(/\\/g, "/");
+  if (normalizedFilename.endsWith(`index${ext}`)) {
+    normalizedFilename = normalizedFilename.replace(`/index${ext}`, ext);
+  }
   const lastSlashIndex = normalizedFilename.lastIndexOf("/");
   const baseNameWithExt = normalizedFilename.substring(lastSlashIndex + 1);
   if (ext) {
@@ -518,11 +522,11 @@ function createHooks() {
   return new Hookable();
 }
 
-// node_modules/.pnpm/birpc@0.2.17/node_modules/birpc/dist/index.mjs
+// node_modules/.pnpm/birpc@0.2.19/node_modules/birpc/dist/index.mjs
 var { clearTimeout: clearTimeout2, setTimeout: setTimeout2 } = globalThis;
 var random = Math.random.bind(Math);
 
-// node_modules/.pnpm/@vue+devtools-kit@7.4.6/node_modules/@vue/devtools-kit/dist/index.js
+// node_modules/.pnpm/@vue+devtools-kit@7.6.7/node_modules/@vue/devtools-kit/dist/index.js
 var __create2 = Object.create;
 var __defProp2 = Object.defineProperty;
 var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
@@ -552,7 +556,7 @@ var __toESM2 = (mod, isNodeMode, target22) => (target22 = mod != null ? __create
   mod
 ));
 var init_esm_shims2 = __esm2({
-  "../../node_modules/.pnpm/tsup@8.3.0_@microsoft+api-extractor@7.43.0_@types+node@20.16.5__@swc+core@1.5.29_jiti@1.21.6__ldnw4a7r4ccknnz6q542psuydy/node_modules/tsup/assets/esm_shims.js"() {
+  "../../node_modules/.pnpm/tsup@8.3.5_@microsoft+api-extractor@7.48.0_@types+node@22.10.1__@swc+core@1.5.29_jiti@2.0.0_p_swvvp2d4pgn6xuiiec4l4x2i7a/node_modules/tsup/assets/esm_shims.js"() {
     "use strict";
   }
 });
@@ -2097,38 +2101,14 @@ init_esm_shims2();
 init_esm_shims2();
 init_esm_shims2();
 init_esm_shims2();
-function isReadonly(value) {
-  return !!(value && value[
-    "__v_isReadonly"
-    /* IS_READONLY */
-  ]);
-}
-function isReactive(value) {
-  if (isReadonly(value)) {
-    return isReactive(value[
-      "__v_raw"
-      /* RAW */
-    ]);
-  }
-  return !!(value && value[
-    "__v_isReactive"
-    /* IS_REACTIVE */
-  ]);
-}
-function isRef(r) {
-  return !!(r && r.__v_isRef === true);
-}
-function toRaw(observed) {
-  const raw = observed && observed[
-    "__v_raw"
-    /* RAW */
-  ];
-  return raw ? toRaw(raw) : observed;
-}
-var Fragment = Symbol.for("v-fgt");
 init_esm_shims2();
 function getComponentTypeName(options) {
-  return options.name || options._componentTag || options.__VUE_DEVTOOLS_COMPONENT_GUSSED_NAME__ || options.__name;
+  var _a25;
+  const name = options.name || options._componentTag || options.__VUE_DEVTOOLS_COMPONENT_GUSSED_NAME__ || options.__name;
+  if (name === "index" && ((_a25 = options.__file) == null ? void 0 : _a25.endsWith("index.vue"))) {
+    return "";
+  }
+  return name;
 }
 function getComponentFileName(options) {
   const file = options.__file;
@@ -2159,9 +2139,13 @@ async function getComponentId(options) {
   }
 }
 function isFragment(instance) {
-  var _a25;
+  var _a25, _b25;
   const subTreeType = (_a25 = instance.subTree) == null ? void 0 : _a25.type;
-  return subTreeType === Fragment;
+  const appRecord = getAppRecord(instance);
+  if (appRecord) {
+    return ((_b25 = appRecord == null ? void 0 : appRecord.types) == null ? void 0 : _b25.Fragment) === subTreeType;
+  }
+  return false;
 }
 function getInstanceName(instance) {
   var _a25, _b25, _c;
@@ -2188,6 +2172,383 @@ function getComponentInstance(appRecord, instanceId) {
   const instance = appRecord.instanceMap.get(instanceId);
   return instance || appRecord.instanceMap.get(":root");
 }
+function createRect() {
+  const rect = {
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    get width() {
+      return rect.right - rect.left;
+    },
+    get height() {
+      return rect.bottom - rect.top;
+    }
+  };
+  return rect;
+}
+var range;
+function getTextRect(node) {
+  if (!range)
+    range = document.createRange();
+  range.selectNode(node);
+  return range.getBoundingClientRect();
+}
+function getFragmentRect(vnode) {
+  const rect = createRect();
+  if (!vnode.children)
+    return rect;
+  for (let i = 0, l = vnode.children.length; i < l; i++) {
+    const childVnode = vnode.children[i];
+    let childRect;
+    if (childVnode.component) {
+      childRect = getComponentBoundingRect(childVnode.component);
+    } else if (childVnode.el) {
+      const el = childVnode.el;
+      if (el.nodeType === 1 || el.getBoundingClientRect)
+        childRect = el.getBoundingClientRect();
+      else if (el.nodeType === 3 && el.data.trim())
+        childRect = getTextRect(el);
+    }
+    if (childRect)
+      mergeRects(rect, childRect);
+  }
+  return rect;
+}
+function mergeRects(a, b) {
+  if (!a.top || b.top < a.top)
+    a.top = b.top;
+  if (!a.bottom || b.bottom > a.bottom)
+    a.bottom = b.bottom;
+  if (!a.left || b.left < a.left)
+    a.left = b.left;
+  if (!a.right || b.right > a.right)
+    a.right = b.right;
+  return a;
+}
+var DEFAULT_RECT = {
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  width: 0,
+  height: 0
+};
+function getComponentBoundingRect(instance) {
+  const el = instance.subTree.el;
+  if (typeof window === "undefined") {
+    return DEFAULT_RECT;
+  }
+  if (isFragment(instance))
+    return getFragmentRect(instance.subTree);
+  else if ((el == null ? void 0 : el.nodeType) === 1)
+    return el == null ? void 0 : el.getBoundingClientRect();
+  else if (instance.subTree.component)
+    return getComponentBoundingRect(instance.subTree.component);
+  else
+    return DEFAULT_RECT;
+}
+init_esm_shims2();
+function getRootElementsFromComponentInstance(instance) {
+  if (isFragment(instance))
+    return getFragmentRootElements(instance.subTree);
+  if (!instance.subTree)
+    return [];
+  return [instance.subTree.el];
+}
+function getFragmentRootElements(vnode) {
+  if (!vnode.children)
+    return [];
+  const list = [];
+  vnode.children.forEach((childVnode) => {
+    if (childVnode.component)
+      list.push(...getRootElementsFromComponentInstance(childVnode.component));
+    else if (childVnode == null ? void 0 : childVnode.el)
+      list.push(childVnode.el);
+  });
+  return list;
+}
+var CONTAINER_ELEMENT_ID = "__vue-devtools-component-inspector__";
+var CARD_ELEMENT_ID = "__vue-devtools-component-inspector__card__";
+var COMPONENT_NAME_ELEMENT_ID = "__vue-devtools-component-inspector__name__";
+var INDICATOR_ELEMENT_ID = "__vue-devtools-component-inspector__indicator__";
+var containerStyles = {
+  display: "block",
+  zIndex: 2147483640,
+  position: "fixed",
+  backgroundColor: "#42b88325",
+  border: "1px solid #42b88350",
+  borderRadius: "5px",
+  transition: "all 0.1s ease-in",
+  pointerEvents: "none"
+};
+var cardStyles = {
+  fontFamily: "Arial, Helvetica, sans-serif",
+  padding: "5px 8px",
+  borderRadius: "4px",
+  textAlign: "left",
+  position: "absolute",
+  left: 0,
+  color: "#e9e9e9",
+  fontSize: "14px",
+  fontWeight: 600,
+  lineHeight: "24px",
+  backgroundColor: "#42b883",
+  boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)"
+};
+var indicatorStyles = {
+  display: "inline-block",
+  fontWeight: 400,
+  fontStyle: "normal",
+  fontSize: "12px",
+  opacity: 0.7
+};
+function getContainerElement() {
+  return document.getElementById(CONTAINER_ELEMENT_ID);
+}
+function getCardElement() {
+  return document.getElementById(CARD_ELEMENT_ID);
+}
+function getIndicatorElement() {
+  return document.getElementById(INDICATOR_ELEMENT_ID);
+}
+function getNameElement() {
+  return document.getElementById(COMPONENT_NAME_ELEMENT_ID);
+}
+function getStyles(bounds) {
+  return {
+    left: `${Math.round(bounds.left * 100) / 100}px`,
+    top: `${Math.round(bounds.top * 100) / 100}px`,
+    width: `${Math.round(bounds.width * 100) / 100}px`,
+    height: `${Math.round(bounds.height * 100) / 100}px`
+  };
+}
+function create(options) {
+  var _a25;
+  const containerEl = document.createElement("div");
+  containerEl.id = (_a25 = options.elementId) != null ? _a25 : CONTAINER_ELEMENT_ID;
+  Object.assign(containerEl.style, {
+    ...containerStyles,
+    ...getStyles(options.bounds),
+    ...options.style
+  });
+  const cardEl = document.createElement("span");
+  cardEl.id = CARD_ELEMENT_ID;
+  Object.assign(cardEl.style, {
+    ...cardStyles,
+    top: options.bounds.top < 35 ? 0 : "-35px"
+  });
+  const nameEl = document.createElement("span");
+  nameEl.id = COMPONENT_NAME_ELEMENT_ID;
+  nameEl.innerHTML = `&lt;${options.name}&gt;&nbsp;&nbsp;`;
+  const indicatorEl = document.createElement("i");
+  indicatorEl.id = INDICATOR_ELEMENT_ID;
+  indicatorEl.innerHTML = `${Math.round(options.bounds.width * 100) / 100} x ${Math.round(options.bounds.height * 100) / 100}`;
+  Object.assign(indicatorEl.style, indicatorStyles);
+  cardEl.appendChild(nameEl);
+  cardEl.appendChild(indicatorEl);
+  containerEl.appendChild(cardEl);
+  document.body.appendChild(containerEl);
+  return containerEl;
+}
+function update(options) {
+  const containerEl = getContainerElement();
+  const cardEl = getCardElement();
+  const nameEl = getNameElement();
+  const indicatorEl = getIndicatorElement();
+  if (containerEl) {
+    Object.assign(containerEl.style, {
+      ...containerStyles,
+      ...getStyles(options.bounds)
+    });
+    Object.assign(cardEl.style, {
+      top: options.bounds.top < 35 ? 0 : "-35px"
+    });
+    nameEl.innerHTML = `&lt;${options.name}&gt;&nbsp;&nbsp;`;
+    indicatorEl.innerHTML = `${Math.round(options.bounds.width * 100) / 100} x ${Math.round(options.bounds.height * 100) / 100}`;
+  }
+}
+function highlight(instance) {
+  const bounds = getComponentBoundingRect(instance);
+  if (!bounds.width && !bounds.height)
+    return;
+  const name = getInstanceName(instance);
+  const container = getContainerElement();
+  container ? update({ bounds, name }) : create({ bounds, name });
+}
+function unhighlight() {
+  const el = getContainerElement();
+  if (el)
+    el.style.display = "none";
+}
+var inspectInstance = null;
+function inspectFn(e) {
+  const target22 = e.target;
+  if (target22) {
+    const instance = target22.__vueParentComponent;
+    if (instance) {
+      inspectInstance = instance;
+      const el = instance.vnode.el;
+      if (el) {
+        const bounds = getComponentBoundingRect(instance);
+        const name = getInstanceName(instance);
+        const container = getContainerElement();
+        container ? update({ bounds, name }) : create({ bounds, name });
+      }
+    }
+  }
+}
+function selectComponentFn(e, cb) {
+  var _a25;
+  e.preventDefault();
+  e.stopPropagation();
+  if (inspectInstance) {
+    const app = (_a25 = activeAppRecord.value) == null ? void 0 : _a25.app;
+    getComponentId({
+      app,
+      uid: app.uid,
+      instance: inspectInstance
+    }).then((id) => {
+      cb(id);
+    });
+  }
+}
+var inspectComponentHighLighterSelectFn = null;
+function cancelInspectComponentHighLighter() {
+  unhighlight();
+  window.removeEventListener("mouseover", inspectFn);
+  window.removeEventListener("click", inspectComponentHighLighterSelectFn, true);
+  inspectComponentHighLighterSelectFn = null;
+}
+function inspectComponentHighLighter() {
+  window.addEventListener("mouseover", inspectFn);
+  return new Promise((resolve) => {
+    function onSelect(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      selectComponentFn(e, (id) => {
+        window.removeEventListener("click", onSelect, true);
+        inspectComponentHighLighterSelectFn = null;
+        window.removeEventListener("mouseover", inspectFn);
+        const el = getContainerElement();
+        if (el)
+          el.style.display = "none";
+        resolve(JSON.stringify({ id }));
+      });
+    }
+    inspectComponentHighLighterSelectFn = onSelect;
+    window.addEventListener("click", onSelect, true);
+  });
+}
+function scrollToComponent(options) {
+  const instance = getComponentInstance(activeAppRecord.value, options.id);
+  if (instance) {
+    const [el] = getRootElementsFromComponentInstance(instance);
+    if (typeof el.scrollIntoView === "function") {
+      el.scrollIntoView({
+        behavior: "smooth"
+      });
+    } else {
+      const bounds = getComponentBoundingRect(instance);
+      const scrollTarget = document.createElement("div");
+      const styles = {
+        ...getStyles(bounds),
+        position: "absolute"
+      };
+      Object.assign(scrollTarget.style, styles);
+      document.body.appendChild(scrollTarget);
+      scrollTarget.scrollIntoView({
+        behavior: "smooth"
+      });
+      setTimeout(() => {
+        document.body.removeChild(scrollTarget);
+      }, 2e3);
+    }
+    setTimeout(() => {
+      const bounds = getComponentBoundingRect(instance);
+      if (bounds.width || bounds.height) {
+        const name = getInstanceName(instance);
+        const el2 = getContainerElement();
+        el2 ? update({ ...options, name, bounds }) : create({ ...options, name, bounds });
+        setTimeout(() => {
+          if (el2)
+            el2.style.display = "none";
+        }, 1500);
+      }
+    }, 1200);
+  }
+}
+init_esm_shims2();
+var _a2;
+var _b;
+(_b = (_a2 = target).__VUE_DEVTOOLS_COMPONENT_INSPECTOR_ENABLED__) != null ? _b : _a2.__VUE_DEVTOOLS_COMPONENT_INSPECTOR_ENABLED__ = true;
+function waitForInspectorInit(cb) {
+  let total = 0;
+  const timer = setInterval(() => {
+    if (target.__VUE_INSPECTOR__) {
+      clearInterval(timer);
+      total += 30;
+      cb();
+    }
+    if (total >= /* 5s */
+    5e3)
+      clearInterval(timer);
+  }, 30);
+}
+function setupInspector() {
+  const inspector = target.__VUE_INSPECTOR__;
+  const _openInEditor = inspector.openInEditor;
+  inspector.openInEditor = async (...params) => {
+    inspector.disable();
+    _openInEditor(...params);
+  };
+}
+function getComponentInspector() {
+  return new Promise((resolve) => {
+    function setup() {
+      setupInspector();
+      resolve(target.__VUE_INSPECTOR__);
+    }
+    if (!target.__VUE_INSPECTOR__) {
+      waitForInspectorInit(() => {
+        setup();
+      });
+    } else {
+      setup();
+    }
+  });
+}
+init_esm_shims2();
+init_esm_shims2();
+function isReadonly(value) {
+  return !!(value && value[
+    "__v_isReadonly"
+    /* IS_READONLY */
+  ]);
+}
+function isReactive(value) {
+  if (isReadonly(value)) {
+    return isReactive(value[
+      "__v_raw"
+      /* RAW */
+    ]);
+  }
+  return !!(value && value[
+    "__v_isReactive"
+    /* IS_REACTIVE */
+  ]);
+}
+function isRef(r) {
+  return !!(r && r.__v_isRef === true);
+}
+function toRaw(observed) {
+  const raw = observed && observed[
+    "__v_raw"
+    /* RAW */
+  ];
+  return raw ? toRaw(raw) : observed;
+}
+var Fragment = Symbol.for("v-fgt");
 var StateEditor = class {
   constructor() {
     this.refEditor = new RefStateEditor();
@@ -2307,365 +2668,43 @@ var RefStateEditor = class {
 };
 var stateEditor = new StateEditor();
 init_esm_shims2();
-function getRootElementsFromComponentInstance(instance) {
-  if (isFragment(instance))
-    return getFragmentRootElements(instance.subTree);
-  if (!instance.subTree)
-    return [];
-  return [instance.subTree.el];
-}
-function getFragmentRootElements(vnode) {
-  if (!vnode.children)
-    return [];
-  const list = [];
-  vnode.children.forEach((childVnode) => {
-    if (childVnode.component)
-      list.push(...getRootElementsFromComponentInstance(childVnode.component));
-    else if (childVnode == null ? void 0 : childVnode.el)
-      list.push(childVnode.el);
-  });
-  return list;
-}
 init_esm_shims2();
 init_esm_shims2();
-function createRect() {
-  const rect = {
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    get width() {
-      return rect.right - rect.left;
-    },
-    get height() {
-      return rect.bottom - rect.top;
-    }
-  };
-  return rect;
-}
-var range;
-function getTextRect(node) {
-  if (!range)
-    range = document.createRange();
-  range.selectNode(node);
-  return range.getBoundingClientRect();
-}
-function getFragmentRect(vnode) {
-  const rect = createRect();
-  if (!vnode.children)
-    return rect;
-  for (let i = 0, l = vnode.children.length; i < l; i++) {
-    const childVnode = vnode.children[i];
-    let childRect;
-    if (childVnode.component) {
-      childRect = getComponentBoundingRect(childVnode.component);
-    } else if (childVnode.el) {
-      const el = childVnode.el;
-      if (el.nodeType === 1 || el.getBoundingClientRect)
-        childRect = el.getBoundingClientRect();
-      else if (el.nodeType === 3 && el.data.trim())
-        childRect = getTextRect(el);
-    }
-    if (childRect)
-      mergeRects(rect, childRect);
+var TIMELINE_LAYERS_STATE_STORAGE_ID = "__VUE_DEVTOOLS_KIT_TIMELINE_LAYERS_STATE__";
+function getTimelineLayersStateFromStorage() {
+  if (!isBrowser || typeof localStorage === "undefined" || localStorage === null) {
+    return {
+      recordingState: false,
+      mouseEventEnabled: false,
+      keyboardEventEnabled: false,
+      componentEventEnabled: false,
+      performanceEventEnabled: false,
+      selected: ""
+    };
   }
-  return rect;
-}
-function mergeRects(a, b) {
-  if (!a.top || b.top < a.top)
-    a.top = b.top;
-  if (!a.bottom || b.bottom > a.bottom)
-    a.bottom = b.bottom;
-  if (!a.left || b.left < a.left)
-    a.left = b.left;
-  if (!a.right || b.right > a.right)
-    a.right = b.right;
-  return a;
-}
-var DEFAULT_RECT = {
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  width: 0,
-  height: 0
-};
-function getComponentBoundingRect(instance) {
-  const el = instance.subTree.el;
-  if (typeof window === "undefined") {
-    return DEFAULT_RECT;
-  }
-  if (isFragment(instance))
-    return getFragmentRect(instance.subTree);
-  else if ((el == null ? void 0 : el.nodeType) === 1)
-    return el == null ? void 0 : el.getBoundingClientRect();
-  else if (instance.subTree.component)
-    return getComponentBoundingRect(instance.subTree.component);
-  else
-    return DEFAULT_RECT;
-}
-var CONTAINER_ELEMENT_ID = "__vue-devtools-component-inspector__";
-var CARD_ELEMENT_ID = "__vue-devtools-component-inspector__card__";
-var COMPONENT_NAME_ELEMENT_ID = "__vue-devtools-component-inspector__name__";
-var INDICATOR_ELEMENT_ID = "__vue-devtools-component-inspector__indicator__";
-var containerStyles = {
-  display: "block",
-  zIndex: 2147483640,
-  position: "fixed",
-  backgroundColor: "#42b88325",
-  border: "1px solid #42b88350",
-  borderRadius: "5px",
-  transition: "all 0.1s ease-in",
-  pointerEvents: "none"
-};
-var cardStyles = {
-  fontFamily: "Arial, Helvetica, sans-serif",
-  padding: "5px 8px",
-  borderRadius: "4px",
-  textAlign: "left",
-  position: "absolute",
-  left: 0,
-  color: "#e9e9e9",
-  fontSize: "14px",
-  fontWeight: 600,
-  lineHeight: "24px",
-  backgroundColor: "#42b883",
-  boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)"
-};
-var indicatorStyles = {
-  display: "inline-block",
-  fontWeight: 400,
-  fontStyle: "normal",
-  fontSize: "12px",
-  opacity: 0.7
-};
-function getContainerElement() {
-  return document.getElementById(CONTAINER_ELEMENT_ID);
-}
-function getCardElement() {
-  return document.getElementById(CARD_ELEMENT_ID);
-}
-function getIndicatorElement() {
-  return document.getElementById(INDICATOR_ELEMENT_ID);
-}
-function getNameElement() {
-  return document.getElementById(COMPONENT_NAME_ELEMENT_ID);
-}
-function getStyles(bounds) {
-  return {
-    left: `${Math.round(bounds.left * 100) / 100}px`,
-    top: `${Math.round(bounds.top * 100) / 100}px`,
-    width: `${Math.round(bounds.width * 100) / 100}px`,
-    height: `${Math.round(bounds.height * 100) / 100}px`
+  const state = localStorage.getItem(TIMELINE_LAYERS_STATE_STORAGE_ID);
+  return state ? JSON.parse(state) : {
+    recordingState: false,
+    mouseEventEnabled: false,
+    keyboardEventEnabled: false,
+    componentEventEnabled: false,
+    performanceEventEnabled: false,
+    selected: ""
   };
 }
-function create(options) {
-  var _a25;
-  const containerEl = document.createElement("div");
-  containerEl.id = (_a25 = options.elementId) != null ? _a25 : CONTAINER_ELEMENT_ID;
-  Object.assign(containerEl.style, {
-    ...containerStyles,
-    ...getStyles(options.bounds),
-    ...options.style
-  });
-  const cardEl = document.createElement("span");
-  cardEl.id = CARD_ELEMENT_ID;
-  Object.assign(cardEl.style, {
-    ...cardStyles,
-    top: options.bounds.top < 35 ? 0 : "-35px"
-  });
-  const nameEl = document.createElement("span");
-  nameEl.id = COMPONENT_NAME_ELEMENT_ID;
-  nameEl.innerHTML = `&lt;${options.name}&gt;&nbsp;&nbsp;`;
-  const indicatorEl = document.createElement("i");
-  indicatorEl.id = INDICATOR_ELEMENT_ID;
-  indicatorEl.innerHTML = `${Math.round(options.bounds.width * 100) / 100} x ${Math.round(options.bounds.height * 100) / 100}`;
-  Object.assign(indicatorEl.style, indicatorStyles);
-  cardEl.appendChild(nameEl);
-  cardEl.appendChild(indicatorEl);
-  containerEl.appendChild(cardEl);
-  document.body.appendChild(containerEl);
-  return containerEl;
-}
-function update(options) {
-  const containerEl = getContainerElement();
-  const cardEl = getCardElement();
-  const nameEl = getNameElement();
-  const indicatorEl = getIndicatorElement();
-  if (containerEl) {
-    Object.assign(containerEl.style, {
-      ...containerStyles,
-      ...getStyles(options.bounds)
-    });
-    Object.assign(cardEl.style, {
-      top: options.bounds.top < 35 ? 0 : "-35px"
-    });
-    nameEl.innerHTML = `&lt;${options.name}&gt;&nbsp;&nbsp;`;
-    indicatorEl.innerHTML = `${Math.round(options.bounds.width * 100) / 100} x ${Math.round(options.bounds.height * 100) / 100}`;
-  }
-}
-function highlight(instance) {
-  const bounds = getComponentBoundingRect(instance);
-  const name = getInstanceName(instance);
-  const container = getContainerElement();
-  container ? update({ bounds, name }) : create({ bounds, name });
-}
-function unhighlight() {
-  const el = getContainerElement();
-  if (el)
-    el.style.display = "none";
-}
-var inspectInstance = null;
-function inspectFn(e) {
-  const target22 = e.target;
-  if (target22) {
-    const instance = target22.__vueParentComponent;
-    if (instance) {
-      inspectInstance = instance;
-      const el = instance.vnode.el;
-      if (el) {
-        const bounds = getComponentBoundingRect(instance);
-        const name = getInstanceName(instance);
-        const container = getContainerElement();
-        container ? update({ bounds, name }) : create({ bounds, name });
-      }
-    }
-  }
-}
-function selectComponentFn(e, cb) {
-  var _a25;
-  e.preventDefault();
-  e.stopPropagation();
-  if (inspectInstance) {
-    const app = (_a25 = activeAppRecord.value) == null ? void 0 : _a25.app;
-    getComponentId({
-      app,
-      uid: app.uid,
-      instance: inspectInstance
-    }).then((id) => {
-      cb(id);
-    });
-  }
-}
-var inspectComponentHighLighterSelectFn = null;
-function cancelInspectComponentHighLighter() {
-  unhighlight();
-  window.removeEventListener("mouseover", inspectFn);
-  window.removeEventListener("click", inspectComponentHighLighterSelectFn, true);
-  inspectComponentHighLighterSelectFn = null;
-}
-function inspectComponentHighLighter() {
-  window.addEventListener("mouseover", inspectFn);
-  return new Promise((resolve) => {
-    function onSelect(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      selectComponentFn(e, (id) => {
-        window.removeEventListener("click", onSelect, true);
-        inspectComponentHighLighterSelectFn = null;
-        window.removeEventListener("mouseover", inspectFn);
-        const el = getContainerElement();
-        if (el)
-          el.style.display = "none";
-        resolve(JSON.stringify({ id }));
-      });
-    }
-    inspectComponentHighLighterSelectFn = onSelect;
-    window.addEventListener("click", onSelect, true);
-  });
-}
-function scrollToComponent(options) {
-  const instance = getComponentInstance(activeAppRecord.value, options.id);
-  if (instance) {
-    const [el] = getRootElementsFromComponentInstance(instance);
-    if (typeof el.scrollIntoView === "function") {
-      el.scrollIntoView({
-        behavior: "smooth"
-      });
-    } else {
-      const bounds = getComponentBoundingRect(instance);
-      const scrollTarget = document.createElement("div");
-      const styles = {
-        ...getStyles(bounds),
-        position: "absolute"
-      };
-      Object.assign(scrollTarget.style, styles);
-      document.body.appendChild(scrollTarget);
-      scrollTarget.scrollIntoView({
-        behavior: "smooth"
-      });
-      setTimeout(() => {
-        document.body.removeChild(scrollTarget);
-      }, 2e3);
-    }
-    setTimeout(() => {
-      const bounds = getComponentBoundingRect(instance);
-      if (bounds.width || bounds.height) {
-        const name = getInstanceName(instance);
-        const el2 = getContainerElement();
-        el2 ? update({ ...options, name, bounds }) : create({ ...options, name, bounds });
-        setTimeout(() => {
-          if (el2)
-            el2.style.display = "none";
-        }, 1500);
-      }
-    }, 1200);
-  }
-}
-init_esm_shims2();
-var _a;
-var _b;
-(_b = (_a = target).__VUE_DEVTOOLS_COMPONENT_INSPECTOR_ENABLED__) != null ? _b : _a.__VUE_DEVTOOLS_COMPONENT_INSPECTOR_ENABLED__ = true;
-function waitForInspectorInit(cb) {
-  let total = 0;
-  const timer = setInterval(() => {
-    if (target.__VUE_INSPECTOR__) {
-      clearInterval(timer);
-      total += 30;
-      cb();
-    }
-    if (total >= /* 5s */
-    5e3)
-      clearInterval(timer);
-  }, 30);
-}
-function setupInspector() {
-  const inspector = target.__VUE_INSPECTOR__;
-  const _openInEditor = inspector.openInEditor;
-  inspector.openInEditor = async (...params) => {
-    inspector.disable();
-    _openInEditor(...params);
-  };
-}
-function getComponentInspector() {
-  return new Promise((resolve) => {
-    function setup() {
-      setupInspector();
-      resolve(target.__VUE_INSPECTOR__);
-    }
-    if (!target.__VUE_INSPECTOR__) {
-      waitForInspectorInit(() => {
-        setup();
-      });
-    } else {
-      setup();
-    }
-  });
-}
 init_esm_shims2();
 init_esm_shims2();
 init_esm_shims2();
-init_esm_shims2();
-init_esm_shims2();
-var _a2;
+var _a22;
 var _b2;
-(_b2 = (_a2 = target).__VUE_DEVTOOLS_KIT_TIMELINE_LAYERS) != null ? _b2 : _a2.__VUE_DEVTOOLS_KIT_TIMELINE_LAYERS = [];
+(_b2 = (_a22 = target).__VUE_DEVTOOLS_KIT_TIMELINE_LAYERS) != null ? _b2 : _a22.__VUE_DEVTOOLS_KIT_TIMELINE_LAYERS = [];
 var devtoolsTimelineLayers = new Proxy(target.__VUE_DEVTOOLS_KIT_TIMELINE_LAYERS, {
   get(target22, prop, receiver) {
     return Reflect.get(target22, prop, receiver);
   }
 });
 function addTimelineLayer(options, descriptor) {
+  devtoolsState.timelineLayersState[descriptor.id] = false;
   devtoolsTimelineLayers.push({
     ...options,
     descriptorId: descriptor.id,
@@ -2684,9 +2723,12 @@ var callInspectorUpdatedHook = debounce(() => {
   devtoolsContext.hooks.callHook("sendInspectorToClient", getActiveInspectors());
 });
 function addInspector(inspector, descriptor) {
+  var _a25, _b25;
   devtoolsInspector.push({
     options: inspector,
     descriptor,
+    treeFilterPlaceholder: (_a25 = inspector.treeFilterPlaceholder) != null ? _a25 : "Search tree...",
+    stateFilterPlaceholder: (_b25 = inspector.stateFilterPlaceholder) != null ? _b25 : "Search state...",
     treeFilter: "",
     selectedNodeId: "",
     appRecord: getAppRecord(descriptor.app)
@@ -2754,9 +2796,9 @@ function createDevToolsCtxHooks() {
   hooks2.hook("addInspector", ({ inspector, plugin }) => {
     addInspector(inspector, plugin.descriptor);
   });
-  hooks2.hook("sendInspectorTree", async ({ inspectorId, plugin }) => {
+  const debounceSendInspectorTree = debounce(async ({ inspectorId, plugin }) => {
     var _a25;
-    if (!inspectorId || !((_a25 = plugin == null ? void 0 : plugin.descriptor) == null ? void 0 : _a25.app))
+    if (!inspectorId || !((_a25 = plugin == null ? void 0 : plugin.descriptor) == null ? void 0 : _a25.app) || devtoolsState.highPerfModeEnabled)
       return;
     const inspector = getInspector(inspectorId, plugin.descriptor.app);
     const _payload = {
@@ -2785,10 +2827,11 @@ function createDevToolsCtxHooks() {
       "sendInspectorTreeToClient"
       /* SEND_INSPECTOR_TREE_TO_CLIENT */
     );
-  });
-  hooks2.hook("sendInspectorState", async ({ inspectorId, plugin }) => {
+  }, 120);
+  hooks2.hook("sendInspectorTree", debounceSendInspectorTree);
+  const debounceSendInspectorState = debounce(async ({ inspectorId, plugin }) => {
     var _a25;
-    if (!inspectorId || !((_a25 = plugin == null ? void 0 : plugin.descriptor) == null ? void 0 : _a25.app))
+    if (!inspectorId || !((_a25 = plugin == null ? void 0 : plugin.descriptor) == null ? void 0 : _a25.app) || devtoolsState.highPerfModeEnabled)
       return;
     const inspector = getInspector(inspectorId, plugin.descriptor.app);
     const _payload = {
@@ -2823,7 +2866,8 @@ function createDevToolsCtxHooks() {
       "sendInspectorStateToClient"
       /* SEND_INSPECTOR_STATE_TO_CLIENT */
     );
-  });
+  }, 120);
+  hooks2.hook("sendInspectorState", debounceSendInspectorState);
   hooks2.hook("customInspectorSelectNode", ({ inspectorId, nodeId, plugin }) => {
     const inspector = getInspector(inspectorId, plugin.descriptor.app);
     if (!inspector)
@@ -2834,6 +2878,10 @@ function createDevToolsCtxHooks() {
     addTimelineLayer(options, plugin.descriptor);
   });
   hooks2.hook("timelineEventAdded", ({ options, plugin }) => {
+    var _a25;
+    const internalLayerIds = ["performance", "component-event", "keyboard", "mouse"];
+    if (devtoolsState.highPerfModeEnabled || !((_a25 = devtoolsState.timelineLayersState) == null ? void 0 : _a25[plugin.descriptor.id]) && !internalLayerIds.includes(options.layerId))
+      return;
     hooks2.callHookWith(
       async (callbacks) => {
         await Promise.all(callbacks.map((cb) => cb(options)));
@@ -2895,7 +2943,9 @@ function initStateFactory() {
     tabs: [],
     commands: [],
     highPerfModeEnabled: true,
-    devtoolsClientDetected: {}
+    devtoolsClientDetected: {},
+    perfUniqueGroupId: 0,
+    timelineLayersState: getTimelineLayersStateFromStorage()
   };
 }
 var _a9;
@@ -3142,6 +3192,9 @@ var on = {
   componentAdded(fn) {
     return devtoolsHooks.hook("component:added", fn);
   },
+  componentEmit(fn) {
+    return devtoolsHooks.hook("component:emit", fn);
+  },
   componentUpdated(fn) {
     return devtoolsHooks.hook("component:updated", fn);
   },
@@ -3150,6 +3203,12 @@ var on = {
   },
   setupDevtoolsPlugin(fn) {
     devtoolsHooks.hook("devtools-plugin:setup", fn);
+  },
+  perfStart(fn) {
+    return devtoolsHooks.hook("perf:start", fn);
+  },
+  perfEnd(fn) {
+    return devtoolsHooks.hook("perf:end", fn);
   }
 };
 var hook = {
@@ -3201,6 +3260,9 @@ var DevToolsV6PluginAPI = class {
   // component inspector
   notifyComponentUpdate(instance) {
     var _a25;
+    if (devtoolsState.highPerfModeEnabled) {
+      return;
+    }
     const inspector = getActiveInspectors().find((i) => i.packageName === this.plugin.descriptor.packageName);
     if (inspector == null ? void 0 : inspector.id) {
       if (instance) {
@@ -3228,22 +3290,37 @@ var DevToolsV6PluginAPI = class {
     }
   }
   sendInspectorTree(inspectorId) {
+    if (devtoolsState.highPerfModeEnabled) {
+      return;
+    }
     this.hooks.callHook("sendInspectorTree", { inspectorId, plugin: this.plugin });
   }
   sendInspectorState(inspectorId) {
+    if (devtoolsState.highPerfModeEnabled) {
+      return;
+    }
     this.hooks.callHook("sendInspectorState", { inspectorId, plugin: this.plugin });
   }
   selectInspectorNode(inspectorId, nodeId) {
     this.hooks.callHook("customInspectorSelectNode", { inspectorId, nodeId, plugin: this.plugin });
   }
+  visitComponentTree(payload) {
+    return this.hooks.callHook("visitComponentTree", payload);
+  }
   // timeline
   now() {
+    if (devtoolsState.highPerfModeEnabled) {
+      return 0;
+    }
     return Date.now();
   }
   addTimelineLayer(options) {
     this.hooks.callHook("timelineLayerAdded", { options, plugin: this.plugin });
   }
   addTimelineEvent(options) {
+    if (devtoolsState.highPerfModeEnabled) {
+      return;
+    }
     this.hooks.callHook("timelineEventAdded", { options, plugin: this.plugin });
   }
   // settings
@@ -3295,6 +3372,8 @@ var reversedTokenMap = Object.entries(tokenMap).reduce((acc, [key, value]) => {
 init_esm_shims2();
 init_esm_shims2();
 init_esm_shims2();
+init_esm_shims2();
+init_esm_shims2();
 var _a12;
 var _b12;
 (_b12 = (_a12 = target).__VUE_DEVTOOLS_KIT__REGISTERED_PLUGIN_APPS__) != null ? _b12 : _a12.__VUE_DEVTOOLS_KIT__REGISTERED_PLUGIN_APPS__ = /* @__PURE__ */ new Set();
@@ -3320,7 +3399,7 @@ function callDevToolsPluginSetupFn(plugin, app) {
   setupFn(api);
 }
 function registerDevToolsPlugin(app) {
-  if (target.__VUE_DEVTOOLS_KIT__REGISTERED_PLUGIN_APPS__.has(app))
+  if (target.__VUE_DEVTOOLS_KIT__REGISTERED_PLUGIN_APPS__.has(app) || devtoolsState.highPerfModeEnabled)
     return;
   target.__VUE_DEVTOOLS_KIT__REGISTERED_PLUGIN_APPS__.add(app);
   devtoolsPluginBuffer.forEach((plugin) => {
@@ -3407,6 +3486,8 @@ function normalizeRouterInfo(appRecord, activeAppRecord2) {
     if (((_a25 = activeAppRecord2.value) == null ? void 0 : _a25.app) !== appRecord.app)
       return;
     init();
+    if (devtoolsState.highPerfModeEnabled)
+      return;
     devtoolsContext.hooks.callHook("routerInfoUpdated", { state: target[ROUTER_INFO_KEY] });
   }, 200));
 }
@@ -3581,6 +3662,9 @@ function onDevToolsClientConnected(fn) {
 init_esm_shims2();
 function toggleHighPerfMode(state) {
   devtoolsState.highPerfModeEnabled = state != null ? state : !devtoolsState.highPerfModeEnabled;
+  if (!state && activeAppRecord.value) {
+    registerDevToolsPlugin(activeAppRecord.value.app);
+  }
 }
 init_esm_shims2();
 init_esm_shims2();
@@ -4401,9 +4485,9 @@ var _b20;
 var _a21;
 var _b21;
 (_b21 = (_a21 = target).__VUE_DEVTOOLS_KIT_RPC_SERVER__) != null ? _b21 : _a21.__VUE_DEVTOOLS_KIT_RPC_SERVER__ = null;
-var _a22;
+var _a222;
 var _b22;
-(_b22 = (_a22 = target).__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__) != null ? _b22 : _a22.__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__ = null;
+(_b22 = (_a222 = target).__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__) != null ? _b22 : _a222.__VUE_DEVTOOLS_KIT_VITE_RPC_CLIENT__ = null;
 var _a23;
 var _b23;
 (_b23 = (_a23 = target).__VUE_DEVTOOLS_KIT_VITE_RPC_SERVER__) != null ? _b23 : _a23.__VUE_DEVTOOLS_KIT_VITE_RPC_SERVER__ = null;

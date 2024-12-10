@@ -36,7 +36,7 @@ const [Form] = createForm()
 
 <template>
 <Form>
-	<PlainField name="..." />  
+	<PlainField key="..." />  
 </Form>
 </template>
 ```

@@ -78,7 +78,6 @@ export function useFieldValue<T>({ value, actions, getField }: CreateFieldValueO
 }
 
 function recursiveSetter(field: Field, value: any) {
-  value = toRaw(value)
   switch (field.type) {
     case "root":
     case "object": {
@@ -86,7 +85,7 @@ function recursiveSetter(field: Field, value: any) {
         for (const key in value) {
           const subField = field.struct.get(key)
           if (subField) {
-            recursiveSetter(subField, value[key])
+            recursiveSetter(subField, toRaw(value[key]))
           }
         }
       }

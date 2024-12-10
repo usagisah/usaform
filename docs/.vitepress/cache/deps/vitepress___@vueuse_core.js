@@ -3,7 +3,7 @@ import {
   isVue2,
   isVue3,
   set
-} from "./chunk-L6XVY55K.js";
+} from "./chunk-EKCY4U4O.js";
 import {
   Fragment,
   TransitionGroup,
@@ -40,10 +40,10 @@ import {
   version,
   watch,
   watchEffect
-} from "./chunk-ZGGWEPJQ.js";
+} from "./chunk-NKPCMO6O.js";
 import "./chunk-5WRI5ZAA.js";
 
-// node_modules/.pnpm/@vueuse+shared@11.1.0_vue@3.5.10_typescript@5.6.2_/node_modules/@vueuse/shared/index.mjs
+// node_modules/.pnpm/@vueuse+shared@11.3.0_vue@3.5.13_typescript@5.7.2_/node_modules/@vueuse/shared/index.mjs
 function computedEager(fn, options) {
   var _a;
   const result = shallowRef();
@@ -1019,7 +1019,7 @@ function useArrayReduce(list, reducer, ...args) {
   const reduceCallback = (sum, value, index) => reducer(toValue(sum), toValue(value), index);
   return computed(() => {
     const resolved = toValue(list);
-    return args.length ? resolved.reduce(reduceCallback, toValue(args[0])) : resolved.reduce(reduceCallback);
+    return args.length ? resolved.reduce(reduceCallback, typeof args[0] === "function" ? toValue(args[0]()) : toValue(args[0])) : resolved.reduce(reduceCallback);
   });
 }
 function useArraySome(list, fn) {
@@ -1166,7 +1166,8 @@ function useIntervalFn(cb, interval = 1e3, options = {}) {
     if (immediateCallback)
       cb();
     clean();
-    timer = setInterval(cb, intervalValue);
+    if (isActive.value)
+      timer = setInterval(cb, intervalValue);
   }
   if (immediate && isClient)
     resume();
@@ -1546,7 +1547,7 @@ function whenever(source, cb, options) {
   return stop;
 }
 
-// node_modules/.pnpm/@vueuse+core@11.1.0_vue@3.5.10_typescript@5.6.2_/node_modules/@vueuse/core/index.mjs
+// node_modules/.pnpm/@vueuse+core@11.3.0_vue@3.5.13_typescript@5.7.2_/node_modules/@vueuse/core/index.mjs
 function computedAsync(evaluationCallback, initialState, optionsOrRef) {
   let options;
   if (isRef(optionsOrRef)) {
@@ -1794,8 +1795,23 @@ function onClickOutside(target, handler, options = {}) {
       }
     });
   };
+  function hasMultipleRoots(target2) {
+    const vm = toValue(target2);
+    return vm && vm.$.subTree.shapeFlag === 16;
+  }
+  function checkMultipleRoots(target2, event) {
+    const vm = toValue(target2);
+    const children = vm.$.subTree && vm.$.subTree.children;
+    if (children == null || !Array.isArray(children))
+      return false;
+    return children.some((child) => child.el === event.target || event.composedPath().includes(child.el));
+  }
   const listener = (event) => {
     const el = unrefElement(target);
+    if (event.target == null)
+      return;
+    if (!(el instanceof Element) && hasMultipleRoots(target) && checkMultipleRoots(target, event))
+      return;
     if (!el || el === event.target || event.composedPath().includes(el))
       return;
     if (event.detail === 0)
@@ -2817,6 +2833,13 @@ var breakpointsPrimeFlex = {
   md: 768,
   lg: 992,
   xl: 1200
+};
+var breakpointsElement = {
+  xs: 0,
+  sm: 768,
+  md: 992,
+  lg: 1200,
+  xl: 1920
 };
 function useBreakpoints(breakpoints, options = {}) {
   function getValue2(k, delta) {
@@ -3848,9 +3871,15 @@ function useDevicesList(options = {}) {
     const { state, query } = usePermission("camera", { controls: true });
     await query();
     if (state.value !== "granted") {
-      stream = await navigator.mediaDevices.getUserMedia(constraints);
+      let granted = true;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (e) {
+        stream = null;
+        granted = false;
+      }
       update();
-      permissionGranted.value = true;
+      permissionGranted.value = granted;
     } else {
       permissionGranted.value = true;
     }
@@ -4061,9 +4090,9 @@ function useDropZone(target, options = {}) {
     const checkValidity = (event) => {
       var _a2, _b2;
       const items = Array.from((_b2 = (_a2 = event.dataTransfer) == null ? void 0 : _a2.items) != null ? _b2 : []);
-      const types = items.filter((item) => item.kind === "file").map((item) => item.type);
+      const types = items.map((item) => item.type);
       const dataTypesValid = checkDataTypes(types);
-      const multipleFilesValid = multiple || items.filter((item) => item.kind === "file").length <= 1;
+      const multipleFilesValid = multiple || items.length <= 1;
       return dataTypesValid && multipleFilesValid;
     };
     const handleDragEvent = (event, eventType) => {
@@ -4744,7 +4773,8 @@ function useFetch(url, ...args) {
     if (config.payload) {
       const headers = headersToObject(defaultFetchOptions.headers);
       const payload = toValue(config.payload);
-      if (!config.payloadType && payload && Object.getPrototypeOf(payload) === Object.prototype && !(payload instanceof FormData))
+      const proto = Object.getPrototypeOf(payload);
+      if (!config.payloadType && payload && (proto === Object.prototype || Array.isArray(proto)) && !(payload instanceof FormData))
         config.payloadType = "json";
       if (config.payloadType)
         headers["Content-Type"] = (_a2 = payloadMapping[config.payloadType]) != null ? _a2 : config.payloadType;
@@ -4887,7 +4917,7 @@ function useFetch(url, ...args) {
   }
   function waitUntilFinished() {
     return new Promise((resolve, reject) => {
-      until(isFinished).toBe(true).then(() => resolve(shell)).catch((error2) => reject(error2));
+      until(isFinished).toBe(true).then(() => resolve(shell)).catch(reject);
     });
   }
   function setType(type) {
@@ -4914,8 +4944,12 @@ function useFetch(url, ...args) {
   };
 }
 function joinPaths(start, end) {
-  if (!start.endsWith("/") && !end.startsWith("/"))
+  if (!start.endsWith("/") && !end.startsWith("/")) {
     return `${start}/${end}`;
+  }
+  if (start.endsWith("/") && end.startsWith("/")) {
+    return `${start.slice(0, -1)}${end}`;
+  }
   return `${start}${end}`;
 }
 var DEFAULT_OPTIONS = {
@@ -5885,6 +5919,7 @@ function useMediaControls(target, options = {}) {
   const muted = ref(false);
   const supportsPictureInPicture = document2 && "pictureInPictureEnabled" in document2;
   const sourceErrorEvent = createEventHook();
+  const playbackErrorEvent = createEventHook();
   const disableTrack = (track) => {
     usingElRef(target, (el) => {
       if (track) {
@@ -6002,10 +6037,14 @@ function useMediaControls(target, options = {}) {
     const el = toValue(target);
     if (!el)
       return;
-    if (isPlaying)
-      el.play();
-    else
+    if (isPlaying) {
+      el.play().catch((e) => {
+        playbackErrorEvent.trigger(e);
+        throw e;
+      });
+    } else {
       el.pause();
+    }
   });
   useEventListener(target, "timeupdate", () => ignoreCurrentTimeUpdates(() => currentTime.value = toValue(target).currentTime));
   useEventListener(target, "durationchange", () => duration.value = toValue(target).duration);
@@ -6070,7 +6109,8 @@ function useMediaControls(target, options = {}) {
     togglePictureInPicture,
     isPictureInPicture,
     // Events
-    onSourceError: sourceErrorEvent.on
+    onSourceError: sourceErrorEvent.on,
+    onPlaybackError: playbackErrorEvent.on
   };
 }
 function getMapVue2Compat() {
@@ -6150,6 +6190,8 @@ function useMouse(options = {}) {
     eventFilter
   } = options;
   let _prevMouseEvent = null;
+  let _prevScrollX = 0;
+  let _prevScrollY = 0;
   const x = ref(initialValue.x);
   const y = ref(initialValue.y);
   const sourceType = ref(null);
@@ -6160,6 +6202,10 @@ function useMouse(options = {}) {
     if (result) {
       [x.value, y.value] = result;
       sourceType.value = "mouse";
+    }
+    if (window2) {
+      _prevScrollX = window2.scrollX;
+      _prevScrollY = window2.scrollY;
     }
   };
   const touchHandler = (event) => {
@@ -6176,8 +6222,8 @@ function useMouse(options = {}) {
       return;
     const pos = extractor(_prevMouseEvent);
     if (_prevMouseEvent instanceof MouseEvent && pos) {
-      x.value = pos[0] + window2.scrollX;
-      y.value = pos[1] + window2.scrollY;
+      x.value = pos[0] + window2.scrollX - _prevScrollX;
+      y.value = pos[1] + window2.scrollY - _prevScrollY;
     }
   };
   const reset = () => {
@@ -7552,8 +7598,6 @@ function useSwipe(target, options = {}) {
     useEventListener(target, "touchstart", (e) => {
       if (e.touches.length !== 1)
         return;
-      if (listenerOptions.capture && !listenerOptions.passive)
-        e.preventDefault();
       const [x, y] = getTouchEventCoords(e);
       updateCoordsStart(x, y);
       updateCoordsEnd(x, y);
@@ -7564,6 +7608,8 @@ function useSwipe(target, options = {}) {
         return;
       const [x, y] = getTouchEventCoords(e);
       updateCoordsEnd(x, y);
+      if (listenerOptions.capture && !listenerOptions.passive && Math.abs(diffX.value) > Math.abs(diffY.value))
+        e.preventDefault();
       if (!isSwiping.value && isThresholdExceeded.value)
         isSwiping.value = true;
       if (isSwiping.value)
@@ -8062,8 +8108,8 @@ function useUrlSearchParams(mode = "history", options = {}) {
     const hash = window2.location.hash || "#";
     const index = hash.indexOf("?");
     if (index > 0)
-      return `${hash.slice(0, index)}${stringified ? `?${stringified}` : ""}`;
-    return `${hash}${stringified ? `?${stringified}` : ""}`;
+      return `${window2.location.search || ""}${hash.slice(0, index)}${stringified ? `?${stringified}` : ""}`;
+    return `${window2.location.search || ""}${hash}${stringified ? `?${stringified}` : ""}`;
   }
   function read() {
     return new URLSearchParams(getRawParams());
@@ -8689,7 +8735,7 @@ function useWebSocket(url, options = {}) {
     ws.onclose = (ev) => {
       status.value = "CLOSED";
       onDisconnected == null ? void 0 : onDisconnected(ws, ev);
-      if (!explicitlyClosed && options.autoReconnect && ws === wsRef.value) {
+      if (!explicitlyClosed && options.autoReconnect && (wsRef.value == null || ws === wsRef.value)) {
         const {
           retries = -1,
           delay = 1e3,
@@ -9018,6 +9064,7 @@ export {
   refAutoReset as autoResetRef,
   breakpointsAntDesign,
   breakpointsBootstrapV5,
+  breakpointsElement,
   breakpointsMasterCss,
   breakpointsPrimeFlex,
   breakpointsQuasar,

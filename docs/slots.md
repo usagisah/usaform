@@ -24,7 +24,7 @@ const PrependComp = () => [h("div", "prepend")]
   <ElCard style="min-width: 600px">
     <Form>
       <!-- 外部插槽需要显示指定，内部插槽会自动传递 -->
-      <PlainField name="input" element="ElInput" :props="{ style: 'width:100%' }" :layoutProps="{ label: '传递插槽' }" :slots="{ suffix: 'InputSuffix', prepend: PrependComp, append: Append }">
+      <PlainField key="input" element="ElInput" :props="{ style: 'width:100%' }" :layoutProps="{ label: '传递插槽' }" :slots="{ suffix: 'InputSuffix', prepend: PrependComp, append: Append }">
         <template #prefix>prefix-slot</template>
       </PlainField>
       <template #InputSuffix>
