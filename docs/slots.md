@@ -9,7 +9,7 @@
 ```vue
 <script lang="ts" setup>
 import { h } from "vue"
-import { createForm, FormItem, PlainField, exportFormStructJson } from "@usaform/element-plus"
+import { createForm, FormItem, PlainField, exportFormStructJson } from "@shoroi/form"
 import { ElButton, ElCard, ElOption, ElSelect, ElSpace } from "element-plus"
 import Append from "./Append.vue"
 

@@ -19,17 +19,17 @@ const submit = () => console.log(form.value?.getFormData())
     </el-steps>
 
     <Form>
-      <PlainField name="step 1" v-show="active === 1">
+      <PlainField key="step 1" v-show="active === 1">
         <template #default="{ bind }">
           <ElInput v-bind="bind"></ElInput>
         </template>
       </PlainField>
-      <PlainField name="step 2" v-show="active === 2">
+      <PlainField key="step 2" v-show="active === 2">
         <template #default="{ bind }">
           <ElInput v-bind="bind"></ElInput>
         </template>
       </PlainField>
-      <PlainField name="step 3" v-show="active === 3">
+      <PlainField key="step 3" v-show="active === 3">
         <template #default="{ bind }">
           <ElInput v-bind="bind"></ElInput>
         </template>

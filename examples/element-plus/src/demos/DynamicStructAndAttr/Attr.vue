@@ -11,19 +11,19 @@ const toJson = () => console.log(exportFormStructJson(form.value!.field))
 <template>
   <ElCard style="margin: 0 auto; width: 45%">
     <Form>
-      <PlainField name="a" :layoutProps="{ label: '跟随全局禁用', disabled }">
+      <PlainField key="a" :layoutProps="{ label: '跟随全局禁用', disabled }">
         <template #default="{ bind, ...p }">
           <ElInput v-bind="bind" />
         </template>
       </PlainField>
 
-      <PlainField name="b" :layout-props="{ label: '跟随全局禁用', disabled }">
+      <PlainField key="b" :layout-props="{ label: '跟随全局禁用', disabled }">
         <template #default="{ bind }">
           <ElInput v-bind="bind" />
         </template>
       </PlainField>
 
-      <PlainField name="c" :layout-props="{ label: '跟随全局禁用', disabled }">
+      <PlainField key="c" :layout-props="{ label: '跟随全局禁用', disabled }">
         <template #default="{ bind }">
           <ElInput v-bind="bind" />
         </template>

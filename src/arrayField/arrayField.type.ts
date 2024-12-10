@@ -49,8 +49,6 @@ export type ArrayItemConfig = {
 }
 
 export interface CArrayFieldProps extends HTMLAttributes, Obj {
-  name: string | number
-
   initValue?: any[]
 
   layout?: string | Component

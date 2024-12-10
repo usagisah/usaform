@@ -1,6 +1,7 @@
-import { SlotsType, computed, defineComponent, h, reactive, shallowReactive, shallowRef, unref } from "vue"
+import { SlotsType, computed, defineComponent, getCurrentInstance, h, reactive, shallowReactive, shallowRef, unref } from "vue"
 import { FormActionCallInfo } from "../actions/hooks"
 import { CFormItemExpose } from "../controller/FormItem.type"
+import { FieldName } from "../form/field.type"
 import { isPlainObject } from "../shared/check"
 import { FieldComponentConfig, resolveFieldComponentConfig } from "../shared/field"
 import { callFuncWithError, createFormCFieldToJson } from "../shared/helper"
@@ -8,15 +9,16 @@ import { Obj } from "../shared/type"
 import { useFormPlainField } from "./plainField"
 import { CPlainFieldLayoutInfo, CPlainFieldProps } from "./plainField.type"
 
-export const PlainField = defineComponent<CPlainFieldProps>({
+export const PlainField = defineComponent({
   name: "PlainField",
   props: ["name", "initValue", "layout", "layoutProps", "element", "props", "modelValue", "slots"] as any as undefined,
   slots: Object as SlotsType<{
     default: (props: { bind?: Record<any, any> } & Record<any, any>) => any
   }>,
-  setup(props, { slots, attrs }) {
-    const { name, layout, element } = props
-    if (name !== 0 && !name) {
+  setup(props: CPlainFieldProps, { slots, attrs }) {
+    const { layout, element } = props
+    const { key } = getCurrentInstance()!.vnode
+    if (!key && key !== 0) {
       throw "非法的使用方式，请正确使用 PlainField 组件"
     }
 
@@ -24,7 +26,7 @@ export const PlainField = defineComponent<CPlainFieldProps>({
     const fieldLayoutRef = shallowRef<(CFormItemExpose & Obj) | null>(null)
     const fieldElementRef = shallowRef<Obj | null>(null)
     const extraProps = shallowReactive({ props: {} as Obj, layoutProps: {} as Obj })
-    const { fieldValue, actions } = useFormPlainField(name, ({ initValue, formConfig }) => {
+    const { fieldValue, actions } = useFormPlainField(key as FieldName, ({ initValue, formConfig }) => {
       fieldComponentConfig = resolveFieldComponentConfig("plain", formConfig, props, slots)
       return {
         initValue: initValue === undefined ? props.initValue : initValue,

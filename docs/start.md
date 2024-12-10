@@ -21,7 +21,7 @@
 下载相关依赖，UI 库可以选择 `ant-design-vue` 或 `element-plus` 任意一个
 
 ```shell
-pnpm add @usaform/element-plus element-plus @vitejs/plugin-vue-jsx sass
+pnpm add @shoroi/form element-plus @vitejs/plugin-vue-jsx sass
 ```
 
 配置 `vite`
@@ -37,8 +37,8 @@ export default defineConfig({
 选择使用的 `ui` 库引入相关的样式文件
 
 ```js
-import "@usaform/element-plus/style/ant-design"
-import "@usaform/element-plus/style/element-plus"
+import "@shoroi/form/style/ant-design"
+import "@shoroi/form/style/element-plus"
 ```
 
 

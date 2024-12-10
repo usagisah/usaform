@@ -24,8 +24,6 @@ export type ObjectFieldConfig<T = unknown> = { initValue?: T; toJson?: FieldToJs
 export type ObjectFieldInit<T> = (info: ObjectFieldInitInfo) => ObjectFieldConfig<T>
 
 export interface CObjectFieldProps extends HTMLAttributes, Obj {
-  name: string | number
-
   initValue?: any
 
   layout?: string | Component

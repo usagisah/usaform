@@ -12,7 +12,7 @@ const PrependComp = () => [h("div", "prepend")]
   <ElCard style="margin: 0 auto; width: 45%">
     <Form>
       <PlainField
-        name="input"
+        key="input"
         element="ElInput"
         :props="{ style: 'width:100%' }"
         :layoutProps="{ label: '组件插槽' }"

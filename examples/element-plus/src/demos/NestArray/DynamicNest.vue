@@ -88,7 +88,7 @@ onUnmounted(() => {
   <ElCard style="margin: auto; width: 1000px">
     <template #header>封装一个，复杂的，动态的，多层嵌套的表单</template>
     <Form>
-      <ArrayField name="dynamic" element="DynamicGroup" />
+      <ArrayField key="dynamic" element="DynamicGroup" />
       <ElDivider content-position="center">提交</ElDivider>
       <FormItem>
         <ElButton @click="submit">submit</ElButton>

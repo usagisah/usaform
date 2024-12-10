@@ -21,7 +21,7 @@ export function resolveFields({ path, field, rootField, first = false }: Resolve
   const matchedFields: MatchedFields[] = []
   const startField = startRoot ? rootField : field
   resolve({ matches, path: [], name: startField.name.toString(), field: startField, first, matchedFields })
-  
+
   return matchedFields
 }
 

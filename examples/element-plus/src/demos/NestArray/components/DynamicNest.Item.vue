@@ -21,10 +21,10 @@ const remove = (i: number) => {
 </script>
 
 <template>
-  <ObjectField v-for="(item, index) in props.value" :key="item.itemId" :name="index" layout="FormItem">
-    <PlainField layout="FormItem" :layout-props="{ label: '运算类型' }" name="type" element="DynamicType" />
-    <PlainField layout="FormItem" :layout-props="{ label: '运算方式' }" name="operate" element="DynamicOperate" />
-    <PlainField layout="FormItem" :layout-props="{ label: '运算备注' }" name="value" element="DynamicValue" />
+  <ObjectField v-for="(item, index) in props.value" :key="item.itemId" :key="index" layout="FormItem">
+    <PlainField layout="FormItem" :layout-props="{ label: '运算类型' }" key="type" element="DynamicType" />
+    <PlainField layout="FormItem" :layout-props="{ label: '运算方式' }" key="operate" element="DynamicOperate" />
+    <PlainField layout="FormItem" :layout-props="{ label: '运算备注' }" key="value" element="DynamicValue" />
     <ElButton v-if="props.value.length !== 1" type="danger" @click="remove(index)">移除条目</ElButton>
   </ObjectField>
   <ElSpace>

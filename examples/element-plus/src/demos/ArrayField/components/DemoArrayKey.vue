@@ -7,7 +7,7 @@ const props = defineProps<{ value: any[]; actions: CArrayFieldActions }>()
 
 <template>
   <div v-for="(item, i) in props.value" :key="item.id">
-    <PlainField :name="i" element="ElInput" :props="{ placeholder: '请输入名称' }" layout="FormItem" :layout-props="{ label: '名称' }"> </PlainField>
+    <PlainField :key="i" element="ElInput" :props="{ placeholder: '请输入名称' }" layout="FormItem" :layout-props="{ label: '名称' }"> </PlainField>
   </div>
 
   <ElSpace>

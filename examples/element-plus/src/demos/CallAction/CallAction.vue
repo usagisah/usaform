@@ -42,12 +42,12 @@ const setProps = () => {
       <template #header>调用到内部方法</template>
       <Form>
         <PlainField
-          name="input"
+          key="input"
           element="ElInput"
           :layoutProps="{ label: '标题', rules: [{ required: true, trigger: 'blur', message: '该字段是必填的', type: 'string', min: 1 }] }"
         />
         <PlainField
-          name="input1"
+          key="input1"
           element="ElInput"
           :layoutProps="{ label: '标题', rules: [{ required: true, trigger: 'blur', message: '该字段是必填的', type: 'string', min: 1 }] }"
         />

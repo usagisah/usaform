@@ -16,19 +16,19 @@ const toJson = () => console.log(exportFormStructJson(form.value!.field))
 <template>
   <ElCard style="margin: 0 auto; width: 45%">
     <Form>
-      <PlainField v-if="count % 2 == 0" name="a" :layoutProps="{ label: '单数' }">
+      <PlainField v-if="count % 2 == 0" key="a" :layoutProps="{ label: '单数' }">
         <template #default="{ bind, ...p }">
           <ElInput v-bind="bind" />
         </template>
       </PlainField>
 
-      <PlainField v-if="count % 2 !== 0" name="b" :layout-props="{ label: '双数' }">
+      <PlainField v-if="count % 2 !== 0" key="b" :layout-props="{ label: '双数' }">
         <template #default="{ bind }">
           <ElInput v-bind="bind" />
         </template>
       </PlainField>
 
-      <PlainField v-if="count % 2 == 0" name="c" :layout-props="{ label: '单数' }">
+      <PlainField v-if="count % 2 == 0" key="c" :layout-props="{ label: '单数' }">
         <template #default="{ bind }">
           <ElInput v-bind="bind" />
         </template>

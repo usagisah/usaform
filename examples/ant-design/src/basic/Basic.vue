@@ -1,5 +1,5 @@
 <script lang="tsx" setup>
-import { CFormExpose, Form, FormItem, PlainField } from "@usaform/element-plus"
+import { CFormExpose, Form, FormItem, PlainField } from "@shoroi/form"
 import { Button, Card, Checkbox, CheckboxGroup, DatePicker, Divider, Input, InputNumber, RadioGroup, Select, Space } from "ant-design-vue"
 import { ref } from "vue"
 

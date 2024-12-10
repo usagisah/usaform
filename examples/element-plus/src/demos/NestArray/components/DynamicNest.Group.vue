@@ -7,6 +7,6 @@ const props = defineProps<{ value: any[]; actions: CArrayFieldActions }>()
 <template>
   <ElDivider content-position="center">分组配置</ElDivider>
   <div v-for="(item, index) in props.value" :key="item.groupId">
-    <ArrayField :name="index" element="DynamicItem" />
+    <ArrayField :key="index" element="DynamicItem" />
   </div>
 </template>

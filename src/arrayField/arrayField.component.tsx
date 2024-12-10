@@ -1,5 +1,6 @@
-import { Fragment, SlotsType, computed, defineComponent, h, reactive, shallowRef, unref } from "vue"
+import { Fragment, SlotsType, computed, defineComponent, getCurrentInstance, h, reactive, shallowRef, unref } from "vue"
 import { FormActionCallInfo } from "../actions/hooks"
+import { FieldName } from "../form/field.type"
 import { FieldComponentConfig, resolveFieldComponentConfig } from "../shared/field"
 import { callFuncWithError, createFormCFieldToJson } from "../shared/helper"
 import { Obj } from "../shared/type"
@@ -13,15 +14,16 @@ export const ArrayField = defineComponent({
     default: { value: any[]; actions: CArrayFieldActions } & Obj
   }>,
   setup(props: CArrayFieldProps, { slots, attrs }) {
-    const { name, layout, element } = props
-    if (name !== 0 && !name) {
+    const { layout, element } = props
+    const { key } = getCurrentInstance()!.vnode
+    if (!key && key !== 0) {
       throw "非法的使用方式，请正确使用 ArrayField 组件"
     }
 
     let fieldComponentConfig: FieldComponentConfig
     const fieldLayoutRef = shallowRef<Obj | null>(null)
     const fieldElementRef = shallowRef<Obj | null>(null)
-    const { fieldValue, actions } = useFormArrayField(name, ({ initValue, formConfig }) => {
+    const { fieldValue, actions } = useFormArrayField(key as FieldName, ({ initValue, formConfig }) => {
       fieldComponentConfig = resolveFieldComponentConfig("array", formConfig, props, slots)
       return {
         initValue: initValue === undefined ? props.initValue : initValue,
@@ -69,9 +71,7 @@ export const ArrayField = defineComponent({
 
     let _iota = 0
     return () => {
-      return (
-        <Fragment key={_iota++}>{fieldLayout ? h(fieldLayout, { FormControllerProps: controllerProps.value, ref: fieldLayoutRef }) : resolveRenderElement()}</Fragment>
-      )
+      return <Fragment key={_iota++}>{fieldLayout ? h(fieldLayout, { FormControllerProps: controllerProps.value, ref: fieldLayoutRef }) : resolveRenderElement()}</Fragment>
     }
   }
 })

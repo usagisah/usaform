@@ -25,7 +25,7 @@ const printJson = () => {
     <ElCard style="width: 45%">
       <template #header>指定key</template>
       <DemoKeyForm>
-        <ArrayField name="array" element="DemoArrayKey" />
+        <ArrayField key="array" element="DemoArrayKey" />
       </DemoKeyForm>
 
       <ElDivider>提交操作</ElDivider>
@@ -38,10 +38,10 @@ const printJson = () => {
     <ElCard style="width: 45%">
       <template #header>内联插槽</template>
       <DemoSlotForm>
-        <ArrayField name="array">
+        <ArrayField key="array">
           <template #default="{ value, actions }">
             <div v-for="(item, i) in value" :key="item.id">
-              <PlainField :name="i" layout="FormItem" :layout-props="{ label: '名称' }">
+              <PlainField :key="i" layout="FormItem" :layout-props="{ label: '名称' }">
                 <template #default="{ bind }">
                   <ElInput v-bind="bind" placeholder="请输入名称" />
                 </template>

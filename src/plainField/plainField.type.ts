@@ -27,8 +27,6 @@ export type PlainFieldConfig<T = unknown> = {
 export type PlainFieldInit<T> = (info: PlainFieldInitInfo) => PlainFieldConfig<T>
 
 export interface CPlainFieldProps extends HTMLAttributes {
-  name: string | number
-
   // 初始值
   initValue?: any
 

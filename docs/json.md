@@ -5,7 +5,7 @@
 ## 导出 `json`
 
 ```ts
-import { createForm, FormItem, PlainField, exportFormStructJson } from "@usaform/element-plus"
+import { createForm, FormItem, PlainField, exportFormStructJson } from "@shoroi/form"
 const [Form, form] = createForm()
 const printJson = () => console.log(exportFormStructJson(form.value.field))
 ```

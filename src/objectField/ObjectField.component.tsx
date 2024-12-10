@@ -1,27 +1,29 @@
-import { Fragment, SlotsType, computed, defineComponent, h, reactive, shallowRef, unref } from "vue"
+import { Fragment, SlotsType, computed, defineComponent, getCurrentInstance, h, reactive, shallowRef, unref } from "vue"
 import { FormActionCallInfo } from "../actions/hooks"
+import { FieldName } from "../form/field.type"
 import { FieldComponentConfig, resolveFieldComponentConfig } from "../shared/field"
 import { callFuncWithError, createFormCFieldToJson } from "../shared/helper"
 import { Obj } from "../shared/type"
 import { useFormObjectField } from "./objectField"
 import { CObjectFieldLayoutInfo, CObjectFieldProps, ObjectFieldActions } from "./objectField.type"
 
-export const ObjectField = defineComponent<CObjectFieldProps>({
+export const ObjectField = defineComponent({
   name: "ObjectField",
   props: ["name", "initValue", "layout", "layoutProps", "element", "props"] as any as undefined,
   slots: Object as SlotsType<{
     default: (props: { actions: ObjectFieldActions; fieldValue: any; [x: string]: any }) => any
   }>,
-  setup(props, { slots, attrs }) {
-    const { name, layout, element } = props
-    if (name !== 0 && !name) {
+  setup(props: CObjectFieldProps, { slots, attrs }) {
+    const { layout, element } = props
+    const { key } = getCurrentInstance()!.vnode
+    if (!key && key !== 0) {
       throw "非法的使用方式，请正确使用 ObjectField 组件"
     }
 
     let fieldComponentConfig: FieldComponentConfig
     const fieldLayoutRef = shallowRef<Obj | null>(null)
     const fieldElementRef = shallowRef<Obj | null>(null)
-    const { fieldValue, actions } = useFormObjectField(name, ({ initValue, formConfig }) => {
+    const { fieldValue, actions } = useFormObjectField(key as FieldName, ({ initValue, formConfig }) => {
       fieldComponentConfig = resolveFieldComponentConfig("object", formConfig, props, slots)
       return {
         initValue: initValue === undefined ? props.initValue : initValue,

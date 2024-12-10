@@ -74,7 +74,7 @@
 
 ```ts
 import {createApp} from "vue"
-import {CFormPlugin} from "@usaform/element-plus"
+import {CFormPlugin} from "@shoroi/form"
 createApp().use(CFormPlugin, {
   Rules: {
     phone: (value) => {

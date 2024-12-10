@@ -1,21 +1,23 @@
-import { SlotsType, defineComponent, h, unref } from "vue"
+import { SlotsType, defineComponent, getCurrentInstance, h, unref } from "vue"
+import { FieldName } from "../form/field.type"
 import { createFormCFieldToJson, resolveScopeElement } from "../shared/helper"
 import { useFormVoidField } from "./voidField"
 import { CVoidFieldProps } from "./voidField.type"
 
-export const VoidField = defineComponent<CVoidFieldProps>({
+export const VoidField = defineComponent({
   name: "VoidField",
   props: ["name", "element"] as any as undefined,
   slots: Object as SlotsType<{
     default: () => any
   }>,
-  setup(props, { slots, attrs }) {
-    let { name, element } = props
-    if (name !== 0 && !name) {
+  setup(props: CVoidFieldProps, { slots, attrs }) {
+    let { element } = props
+    const { key } = getCurrentInstance()!.vnode
+    if (!key && key !== 0) {
       throw "非法的使用方式，请正确使用 VoidField 组件"
     }
 
-    useFormVoidField(name, ({ formConfig }) => {
+    useFormVoidField(key as FieldName, ({ formConfig }) => {
       if (typeof element === "string") {
         element = resolveScopeElement(element, unref(formConfig.Elements!))
       }

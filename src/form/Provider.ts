@@ -7,7 +7,6 @@ export function normalizeFormConfig(currentConfig: FormConfig): FormConfig {
   const parentConfig = (hasInjectionContext() ? inject(FormContextConfigKey) : {}) as FormConfig
   const config = { plainFieldController: "FormItem", ...parentConfig, ...c }
 
-
   config.Elements = customRef((track, trigger) => {
     let value: any
     return {
@@ -20,7 +19,7 @@ export function normalizeFormConfig(currentConfig: FormConfig): FormConfig {
       },
       set(_value) {
         value = _value
-      },
+      }
     }
   })
   config.Rules = computed(() => ({ ...unref(parentConfig.Rules), ...unref(Rules) }))
