@@ -12,9 +12,11 @@ import { CPlainFieldLayoutInfo, CPlainFieldProps } from "./plainField.type"
 export const PlainField = defineComponent({
   name: "PlainField",
   props: ["name", "initValue", "layout", "layoutProps", "element", "props", "modelValue", "slots"] as any as undefined,
-  slots: Object as SlotsType<{
-    default: (props: { bind?: Record<any, any> } & Record<any, any>) => any
-  }>,
+  slots: Object as SlotsType<
+    {
+      default: (props: { bind?: Record<any, any> } & Record<any, any>) => any
+    } & Record<any, (...args: any[]) => any>
+  >,
   setup(props: CPlainFieldProps, { slots, attrs }) {
     const { layout, element } = props
     const { key } = getCurrentInstance()!.vnode
