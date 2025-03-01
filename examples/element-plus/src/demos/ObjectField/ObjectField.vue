@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { createForm, exportFormStructJson, ObjectField, PlainField } from "@shoroi/form"
 import { ElButton, ElCard, ElCheckbox, ElDatePicker, ElInput, ElInputNumber, ElOption, ElRadio, ElRadioGroup, ElSelect } from "element-plus"
-import {} from "vue"
+import O1 from "./components/O1.vue"
 
-const [DemoKeyForm, keyFormAction] = createForm()
+const [DemoKeyForm, keyFormAction] = createForm({ config: { Elements: { O1 } } })
 const [DemoSlotForm, slotFormAction] = createForm()
 
 const submit = (isKey = true) => {
@@ -25,7 +25,7 @@ const printJson = () => {
     <ElCard style="width: 45%">
       <template #header>指定key</template>
       <DemoKeyForm>
-        <ObjectField key="o1">
+        <ObjectField key="o1" element="O1">
           <PlainField
             key="input"
             element="ElInput"

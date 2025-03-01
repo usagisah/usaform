@@ -16,9 +16,6 @@ describe("slot render", () => {
     const renderValue = (wrapper.get(".input input").element as HTMLInputElement).value
     expect(renderValue).toBe(initValue)
   })
-
-  // it("custom component initValue", () => {
-  // })
 })
 
 describe("slot actions", () => {

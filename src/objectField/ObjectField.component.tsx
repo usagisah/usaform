@@ -59,7 +59,7 @@ export const ObjectField = defineComponent({
     })
     const resolveRenderElement = ({ props, bind }: Obj = {}) => {
       if (fieldElement) {
-        return h(fieldElement, { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef })
+        return h(fieldElement, { ...props, fieldValue: fieldValue.value, actions, ref: fieldElementRef }, slots)
       } else {
         return fieldSlots.default?.({ bind: { ...bind, ref: fieldElementRef }, value: fieldValue.value, actions })
       }
